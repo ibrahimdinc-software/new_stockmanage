@@ -29,6 +29,7 @@ class ProductModelAdmin(admin.ModelAdmin):
     ]
 
     list_display=["name", "sku", "piece"]
+    #search_fields = ["hepsimedproductmodel.__str__","trendmedproductmodel.__str__"]
 
     class Meta:
         model = ProductModel

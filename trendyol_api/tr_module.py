@@ -57,7 +57,7 @@ class ProductModule(Product):
         for tmpm in tmpms:
             mpms = tmpm.product.medproductmodel_set.all()
             for mpm in mpms:
-                mpm.base_product.dropStock(quantity)
+                mpm.base_product.dropStock(quantity*mpm.piece)
 
 class OrderModule(Order):
     def getOrders(self):
