@@ -27,6 +27,9 @@ class ProductModelAdmin(admin.ModelAdmin):
         HepsiMedProductModelTabularInline,
         TrendMedProductModelTabularInline
     ]
+
+    list_display=["name", "sku", "piece"]
+
     class Meta:
         model = ProductModel
     
