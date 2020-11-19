@@ -51,7 +51,7 @@ class ListingModule:
         for hmpm in hmpms:
             mpms = hmpm.product.medproductmodel_set.all()
             for mpm in mpms:
-                mpm.base_product.dropStock(quantity)
+                mpm.base_product.dropStock(quantity*mpm.piece)
 
     def sendProducts(self, qs):
         d=[]
