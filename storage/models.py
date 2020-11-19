@@ -15,7 +15,7 @@ class ProductModel(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.piece = self.setStock()
+        self.piece = self.stockMethod()
         super(ProductModel, self).save(*args, **kwargs) # Call the real save() method
         self.setMedProductStocks()
 
@@ -32,7 +32,7 @@ class ProductModel(models.Model):
             m.tpm.save()
         del tmpm
 
-    def setStock(self):
+    def stockMethod(self):
         meds = self.medproductmodel_set.all()
         print(meds)
         if meds:
@@ -43,6 +43,10 @@ class ProductModel(models.Model):
                     print(piece)                
                     piece = m.base_product.piece / m.piece
             return piece
+
+    def setStock(self):        
+            self.piece = self.stockMethod()
+            self.save()
 
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
@@ -57,7 +61,7 @@ class BaseProductModel(models.Model):
         meds = self.medproductmodel_set.all()
         
         for m in meds:
-            m.save()
+            m.product.setStock()
 
     def dropStock(self, quantity):
         self.piece -= quantity
