@@ -60,3 +60,5 @@ storage/__pycache__/admin.cpython-38.pyc
 storage/__pycache__/models.cpython-38.pyc
 storage/__pycache__/admin.cpython-38.pyc
 storage/__pycache__/models.cpython-38.pyc
+storage/migrations/0008_auto_20201120_0108.py
+storage/migrations/__pycache__/0008_auto_20201120_0108.cpython-38.pyc

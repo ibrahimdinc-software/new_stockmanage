@@ -50,7 +50,7 @@ class ProductModel(models.Model):
 
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
-    barcode = models.IntegerField(verbose_name="Barkod", blank=True, null=True)
+    barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
     piece = models.IntegerField(verbose_name="Adet")
 
     def __str__(self):
