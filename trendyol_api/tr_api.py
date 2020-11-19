@@ -25,15 +25,26 @@ class Product:
         print(result)
         return json.loads(result)
 
-    def get(self):
-        
-        response = requests.get(self.url+"?size=500", headers=self.headers)
-
-        if not response.status_code == 200:
-            return
-        result = json.loads(response.content.decode("utf-8"))["content"]
-
+    def getWPage(self, page):
+        response = requests.get(self.url+"?page="+page, headers=self.headers)
+        result = json.loads(response.content.decode("utf-8"))
         return result
+
+
+    def get(self):
+        n_res = []
+
+        page = 0
+        totalPages = 2
+
+        while totalPages != page :
+            result = self.getWPage(page)
+            n_res += result.get("content")
+
+            page += 1
+            totalPages = result.get("totalPages")
+
+        return n_res
 
     def update(self,p_list):
         data = {
@@ -60,9 +71,7 @@ class Order:
         return json.loads(response.content)
 
 
-    def get(self):
-        result = self.getWPage(0)
-        
+    def get(self):        
         n_res = []
 
         page = 0
