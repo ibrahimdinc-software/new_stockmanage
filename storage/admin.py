@@ -17,6 +17,8 @@ from trendyol_api.admin import TrendMedProductModelTabularInline
 class MedProductModelTabularInline(admin.TabularInline):
     model = MedProductModel
     extra = 0
+    autocomplete_fields = ["base_product"]
+
 
 @admin.register(ProductModel)
 class ProductModelAdmin(admin.ModelAdmin):
@@ -40,6 +42,10 @@ class BaseProductModelAdmin(admin.ModelAdmin):
     change_list_template = "storage/admin/get_products.html"
     list_display=["name","barcode","piece"]
     ordering = ["name"]
+
+    search_fields = ["name","barcode",]
+
+
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
