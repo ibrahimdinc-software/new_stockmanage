@@ -1,4 +1,10 @@
+import pandas as pd
+import math
+
 from django.contrib import admin
+
+from django.http import HttpResponseRedirect
+from django.urls import path
 
 from .models import ProductModel, BaseProductModel, MedProductModel
 
@@ -12,6 +18,7 @@ class MedProductModelTabularInline(admin.TabularInline):
     model = MedProductModel
     extra = 0
 
+@admin.register(ProductModel)
 class ProductModelAdmin(admin.ModelAdmin):
     inlines = [
         MedProductModelTabularInline, 
@@ -20,23 +27,41 @@ class ProductModelAdmin(admin.ModelAdmin):
     ]
     class Meta:
         model = ProductModel
-    """#!
-    def save_formset(self, request, form, formset, change):
-        print(dir(formset.data))
-        print(formset.form)
-        piece = formset.forms[0].instance.base_product.piece / formset.forms[0].instance.piece
-        for i in formset.forms:
-            if piece > i.instance.base_product.piece / i.instance.piece:
-                piece = i.instance.base_product.piece / i.instance.piece
-        form.instance.piece = piece
-        form.instance.save()
-        super(ProductModelAdmin, self).save_formset(request, form, formset, change)
-    """
+    
+
     def save_model(self, request, obj, form, change):
         print(form)
         super().save_model(request, obj, form, change)
 
-admin.site.register(ProductModel, ProductModelAdmin)
-admin.site.register(BaseProductModel)
+
+@admin.register(BaseProductModel)
+class BaseProductModelAdmin(admin.ModelAdmin):
+    
+    change_list_template = "storage/admin/get_products.html"
+    list_display=["name","barcode","piece"]
+    ordering = ["name"]
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('getProducts/', self.getProductsFromExcel),
+        ]
+        return my_urls + urls
+
+    def getProductsFromExcel(self, request):
+        excel = pd.read_excel(request.FILES.get("excel"))
+        products = BaseProductModel.objects.all()
+        for product in excel.iloc:
+            barcode = 0 if math.isnan(product.get("Barcode")) else product.get("Barcode")
+            p = products.filter(name=product.get("Item"),barcode=barcode)
+            print(p)
+            if not p:
+                p = BaseProductModel(
+                    name=product.get("Item"),
+                    barcode=barcode,
+                    piece=product.get("Quantity")
+                )
+                p.save()
+        return HttpResponseRedirect("../")
+
 #!admin.site.register(MedProductModel)
 

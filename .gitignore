@@ -54,3 +54,9 @@ storage/migrations/__pycache__/0002_auto_20201112_1812.cpython-38.pyc
 storage/migrations/__pycache__/0003_medproductmodel.cpython-38.pyc
 storage/migrations/__pycache__/0004_remove_baseproductmodel_product.cpython-38.pyc
 storage/migrations/__pycache__/0005_productmodel_piece.cpython-38.pyc
+storage/migrations/__pycache__/0006_auto_20201120_0025.cpython-38.pyc
+storage/migrations/__pycache__/0007_auto_20201120_0054.cpython-38.pyc
+storage/__pycache__/admin.cpython-38.pyc
+storage/__pycache__/models.cpython-38.pyc
+storage/__pycache__/admin.cpython-38.pyc
+storage/__pycache__/models.cpython-38.pyc
