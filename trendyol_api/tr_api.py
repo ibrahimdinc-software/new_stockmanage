@@ -26,7 +26,7 @@ class Product:
         return json.loads(result)
 
     def getWPage(self, page):
-        response = requests.get(self.url+"?page="+page, headers=self.headers)
+        response = requests.get(self.url+"?page="+str(page), headers=self.headers)
         result = json.loads(response.content.decode("utf-8"))
         return result
 
