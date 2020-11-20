@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from .tr_api import Product, Order
 
-from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel
+from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel
 
  
 class ProductModule(Product):
@@ -37,20 +37,35 @@ class ProductModule(Product):
         else:
             return "Hata var lo!"
 
-    def updateProducts(self, products):
+    def updateQueue(self, qs):
+        if not 'count' in dir(qs):
+            tuq = TrendUpdateQueueModel(tpm=qs)
+            tuq.save()
+        elif qs.count() > 1:
+            for p in qs:
+                tuq = TrendUpdateQueueModel(tpm=p)
+                tuq.save()
+        else:
+            tuq = TrendUpdateQueueModel(tpm=qs[0])
+            tuq.save()
+
+    def updateProducts(self):
         p_list = []
-        for p in products:
-            item={
-                "barcode": p.barcode,
-                "quantity": p.piece,
-                "salePrice": p.salePrice,
-                "listPrice": p.listPrice
-            }
-            print(item)
-            p_list.append(item)
-        result = self.update(p_list)
-        print(result, "\n TR_MODULE.PY \n LINE:45")
-        return self.batchControl(result)
+        tuqs = TrendUpdateQueueModel.objects.all()
+        if tuqs:
+            for tuq in tuqs:
+                p = tuq.tpm
+                item={
+                    "barcode": p.barcode,
+                    "quantity": p.piece,
+                    "salePrice": p.salePrice,
+                    "listPrice": p.listPrice
+                }
+                p_list.append(item)
+                tuq.delete()
+            result = self.update(p_list)
+            print(result, "\n TR_MODULE.PY \n LINE:45")
+            return self.batchControl(result)
 
     def dropStock(self, product, quantity):
         tmpms = product.trendmedproductmodel_set.all()

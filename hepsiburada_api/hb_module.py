@@ -1,6 +1,6 @@
 import datetime
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiUpdateQueueModel
 
 from .hb_api import Listing, Order
 
@@ -60,22 +60,25 @@ class ListingModule:
             for mpm in mpms:
                 mpm.base_product.increaseStock(quantity*mpm.piece)
 
-
-    def sendProducts(self, qs):
-        d=[]
+    def updateQueue(self, qs):
         if not 'count' in dir(qs):
-            d = {
-                "HepsiburadaSku": qs.HepsiburadaSku,
-                "MerchantSku": qs.MerchantSku,
-                "ProductName": qs.ProductName,
-                "Price": qs.get_price(),
-                "AvailableStock": int(qs.AvailableStock),
-                "DispatchTime": qs.DispatchTime,
-                "CargoCompany1": qs.CargoCompany1,
-            }
+            huq = HepsiUpdateQueueModel(hpm=qs)
+            huq.save()
         elif qs.count() > 1:
             for p in qs:
-                d.append({
+                huq = HepsiUpdateQueueModel(hpm=p)
+                huq.save()
+        else:
+            huq = HepsiUpdateQueueModel(hpm=qs[0])
+            huq.save()
+
+    def sendProducts(self):
+        l = []
+        huqs = HepsiUpdateQueueModel.objects.all()
+        if huqs:
+            for huq in huqs:
+                p = huq.hpm
+                d = {
                     "HepsiburadaSku": p.HepsiburadaSku,
                     "MerchantSku": p.MerchantSku,
                     "ProductName": p.ProductName,
@@ -83,20 +86,12 @@ class ListingModule:
                     "AvailableStock": p.AvailableStock,
                     "DispatchTime": p.DispatchTime,
                     "CargoCompany1": p.CargoCompany1,
-                })
-        else:
-            d = {
-                "HepsiburadaSku": qs[0].HepsiburadaSku,
-                "MerchantSku": qs[0].MerchantSku,
-                "ProductName": qs[0].ProductName,
-                "Price": qs[0].get_price(),
-                "AvailableStock": qs[0].AvailableStock,
-                "DispatchTime": qs[0].DispatchTime,
-                "CargoCompany1": qs[0].CargoCompany1,
-            }
+                }
+                l.append(d)
+                huq.delete()
 
-        response = Listing().updateListing(d)
-        self.createListingUpdateControl(response.get("Id"))
+            response = Listing().updateListing(l)
+            self.createListingUpdateControl(response.get("Id"))
 
     def deleteAll(self, qs):
         lis = []
@@ -139,7 +134,6 @@ class OrderModule:
                         quantity=detail.get("quantity")
                     )
                     hodm.save()
-
 
 
 

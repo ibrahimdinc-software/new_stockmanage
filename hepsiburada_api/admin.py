@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel
 
 from .hb_module import ListingModule, OrderModule
 
@@ -41,7 +41,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     def send_list(self, request, queryset):
 
-        ListingModule().sendProducts(queryset)
+        ListingModule().updateQueue(queryset)
 
         self.message_user(request, "Emmioğluu senin ürünler hepsiburadaya vardı.")
 
@@ -70,6 +70,27 @@ class UpdateStatusModelAdmin(admin.ModelAdmin):
 
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
+
+@admin.register(HepsiUpdateQueueModel)
+class HepsiUpdateQueueModelAdmin(admin.ModelAdmin):
+    list_display = ["hpm", "date"]
+    change_list_template = "entities/hbUpdateQueue.html"
+
+    readonly_fields = ["date"]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('updateQueue/', self.updateQueue),
+        ]
+        return my_urls + urls
+
+    def updateQueue(self, request):
+        
+        ListingModule().sendProducts()
+        
+        self.message_user(request, "Ürünler gitti loo...")
+        return HttpResponseRedirect("../")
 
 
 class HepsiOrderDetailModelTabularInline(admin.TabularInline):

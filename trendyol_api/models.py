@@ -20,13 +20,18 @@ class TrendProductModel(models.Model):
     
     def save(self, *args, **kwargs):
         from .tr_module import ProductModule
-        ProductModule().updateProducts([self])
+        ProductModule().updateQueue(self)
         super(TrendProductModel, self).save(*args, **kwargs) # Call the real save() method
     
 
 class TrendMedProductModel(models.Model):
     product = models.ForeignKey('storage.ProductModel', verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     tpm = models.ForeignKey(TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
+
+
+class TrendUpdateQueueModel(models.Model):
+    tpm = models.ForeignKey(TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
+    date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
 
 
 class TrendOrderModel(models.Model):

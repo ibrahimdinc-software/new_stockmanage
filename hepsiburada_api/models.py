@@ -22,9 +22,10 @@ class HepsiProductModel(models.Model):
         return str(self.Price).replace('.',',')
 
     def save(self, *args, **kwargs):
+        print(args)
         if self.pk:
             from .hb_module import ListingModule
-            ListingModule().sendProducts(self)
+            ListingModule().updateQueue(self)
         super(HepsiProductModel, self).save(*args, **kwargs) # Call the real save() method
 
 
@@ -32,6 +33,9 @@ class HepsiMedProductModel(models.Model):
     product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)
     
+class HepsiUpdateQueueModel(models.Model):
+    hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)
+    date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
 
 
 class UpdateStatusModel(models.Model):
