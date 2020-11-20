@@ -21,12 +21,11 @@ class HepsiProductModel(models.Model):
     def get_price(self):
         return str(self.Price).replace('.',',')
 
-    def save(self, *args, **kwargs):
-        print(args)
-        if self.pk:
+    def save(self, *update, **kwargs):
+        if update:
             from .hb_module import ListingModule
             ListingModule().updateQueue(self)
-        super(HepsiProductModel, self).save(*args, **kwargs) # Call the real save() method
+        super(HepsiProductModel, self).save(*update, **kwargs) # Call the real save() method
 
 
 class HepsiMedProductModel(models.Model):

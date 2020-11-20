@@ -25,11 +25,11 @@ class ProductModel(models.Model):
         tmpm = self.trendmedproductmodel_set.all()
         for m in hmpm:
             m.hpm.AvailableStock = self.piece
-            m.hpm.save()
+            m.hpm.save(True)
         del hmpm
         for m in tmpm:
             m.tpm.piece = self.piece
-            m.tpm.save()
+            m.tpm.save(True)
         del tmpm
 
     def stockMethod(self):

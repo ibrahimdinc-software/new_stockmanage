@@ -18,10 +18,11 @@ class TrendProductModel(models.Model):
     def __str__(self):
         return self.name
     
-    def save(self, *args, **kwargs):
-        from .tr_module import ProductModule
-        ProductModule().updateQueue(self)
-        super(TrendProductModel, self).save(*args, **kwargs) # Call the real save() method
+    def save(self, *update, **kwargs):
+        if update:
+            from .tr_module import ProductModule
+            ProductModule().updateQueue(self)
+        super(TrendProductModel, self).save(*update, **kwargs) # Call the real save() method
     
 
 class TrendMedProductModel(models.Model):
