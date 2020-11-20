@@ -53,3 +53,7 @@ class TrendOrderDetailModel(models.Model):
         ProductModule().dropStock(self.tpm, self.quantity)
         super(TrendOrderDetailModel, self).save(*args, **kwargs) # Call the real save() method
 
+    def delete(self, *args, **kwargs):
+        from .tr_module import ProductModule
+        ProductModule().increaseStock(self.tpm, self.quantity)
+        super(TrendOrderDetailModel, self).delete(*args, **kwargs)

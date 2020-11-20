@@ -59,6 +59,13 @@ class ProductModule(Product):
             for mpm in mpms:
                 mpm.base_product.dropStock(quantity*mpm.piece)
 
+    def increaseStock(self, product, quantity):
+        tmpms = product.trendmedproductmodel_set.all()
+        for tmpm in tmpms:
+            mpms = tmpm.product.medproductmodel_set.all()
+            for mpm in mpms:
+                mpm.base_product.increaseStock(quantity*mpm.piece)
+
 class OrderModule(Order):
     def getOrders(self):
         orders = self.get()

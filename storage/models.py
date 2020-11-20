@@ -67,6 +67,9 @@ class BaseProductModel(models.Model):
         self.piece -= quantity
         self.save()
     
+    def increaseStock(self, quantity):
+        self.piece += quantity
+        self.save()
 
 class MedProductModel(models.Model):
     product = models.ForeignKey(ProductModel, on_delete=models.CASCADE)

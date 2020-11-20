@@ -53,6 +53,14 @@ class ListingModule:
             for mpm in mpms:
                 mpm.base_product.dropStock(quantity*mpm.piece)
 
+    def increaseStock(self, product, quantity):
+        hmpms = product.hepsimedproductmodel_set.all()
+        for hmpm in hmpms:
+            mpms = hmpm.product.medproductmodel_set.all()
+            for mpm in mpms:
+                mpm.base_product.increaseStock(quantity*mpm.piece)
+
+
     def sendProducts(self, qs):
         d=[]
         if not 'count' in dir(qs):
