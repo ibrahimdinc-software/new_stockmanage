@@ -29,16 +29,21 @@ class ProductModelAdmin(admin.ModelAdmin):
     ]
 
     list_display=["name", "sku", "piece"]
+    change_form_template = "storage/admin/productPage.html"
     #search_fields = ["hepsimedproductmodel.__str__","trendmedproductmodel.__str__"]
 
-    class Meta:
-        model = ProductModel
-    
+    def response_change(self, request, obj):
+        if "setStock" in request.POST:
+            obj.setStock()
+            self.message_user(request, "Stok belirlendi.")
 
-    def save_model(self, request, obj, form, change):
-        print(form)
-        super().save_model(request, obj, form, change)
+            return HttpResponseRedirect(".")
+        elif "updateToMarkets" in request.POST:
+            obj.setMedProductStocks()
+            
+            return HttpResponseRedirect(".")
 
+        return super().response_change(request, obj)
 
 @admin.register(BaseProductModel)
 class BaseProductModelAdmin(admin.ModelAdmin):

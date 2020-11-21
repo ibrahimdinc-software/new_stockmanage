@@ -13,7 +13,7 @@ class ProductModel(models.Model):
     
     def __str__(self):
         return self.name
-
+    
 
     def setMedProductStocks(self):
         hmpm = self.hepsimedproductmodel_set.all()
@@ -43,7 +43,6 @@ class ProductModel(models.Model):
 
     def setStock(self):        
         self.piece = self.stockMethod()
-        self.setMedProductStocks()
         self.save()
 
 class BaseProductModel(models.Model):
@@ -59,6 +58,7 @@ class BaseProductModel(models.Model):
         
         for m in meds:
             m.product.setStock()
+            m.product.setMedProductStocks()
 
     def dropStock(self, quantity):
         self.piece -= quantity
