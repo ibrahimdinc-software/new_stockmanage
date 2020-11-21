@@ -49,6 +49,7 @@ class ProductModelAdmin(admin.ModelAdmin):
 class BaseProductModelAdmin(admin.ModelAdmin):
     
     change_list_template = "storage/admin/get_products.html"
+    change_form_template = "storage/admin/baseProduct.html"
     list_display=["name","barcode","piece"]
     ordering = ["name"]
 
@@ -77,6 +78,15 @@ class BaseProductModelAdmin(admin.ModelAdmin):
                 )
                 p.save()
         return HttpResponseRedirect("../")
+
+    def response_change(self, request, obj):
+        if "setStock" in request.POST:
+            obj.setMedProductStock()
+            self.message_user(request, "Güncellendi.")
+
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
 
 #!admin.site.register(MedProductModel)
 
