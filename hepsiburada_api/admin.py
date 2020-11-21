@@ -20,9 +20,9 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
     
     search_fields = ["HepsiburadaSku","MerchantSku",]
 
-    change_list_template = "entities/get_productlist.html"
+    change_list_template = "hepsiburada_api/admin/get_productlist.html"
     list_display = ['MerchantSku','HepsiburadaSku',  'is_salable',]
-    actions = ['send_list','delete_all']
+    actions = ['send_list']
 
 
     def get_urls(self):
@@ -43,20 +43,23 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
         ListingModule().updateQueue(queryset)
 
-        self.message_user(request, "Emmioğluu senin ürünler hepsiburadaya vardı.")
+        self.message_user(request, "Bekleme listesine eklendi.")
 
-    def delete_all(self, request, queryset):
-        ListingModule().deleteAll(queryset)
+    def response_change(self, request, obj):
+        if "update" in request.POST:
+            obj.save()
+            obj.updateStock()
+            self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
 
-        self.message_user(request, "Silindi.")
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
 
-    delete_all.short_description = "Seçili ürünleri hepsiburadadan sil!"
     send_list.short_description = "Seçili ürünleri hepsiburadaya gönder."
 
 @admin.register(UpdateStatusModel)
 class UpdateStatusModelAdmin(admin.ModelAdmin):
 
-    change_form_template = "entities/list_update_control.html"
+    change_form_template = "hepsiburada_api/admin/list_update_control.html"
     list_display = ['control_id', 'date',]
     readonly_fields = ['date']
 
@@ -74,7 +77,7 @@ class UpdateStatusModelAdmin(admin.ModelAdmin):
 @admin.register(HepsiUpdateQueueModel)
 class HepsiUpdateQueueModelAdmin(admin.ModelAdmin):
     list_display = ["hpm", "date"]
-    change_list_template = "entities/hbUpdateQueue.html"
+    change_list_template = "hepsiburada_api/admin/hbUpdateQueue.html"
 
     readonly_fields = ["date"]
 
@@ -100,7 +103,8 @@ class HepsiOrderDetailModelTabularInline(admin.TabularInline):
 
 @admin.register(HepsiOrderModel)
 class HepsiOrderModelAdmin(admin.ModelAdmin):
-    change_list_template = "entities/get_hborder.html"
+    change_list_template = "hepsiburada_api/admin/get_hborder.html"
+    change_form_template = "hepsiburada_api/admin/cancelOrder.html"
     inlines = [HepsiOrderDetailModelTabularInline]
 
     list_display = ["__str__", "customerName", "totalPrice", "orderDate", "getDetailCount"]
@@ -118,3 +122,16 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
         
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
+
+    def response_change(self, request, obj):
+        if "cancelOrder" in request.POST:
+
+            obj.canceledOrder()
+            self.message_user(request, "İptal Edildi")
+
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+    
+
+
+#class HepsiOrderCancelModel(models.Mode)

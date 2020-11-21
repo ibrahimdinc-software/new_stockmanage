@@ -111,4 +111,5 @@ class OrderModule(Order):
                         quantity = d.get("quantity")
                     )
                     todm.save()
+                    todm.dropStock()
 

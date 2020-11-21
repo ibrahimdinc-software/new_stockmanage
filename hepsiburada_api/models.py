@@ -17,15 +17,14 @@ class HepsiProductModel(models.Model):
 
     def __str__(self):
         return self.MerchantSku + " / " + self.HepsiburadaSku
+
+    def updateStock(self):
+        from .hb_module import ListingModule
+        ListingModule().updateQueue(self)
     
     def get_price(self):
         return str(self.Price).replace('.',',')
 
-    def save(self, *update, **kwargs):
-        if update:
-            from .hb_module import ListingModule
-            ListingModule().updateQueue(self)
-        super(HepsiProductModel, self).save(*update, **kwargs) # Call the real save() method
 
 
 class HepsiMedProductModel(models.Model):
@@ -62,7 +61,13 @@ class HepsiOrderModel(models.Model):
         return str(self.orderNumber)
     def getDetailCount(self):
         return self.hepsiorderdetailmodel_set.all().count()
-
+    
+    def canceledOrder(self):
+        hodms = self.hepsiorderdetailmodel_set.all()
+        if hodms:
+            for hodm in hodms:
+                hodm.increaseStock()
+        
 
 class HepsiOrderDetailModel(models.Model):
     hom = models.ForeignKey(HepsiOrderModel, verbose_name="Hepsiburada Sipariş Modeli", on_delete=models.CASCADE)
@@ -70,8 +75,26 @@ class HepsiOrderDetailModel(models.Model):
     totalPrice = models.FloatField(verbose_name="Toplam Tutar")
     quantity = models.IntegerField(verbose_name="Adet")
 
-
-    def save(self, *args, **kwargs):
+    def dropStock(self):
         from .hb_module import ListingModule
         ListingModule().dropStock(self.hpm, self.quantity)
-        super(HepsiOrderDetailModel, self).save(*args, **kwargs) # Call the real save() method
+
+    def increaseStock(self):
+        from .hb_module import ListingModule
+        ListingModule().increaseStock(self.hpm, self.quantity)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

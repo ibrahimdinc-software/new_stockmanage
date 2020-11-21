@@ -16,6 +16,7 @@ class TrendMedProductModelTabularInline(admin.TabularInline):
 @admin.register(TrendProductModel)
 class TrendProductModelAdmin(admin.ModelAdmin):
     change_list_template = ["trendyol_api/admin/get_products.html"]
+    change_form_template = "trendyol_api/admin/updateProduct.html"
     
     search_fields = ["sku","barcode","name"]
     actions = ['send_list']
@@ -42,13 +43,27 @@ class TrendProductModelAdmin(admin.ModelAdmin):
 
         ProductModule().updateQueue(queryset)
         
-        self.message_user(request, "Listeye Aldım la")
+        self.message_user(request, "Bekleme listesine eklendi.")
+
+
+    def response_change(self, request, obj):
+        if "update" in request.POST:
+            obj.save()
+            obj.updateStock()
+
+
+            self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
+
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
+
 
     send_list.short_description = "Seçili ürünleri trendyola gönder."
 
 
 @admin.register(TrendUpdateQueueModel)
-class HTrendUpdateQueueModelAdmin(admin.ModelAdmin):
+class TrendUpdateQueueModelAdmin(admin.ModelAdmin):
     list_display = ["tpm", "date"]
     change_list_template = "trendyol_api/admin/trUpdateQueue.html"
 
@@ -78,6 +93,7 @@ class TrendOrderDetailModelTabularInline(admin.TabularInline):
 @admin.register(TrendOrderModel)
 class TrendOrderModelAdmin(admin.ModelAdmin):
     change_list_template = "trendyol_api/admin/get_trorder.html"
+    change_form_template = "trendyol_api/admin/cancelOrder.html"
     list_display = ["__str__", "customerName","totalPrice", "orderDate", "getDetailCount"]
     inlines = [TrendOrderDetailModelTabularInline]
 
@@ -95,6 +111,14 @@ class TrendOrderModelAdmin(admin.ModelAdmin):
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 
+    def response_change(self, request, obj):
+        if "cancelOrder" in request.POST:
+
+            obj.canceledOrder()
+            self.message_user(request, "İptal Edildi")
+
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
 
 
 

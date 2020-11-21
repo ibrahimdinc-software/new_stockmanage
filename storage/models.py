@@ -14,22 +14,19 @@ class ProductModel(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        self.piece = self.stockMethod()
-        super(ProductModel, self).save(*args, **kwargs) # Call the real save() method
-        self.setMedProductStocks()
-
 
     def setMedProductStocks(self):
         hmpm = self.hepsimedproductmodel_set.all()
         tmpm = self.trendmedproductmodel_set.all()
         for m in hmpm:
             m.hpm.AvailableStock = self.piece
-            m.hpm.save(True)
+            m.hpm.save()
+            m.hpm.updateStock()
         del hmpm
         for m in tmpm:
             m.tpm.piece = self.piece
-            m.tpm.save(True)
+            m.tpm.save()
+            m.tpm.updateStock()
         del tmpm
 
     def stockMethod(self):
@@ -45,8 +42,9 @@ class ProductModel(models.Model):
             return piece
 
     def setStock(self):        
-            self.piece = self.stockMethod()
-            self.save()
+        self.piece = self.stockMethod()
+        self.setMedProductStocks()
+        self.save()
 
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
@@ -55,9 +53,8 @@ class BaseProductModel(models.Model):
 
     def __str__(self):
         return self.name
-    
-    def save(self, *args, **kwargs):
-        super(BaseProductModel, self).save(*args, **kwargs) # Call the real save() method
+
+    def setMedProductStock(self):
         meds = self.medproductmodel_set.all()
         
         for m in meds:
@@ -66,10 +63,12 @@ class BaseProductModel(models.Model):
     def dropStock(self, quantity):
         self.piece -= quantity
         self.save()
+        self.setMedProductStock()
     
     def increaseStock(self, quantity):
         self.piece += quantity
         self.save()
+        self.setMedProductStock()
 
 class MedProductModel(models.Model):
     product = models.ForeignKey(ProductModel, on_delete=models.CASCADE)

@@ -17,13 +17,10 @@ class TrendProductModel(models.Model):
 
     def __str__(self):
         return self.name
-    
-    def save(self, *update, **kwargs):
-        if update:
-            from .tr_module import ProductModule
-            ProductModule().updateQueue(self)
-        super(TrendProductModel, self).save(*update, **kwargs) # Call the real save() method
-    
+       
+    def updateStock(self):
+        from .tr_module import ProductModule
+        ProductModule().updateQueue(self)
 
 class TrendMedProductModel(models.Model):
     product = models.ForeignKey('storage.ProductModel', verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
@@ -47,6 +44,12 @@ class TrendOrderModel(models.Model):
     def getDetailCount(self):
         return self.trendorderdetailmodel_set.all().count()
 
+    def canceledOrder(self):
+        todms = self.trendorderdetailmodel_set.all()
+        if todms:
+            for todm in todms:
+                todm.increaseStock()
+        
 
 class TrendOrderDetailModel(models.Model):
     tom = models.ForeignKey(TrendOrderModel, verbose_name="Trendyol Sipariş Modeli", on_delete=models.CASCADE)
@@ -54,12 +57,17 @@ class TrendOrderDetailModel(models.Model):
     totalPrice = models.FloatField(verbose_name="Tutar")
     quantity = models.IntegerField(verbose_name="Adet")
 
-    def save(self, *args, **kwargs):
-        from .tr_module import ProductModule
-        ProductModule().dropStock(self.tpm, self.quantity)
-        super(TrendOrderDetailModel, self).save(*args, **kwargs) # Call the real save() method
-
+    """
     def delete(self, *args, **kwargs):
         from .tr_module import ProductModule
         ProductModule().increaseStock(self.tpm, self.quantity)
         super(TrendOrderDetailModel, self).delete(*args, **kwargs)
+    """
+
+    def dropStock(self):
+        from .tr_module import ProductModule
+        ProductModule().dropStock(self.tpm, self.quantity)
+
+    def increaseStock(self):
+        from .tr_module import ProductModule
+        ProductModule().increaseStock(self.tpm, self.quantity)

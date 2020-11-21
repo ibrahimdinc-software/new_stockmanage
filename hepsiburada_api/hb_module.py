@@ -106,6 +106,10 @@ class ListingModule:
 
 
 class OrderModule:
+    def __dateConverter__(self, date):
+        print(date)
+        return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+
     def getOrders(self):
         orders = Order().get_orders()
 
@@ -134,14 +138,7 @@ class OrderModule:
                         quantity=detail.get("quantity")
                     )
                     hodm.save()
+                    hodm.dropStock()
 
 
-
-
-
-
-
-    def __dateConverter__(self, date):
-        print(date)
-        return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
 
