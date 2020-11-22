@@ -38,16 +38,20 @@ class ProductModule(Product):
             return "Hata var lo!"
 
     def updateQueue(self, qs):
+        tuqMs = TrendUpdateQueueModel.objects.all()
         if not 'count' in dir(qs):
-            tuq = TrendUpdateQueueModel(tpm=qs)
-            tuq.save()
+            if not tuqMs.filter(tpm=qs):
+                tuq = TrendUpdateQueueModel(tpm=qs)
+                tuq.save()
         elif qs.count() > 1:
             for p in qs:
-                tuq = TrendUpdateQueueModel(tpm=p)
-                tuq.save()
+                if not tuqMs.filter(tpm=p):
+                    tuq = TrendUpdateQueueModel(tpm=p)
+                    tuq.save()
         else:
-            tuq = TrendUpdateQueueModel(tpm=qs[0])
-            tuq.save()
+            if not tuqMs.filter(tpm=qs[0]):
+                tuq = TrendUpdateQueueModel(tpm=qs[0])
+                tuq.save()
 
     def updateProducts(self):
         p_list = []

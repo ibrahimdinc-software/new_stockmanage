@@ -61,16 +61,20 @@ class ListingModule:
                 mpm.base_product.increaseStock(quantity*mpm.piece)
 
     def updateQueue(self, qs):
+        huqMs = HepsiUpdateQueueModel.objects.all()
         if not 'count' in dir(qs):
-            huq = HepsiUpdateQueueModel(hpm=qs)
-            huq.save()
+            if not huqMs.filter(hpm=qs):
+                huq = HepsiUpdateQueueModel(hpm=qs)
+                huq.save()
         elif qs.count() > 1:
             for p in qs:
-                huq = HepsiUpdateQueueModel(hpm=p)
-                huq.save()
+                if not huqMs.filter(hpm=p):
+                    huq = HepsiUpdateQueueModel(hpm=p)
+                    huq.save()
         else:
-            huq = HepsiUpdateQueueModel(hpm=qs[0])
-            huq.save()
+            if not huqMs.filter(hpm=qs[0]):
+                huq = HepsiUpdateQueueModel(hpm=qs[0])
+                huq.save()
 
     def sendProducts(self):
         l = []
