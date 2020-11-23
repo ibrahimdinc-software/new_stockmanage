@@ -1,4 +1,5 @@
 from django.contrib import admin
+from rangefilter.filter import DateTimeRangeFilter
 
 from django.http import HttpResponseRedirect
 from django.urls import path
@@ -108,6 +109,7 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
     inlines = [HepsiOrderDetailModelTabularInline]
 
     list_display = ["__str__", "customerName", "totalPrice", "orderDate", "getDetailCount"]
+    list_filter = [("orderDate",DateTimeRangeFilter)]
 
     def get_urls(self):
         urls = super().get_urls()

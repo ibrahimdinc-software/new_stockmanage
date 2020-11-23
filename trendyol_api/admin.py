@@ -1,4 +1,5 @@
 from django.contrib import admin
+from rangefilter.filter import DateTimeRangeFilter
 
 from django.http import HttpResponseRedirect
 from django.urls import path
@@ -92,10 +93,13 @@ class TrendOrderDetailModelTabularInline(admin.TabularInline):
 
 @admin.register(TrendOrderModel)
 class TrendOrderModelAdmin(admin.ModelAdmin):
+    inlines = [TrendOrderDetailModelTabularInline]
+    
     change_list_template = "trendyol_api/admin/get_trorder.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
+    
     list_display = ["__str__", "customerName","totalPrice", "orderDate", "getDetailCount"]
-    inlines = [TrendOrderDetailModelTabularInline]
+    list_filter = [("orderDate",DateTimeRangeFilter)]
 
     def get_urls(self):
         urls = super().get_urls()
