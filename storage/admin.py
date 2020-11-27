@@ -19,7 +19,6 @@ class MedProductModelTabularInline(admin.TabularInline):
     extra = 0
     autocomplete_fields = ["base_product"]
 
-
 @admin.register(ProductModel)
 class ProductModelAdmin(admin.ModelAdmin):
     inlines = [
@@ -52,6 +51,7 @@ class BaseProductModelAdmin(admin.ModelAdmin):
     change_form_template = "storage/admin/baseProduct.html"
     list_display=["name","barcode","piece"]
     ordering = ["name"]
+    actions = ['set_stock']
 
     search_fields = ["name","barcode",]
 
@@ -90,6 +90,12 @@ class BaseProductModelAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
+    def set_stock(self, request, queryset):
+        for obj in queryset:
+            obj.setMedProductStock()
+        self.message_user(request, "Güncellendi.")
+    
+    set_stock.short_description = "Bağlı ürünlerin stoklarını güncelle!"
 
 #!admin.site.register(MedProductModel)
 
