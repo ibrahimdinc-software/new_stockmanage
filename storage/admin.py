@@ -77,9 +77,9 @@ class BaseProductModelAdmin(admin.ModelAdmin):
                     piece=product.get("Quantity")
                 )
             else:
-                p[0].piece = product.get("Quantity")
-            
-            p[0].save()
+                p = p[0]
+                p.piece = product.get("Quantity")
+            p.save()
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):
