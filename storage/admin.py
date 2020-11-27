@@ -76,7 +76,10 @@ class BaseProductModelAdmin(admin.ModelAdmin):
                     barcode=barcode,
                     piece=product.get("Quantity")
                 )
-                p.save()
+            else:
+                p[0].piece = product.get("Quantity")
+            
+            p.save()
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):
