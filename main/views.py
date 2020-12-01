@@ -32,7 +32,7 @@ class UnassignedProductHBListView(ListView):
         return ProductModule().getUnassignedHB()
 
 class UnassignedProductTRListView(ListView):
-    template_name = "main/unassignedProductListHB.html"
+    template_name = "main/unassignedProductListTR.html"
     ordering = "name"
     def get_queryset(self):
         return ProductModule().getUnassignedTR()
