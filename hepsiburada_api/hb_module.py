@@ -29,6 +29,7 @@ class ProductModule(Listing):
                 obj = obj[0]
 
                 is_salable = True if listing.get("IsSalable")=="true" else False
+                obj.MerchantSku = listing.get("MerchantSku")
                 obj.Price = listing.get("Price")
                 obj.AvailableStock = listing.get("AvailableStock")
                 obj.is_salable=is_salable
