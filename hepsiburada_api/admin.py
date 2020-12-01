@@ -6,7 +6,7 @@ from django.urls import path
 
 from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel
 
-from .hb_module import ListingModule, OrderModule
+from .hb_module import ProductModule, OrderModule
 
 # Register your models here.
 
@@ -35,14 +35,14 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     def get_list(self, request):
         
-        ListingModule().createProducts()
+        ProductModule().getProducts()
         
         self.message_user(request, "Ürünler geldii hanıım...")
         return HttpResponseRedirect("../")
 
     def send_list(self, request, queryset):
 
-        ListingModule().updateQueue(queryset)
+        ProductModule().updateQueue(queryset)
 
         self.message_user(request, "Bekleme listesine eklendi.")
 
@@ -91,7 +91,7 @@ class HepsiUpdateQueueModelAdmin(admin.ModelAdmin):
 
     def updateQueue(self, request):
         
-        ListingModule().sendProducts()
+        ProductModule().sendProducts()
         
         self.message_user(request, "Ürünler gitti loo...")
         return HttpResponseRedirect("../")

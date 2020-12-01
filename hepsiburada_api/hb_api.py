@@ -43,13 +43,8 @@ class Listing:
         'Content-Type': 'application/xml'
     }
 
-    def getListing(self):
-    
-        headers = {
-            "Authorization": encode()
-            }
-        
-        a = requests.get(self.listing_url+merchant_id, headers=headers).content
+    def get(self):
+        a = requests.get(self.listing_url+merchant_id, headers=self.headers).content
         
         result = xmldict(a)
         result = result["Result"]["Listings"]["Listing"]
@@ -57,7 +52,7 @@ class Listing:
         return result
 
 
-    def updateListing(self,product):
+    def update(self,product):
         listings = et.Element('listings')    
         if type(product) == list:
             for p in product:
@@ -73,48 +68,31 @@ class Listing:
                 e.text = str(v)
                 del e
 
-        headers = {
-            "Authorization": encode(),
-            'Content-Type': 'application/xml'
-        }
-        
+
         data = et.tostring(listings)
         
-        response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=headers, data=data).content
-        print(response)
+        response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=self.headers, data=data).content
+
         js = xmldict(response)
-        print(js, 'HB_API.PY LINE:86')
         return js.get("Result")
 
 
 
     def controlListing(self,id):
-        headers = {
-            "Authorization": encode(),
-            'Content-Type': 'application/xml'
-        }
-        response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=headers).content
+        response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=self.headers).content
         js = xmldict(response)
         return js.get("Result")
 
 
-    def deleteProducts(self,products):
-        for p in products:
-            requests.delete(
-                self.listing_url+merchant_id+"/sku/"+p.get("hbSku")+"/merchantSku/"+p.get("merchSku"),
-                headers=self.headers
-            )
-         
 
 class Order:
     url = "https://oms-external.hepsiburada.com/orders/merchantid/"
-    def get_orders(self):
-        headers = {
-            "Authorization": encode(),
-            'Content-Type': 'application/json'
-        }
-
-        req = requests.get(self.url+merchant_id, headers=headers).content
+    headers = {
+        "Authorization": encode(),
+        'Content-Type': 'application/json'
+    }
+    def get(self):
+        req = requests.get(self.url+merchant_id, headers=self.headers).content
         
         response = json.loads(req.decode('utf-8'))
 
@@ -132,19 +110,14 @@ class Order:
 
         return orders
 
-    def get_order_details(self,orderNumber):
-        headers = {
-            "Authorization": encode(),
-            'Content-Type': 'application/json'
-        }
+    def getDetails(self,orderNumber):
         response = json.loads(
             requests.get(
                 self.url+merchant_id+"/ordernumber/"+orderNumber, 
-                headers=headers
+                headers=self.headers
             ).content
         )
 
-        print(response)
         details = []
 
         for detail in response.get("items"):

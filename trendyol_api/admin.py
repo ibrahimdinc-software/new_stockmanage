@@ -9,6 +9,10 @@ from .models import TrendProductModel, TrendMedProductModel, TrendOrderModel, Tr
 from .tr_module import ProductModule, OrderModule
 # Register your models here.
 
+
+
+
+
 class TrendMedProductModelTabularInline(admin.TabularInline):
     model = TrendMedProductModel
     extra = 0

@@ -4,19 +4,9 @@ from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, Hepsi
 
 from .hb_api import Listing, Order
 
-class ListingModule:
-    def createListingUpdateControl(self, id):
-        usm = UpdateStatusModel(control_id=id)
-        usm.save()
-
-    def listingUpdateControl(self, id):
-        response = Listing().controlListing(id)
-        if response.get("Errors"):
-            return "Hata var kontrol et!"
-        return "Oha gerçekten nasıl başarılı olabilir ya?"
-
-    def createProducts(self):
-        listings = Listing().getListing()
+class ProductModule(Listing):
+    def getProducts(self):
+        listings = self.get()
         objs = HepsiProductModel.objects.all()
         for listing in listings:
             obj = objs.filter(HepsiburadaSku=listing.get("HepsiburadaSku"))
@@ -45,21 +35,6 @@ class ListingModule:
 
                 obj.save()
 
-
-    def dropStock(self, product, quantity):
-        hmpms = product.hepsimedproductmodel_set.all()
-        for hmpm in hmpms:
-            mpms = hmpm.product.medproductmodel_set.all()
-            for mpm in mpms:
-                mpm.base_product.dropStock(quantity*mpm.piece)
-
-    def increaseStock(self, product, quantity):
-        hmpms = product.hepsimedproductmodel_set.all()
-        for hmpm in hmpms:
-            mpms = hmpm.product.medproductmodel_set.all()
-            for mpm in mpms:
-                mpm.base_product.increaseStock(quantity*mpm.piece)
-
     def updateQueue(self, qs):
         huqMs = HepsiUpdateQueueModel.objects.all()
         if not 'count' in dir(qs):
@@ -76,7 +51,7 @@ class ListingModule:
                 huq = HepsiUpdateQueueModel(hpm=qs[0])
                 huq.save()
 
-    def sendProducts(self):
+    def updateProducts(self):
         l = []
         huqs = HepsiUpdateQueueModel.objects.all()
         if huqs:
@@ -94,28 +69,42 @@ class ListingModule:
                 l.append(d)
                 huq.delete()
 
-            response = Listing().updateListing(l)
-            self.createListingUpdateControl(response.get("Id"))
+            response = self.update(l)
+            self.createUpdateControl(response.get("Id"))
 
-    def deleteAll(self, qs):
-        lis = []
-        for p in qs:
-            d = {
-                "hbSku": p.HepsiburadaSku,
-                "merchSku": p.MerchantSku
-            }
-            p.delete()
-            lis.append(d)
-        Listing().deleteProducts(lis)
+    def dropStock(self, product, quantity):
+        hmpms = product.hepsimedproductmodel_set.all()
+        for hmpm in hmpms:
+            mpms = hmpm.product.medproductmodel_set.all()
+            for mpm in mpms:
+                mpm.base_product.dropStock(quantity*mpm.piece)
+
+    def increaseStock(self, product, quantity):
+        hmpms = product.hepsimedproductmodel_set.all()
+        for hmpm in hmpms:
+            mpms = hmpm.product.medproductmodel_set.all()
+            for mpm in mpms:
+                mpm.base_product.increaseStock(quantity*mpm.piece)
+
+    def createUpdateControl(self, id):
+        usm = UpdateStatusModel(control_id=id)
+        usm.save()
+
+    def updateControl(self, id):
+        response = Listing().controlListing(id)
+        if response.get("Errors"):
+            return "Hata var kontrol et!"
+        return "Oha gerçekten nasıl başarılı olabilir ya?"
 
 
-class OrderModule:
+
+class OrderModule(Order):
     def __dateConverter__(self, date):
         print(date)
         return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
 
     def getOrders(self):
-        orders = Order().get_orders()
+        orders = self.get()
 
         hepsiOrders = HepsiOrderModel.objects.all()
         hepsiProducts = HepsiProductModel.objects.all()
@@ -132,7 +121,7 @@ class OrderModule:
                 )
                 hom.save()
 
-                details = Order().get_order_details(hom.orderNumber)
+                details = self.getDetails(hom.orderNumber)
 
                 for detail in details:
                     hodm = HepsiOrderDetailModel(

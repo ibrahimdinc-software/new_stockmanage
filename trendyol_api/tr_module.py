@@ -85,6 +85,8 @@ class ProductModule(Product):
             for mpm in mpms:
                 mpm.base_product.increaseStock(quantity*mpm.piece)
 
+    #! Add update control methods
+
 class OrderModule(Order):
     def getOrders(self):
         orders = self.get()

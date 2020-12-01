@@ -1,6 +1,6 @@
 from django.db import models
 
-from hepsiburada_api.hb_module import ListingModule
+from hepsiburada_api.hb_module import ProductModule
 
 # Create your models here.
 
@@ -49,9 +49,21 @@ class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
     barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
     piece = models.IntegerField(verbose_name="Adet")
-
+    cost = models.FloatField(verbose_name="Maliyet")
+    nexdPiece = models.IntegerField(verbose_name="Son Kullanma Tarihi Yakın Adet")
     def __str__(self):
         return self.name
+
+    def getCost(self):
+        cdm = self.costdetailmodel_set.all()
+        if cdm:
+            nearExpDate = cdm[0].expDate
+            for c in cdm:
+                if nearExpDate > c.expDate:
+                    nearExpDate = c.expDate
+            self.cost = nearExpDate.cost
+            self.nexdPiece = nearExpDate.piece
+            self.save()
 
     def setMedProductStock(self):
         meds = self.medproductmodel_set.all()
@@ -69,6 +81,13 @@ class BaseProductModel(models.Model):
         self.piece += quantity
         self.save()
         self.setMedProductStock()
+
+class CostDetailModel(models.Model):
+    baseProduct = models.ForeignKey(BaseProductModel, verbose_name="Ürün", on_delete=models.CASCADE)
+    expDate = models.DateTimeField(verbose_name="SKT")
+    piece = models.IntegerField(verbose_name="Adet")
+    amount = models.FloatField(verbose_name="Tutar")
+
 
 class MedProductModel(models.Model):
     product = models.ForeignKey(ProductModel, on_delete=models.CASCADE)

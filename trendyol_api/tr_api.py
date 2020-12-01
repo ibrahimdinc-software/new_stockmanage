@@ -50,10 +50,9 @@ class Product:
         data = {
             "items":p_list
         }
-        print(json.dumps(data))
         response = requests.post(self.url+"/price-and-inventory", json=data, headers=self.headers)
         result = json.loads(response.content)
-        print(result, "\n TR_API.PY \n LINE:44")
+        
         return result.get("batchRequestId")
 
 

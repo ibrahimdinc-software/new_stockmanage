@@ -1,9 +1,9 @@
 from trendyol_api.tr_module import OrderModule as tr_Order, ProductModule as tr_Product
-from hepsiburada_api.hb_module import OrderModule as hb_Order, ListingModule as hb_Listing
+from hepsiburada_api.hb_module import OrderModule as hb_Order, ProductModule as hb_Product
 
 
 def productUpdate():
-    hb_Listing().sendProducts()
+    hb_Product().sendProducts()
     tr_Product().updateProducts()
 
 def getOrders():

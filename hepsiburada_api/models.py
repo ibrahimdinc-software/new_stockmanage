@@ -19,8 +19,8 @@ class HepsiProductModel(models.Model):
         return self.MerchantSku + " / " + self.HepsiburadaSku
 
     def updateStock(self):
-        from .hb_module import ListingModule
-        ListingModule().updateQueue(self)
+        from .hb_module import ProductModule
+        ProductModule().updateQueue(self)
     
     def get_price(self):
         return str(self.Price).replace('.',',')
@@ -41,9 +41,9 @@ class UpdateStatusModel(models.Model):
     date = models.DateTimeField(verbose_name="Tarih",auto_created=True, auto_now_add=True)
 
     def control(self):
-        from .hb_module import ListingModule
+        from .hb_module import ProductModule
 
-        message = ListingModule().listingUpdateControl(self.control_id)
+        message = ProductModule().updateControl(self.control_id)
 
         return message
 
@@ -76,12 +76,12 @@ class HepsiOrderDetailModel(models.Model):
     quantity = models.IntegerField(verbose_name="Adet")
 
     def dropStock(self):
-        from .hb_module import ListingModule
-        ListingModule().dropStock(self.hpm, self.quantity)
+        from .hb_module import ProductModule
+        ProductModule().dropStock(self.hpm, self.quantity)
 
     def increaseStock(self):
-        from .hb_module import ListingModule
-        ListingModule().increaseStock(self.hpm, self.quantity)
+        from .hb_module import ProductModule
+        ProductModule().increaseStock(self.hpm, self.quantity)
 
 
 

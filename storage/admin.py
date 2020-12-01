@@ -6,13 +6,16 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import ProductModel, BaseProductModel, MedProductModel
+from .models import ProductModel, BaseProductModel, MedProductModel, CostDetailModel
 
 from hepsiburada_api.admin import HepsiMedProductModelTabularInline
 from trendyol_api.admin import TrendMedProductModelTabularInline
 
 # Register your models here.
 
+class CostDetailModelTabularInline(admin.TabularInline):
+    model = CostDetailModel
+    extra = 0
 
 class MedProductModelTabularInline(admin.TabularInline):
     model = MedProductModel
@@ -52,7 +55,7 @@ class BaseProductModelAdmin(admin.ModelAdmin):
     list_display=["name","barcode","piece"]
     ordering = ["name"]
     actions = ['set_stock']
-
+    inlines = [CostDetailModelTabularInline]
     search_fields = ["name","barcode",]
 
 
