@@ -32,7 +32,7 @@ class ProductModelAdmin(admin.ModelAdmin):
 
     list_display=["name", "sku", "piece"]
     change_form_template = "storage/admin/productPage.html"
-    #search_fields = ["hepsimedproductmodel.__str__","trendmedproductmodel.__str__"]
+    search_fields = ["name","sku"]
 
     def response_change(self, request, obj):
         if "setStock" in request.POST:
