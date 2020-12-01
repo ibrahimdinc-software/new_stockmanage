@@ -19,9 +19,11 @@ class HepsiMedProductModelTabularInline(admin.TabularInline):
 @admin.register(HepsiProductModel)
 class HepsiProductModelAdmin(admin.ModelAdmin):
     
-    search_fields = ["HepsiburadaSku","MerchantSku",]
 
     change_list_template = "hepsiburada_api/admin/get_productlist.html"
+    change_form_template = "hepsiburada_api/admin/updateProduct.html"
+
+    search_fields = ["HepsiburadaSku","MerchantSku",]
     list_display = ['MerchantSku','HepsiburadaSku',  'is_salable',]
     actions = ['send_list']
 
