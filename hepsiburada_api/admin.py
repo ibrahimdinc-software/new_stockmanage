@@ -91,7 +91,7 @@ class HepsiUpdateQueueModelAdmin(admin.ModelAdmin):
 
     def updateQueue(self, request):
         
-        ProductModule().sendProducts()
+        ProductModule().updateProducts()
         
         self.message_user(request, "Ürünler gitti loo...")
         return HttpResponseRedirect("../")

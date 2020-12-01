@@ -3,7 +3,7 @@ from hepsiburada_api.hb_module import OrderModule as hb_Order, ProductModule as 
 
 
 def productUpdate():
-    hb_Product().sendProducts()
+    hb_Product().updateProducts()
     tr_Product().updateProducts()
 
 def getOrders():
