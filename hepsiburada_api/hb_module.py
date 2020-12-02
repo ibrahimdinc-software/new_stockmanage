@@ -103,35 +103,37 @@ class ProductModule(Listing):
 
         notSelling = []
 
-        for bb in bbList:
-            hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
-            if hpbblm:
-                hpbblm = hpbblm[0]
-                hpbblm.rank = bb.get("Rank")
-                hpbblm.merchantName = bb.get("MerchantName")
-                hpbblm.price = bb.get("Price")
-                hpbblm.dispatchTime = bb.get("DispatchTime")
-                hpbblm.save()
-            elif not hpbblm:
-                hpbblm = HepsiProductBuyBoxListModel(
-                    hpm=hpm,
-                    rank=bb.get("Rank"),
-                    merchantName=bb.get("MerchantName"),
-                    price=bb.get("Price"),
-                    dispatchTime=bb.get("DispatchTime")
-                )
-                hpbblm.save()
-            else:
-                notSelling.append(hpbblm[0])
-        
-        for i in notSelling:
-            i.delete()
-
+        if bbList:
+            for bb in bbList:
+                hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
+                if hpbblm:
+                    hpbblm = hpbblm[0]
+                    hpbblm.rank = bb.get("Rank")
+                    hpbblm.merchantName = bb.get("MerchantName")
+                    hpbblm.price = bb.get("Price")
+                    hpbblm.dispatchTime = bb.get("DispatchTime")
+                    hpbblm.save()
+                elif not hpbblm:
+                    hpbblm = HepsiProductBuyBoxListModel(
+                        hpm=hpm,
+                        rank=bb.get("Rank"),
+                        merchantName=bb.get("MerchantName"),
+                        price=bb.get("Price"),
+                        dispatchTime=bb.get("DispatchTime")
+                    )
+                    hpbblm.save()
+                else:
+                    notSelling.append(hpbblm[0])
+            
+            for i in notSelling:
+                i.delete()
+            return None 
+        else:
+            return "Hata var!"
             
 
 class OrderModule(Order):
     def __dateConverter__(self, date):
-        print(date)
         return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
 
     def getOrders(self):

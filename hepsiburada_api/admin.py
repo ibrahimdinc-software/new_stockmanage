@@ -19,7 +19,7 @@ class HepsiMedProductModelTabularInline(admin.TabularInline):
 class HepsiProductBuyBoxListModelTabularInline (admin.TabularInline):
     model = HepsiProductBuyBoxListModel
     extra = 0
-
+    ordering = ('rank',)
 @admin.register(HepsiProductModel)
 class HepsiProductModelAdmin(admin.ModelAdmin):
     change_list_template = "hepsiburada_api/admin/get_productlist.html"
@@ -59,8 +59,11 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
             self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
             return HttpResponseRedirect(".")
         if "getBuyBox" in request.POST:
-            ProductModule().getBuyboxList(obj)
-            self.message_user(request, "Geldi mi bi bak bakalım.")
+            message = ProductModule().buyboxList(obj)
+            if message:
+                self.message_user(request, message)
+            else:
+                self.message_user(request, "Geldi mi bi bak bakalım.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 

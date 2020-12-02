@@ -150,11 +150,12 @@ class Listing:
             </Variants>
         </Result>
         """
-        url = "https://listing-external-sit.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList={}".format(hbSku)
-        response = requests.get(url, headers=self.headers).content
-
-        js = xmldict(response)
-        return(js["Result"]["Variants"]["Variant"])
+        url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList="+str(hbSku)
+        response = requests.get(url, headers=self.headers)
+        if response.status_code != 200:
+            return None
+        js = xmldict(response.content)
+        return(js["Result"]["Variants"]["Variant"]["BuyboxOrders"]["BuyboxOrder"])
 
 
 

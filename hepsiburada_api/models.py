@@ -42,6 +42,10 @@ class HepsiProductBuyBoxListModel(models.Model):
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
     dispatchTime = models.IntegerField("Kargoya Verme Süresi") 
 
+    def __str__(self):
+        return str(self.rank)
+    
+
 class UpdateStatusModel(models.Model):
     control_id = models.CharField(verbose_name="Kontrol ID", max_length=200)
     date = models.DateTimeField(verbose_name="Tarih",auto_created=True, auto_now_add=True)
