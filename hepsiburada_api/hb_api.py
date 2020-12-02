@@ -51,7 +51,6 @@ class Listing:
 
         return result
 
-
     def update(self,product):
         listings = et.Element('listings')    
         if type(product) == list:
@@ -76,12 +75,86 @@ class Listing:
         js = xmldict(response)
         return js.get("Result")
 
-
-
     def controlListing(self,id):
         response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=self.headers).content
         js = xmldict(response)
         return js.get("Result")
+
+    def getBuyboxList(self,hbSku):
+        """
+        Örnek Cevap
+        <?xml version="1.0"?>
+        <Result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <Variants>
+                <Variant>
+                    <Sku>HBV00000NDL8B</Sku>
+                    <BuyboxOrders>
+                        <BuyboxOrder>
+                            <Rank>4</Rank>
+                            <MerchantName>Evinemama</MerchantName>
+                            <Price>13.51</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>5</Rank>
+                            <MerchantName>Coco petshop</MerchantName>
+                            <Price>15</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>1</Rank>
+                            <MerchantName>PativeMama</MerchantName>
+                            <Price>11</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>7</Rank>
+                            <MerchantName>Petimister</MerchantName>
+                            <Price>20.9</Price>
+                            <DispatchTime>3</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>6</Rank>
+                            <MerchantName>Birtiklagelir</MerchantName>
+                            <Price>20.02</Price>
+                            <DispatchTime>1</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>2</Rank>
+                            <MerchantName>Meow Meow</MerchantName>
+                            <Price>12</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>3</Rank>
+                            <MerchantName>özlempet</MerchantName>
+                            <Price>12.5</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                        <BuyboxOrder>
+                            <Rank>8</Rank>
+                            <MerchantName>petihtiyaç</MerchantName>
+                            <Price>23.76</Price>
+                            <DispatchTime>0</DispatchTime>
+                            <MerchantRating xsi:nil="true" />
+                        </BuyboxOrder>
+                    </BuyboxOrders>
+                </Variant>
+            </Variants>
+        </Result>
+        """
+        url = "https://listing-external-sit.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList={}".format(hbSku)
+        response = requests.get(url, headers=self.headers).content
+
+        js = xmldict(response)
+        return(js["Result"]["Variants"]["Variant"])
 
 
 

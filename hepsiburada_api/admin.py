@@ -4,7 +4,7 @@ from rangefilter.filter import DateTimeRangeFilter
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel
 
 from .hb_module import ProductModule, OrderModule
 
@@ -16,17 +16,21 @@ class HepsiMedProductModelTabularInline(admin.TabularInline):
     extra = 0
     autocomplete_fields = ["hpm"]
 
+class HepsiProductBuyBoxListModelTabularInline (admin.TabularInline):
+    model = HepsiProductBuyBoxListModel
+    extra = 0
+
 @admin.register(HepsiProductModel)
 class HepsiProductModelAdmin(admin.ModelAdmin):
-    
-
     change_list_template = "hepsiburada_api/admin/get_productlist.html"
     change_form_template = "hepsiburada_api/admin/updateProduct.html"
 
     search_fields = ["HepsiburadaSku","MerchantSku",]
     list_display = ['MerchantSku','HepsiburadaSku',  'is_salable',]
-    actions = ['send_list']
 
+    inlines = [HepsiProductBuyBoxListModelTabularInline]
+
+    actions = ['send_list']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -53,7 +57,10 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
             obj.save()
             obj.updateStock()
             self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
-
+            return HttpResponseRedirect(".")
+        if "getBuyBox" in request.POST:
+            ProductModule().getBuyboxList(obj)
+            self.message_user(request, "Geldi mi bi bak bakalım.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 

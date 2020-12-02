@@ -1,6 +1,6 @@
 import datetime
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiUpdateQueueModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel
 
 from .hb_api import Listing, Order
 
@@ -97,7 +97,37 @@ class ProductModule(Listing):
             return "Hata var kontrol et!"
         return "Oha gerçekten nasıl başarılı olabilir ya?"
 
+    def buyboxList(self,hpm):
+        bbList = self.getBuyboxList(hpm.HepsiburadaSku)
+        hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)
 
+        notSelling = []
+
+        for bb in bbList:
+            hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
+            if hpbblm:
+                hpbblm = hpbblm[0]
+                hpbblm.rank = bb.get("Rank")
+                hpbblm.merchantName = bb.get("MerchantName")
+                hpbblm.price = bb.get("Price")
+                hpbblm.dispatchTime = bb.get("DispatchTime")
+                hpbblm.save()
+            elif not hpbblm:
+                hpbblm = HepsiProductBuyBoxListModel(
+                    hpm=hpm,
+                    rank=bb.get("Rank"),
+                    merchantName=bb.get("MerchantName"),
+                    price=bb.get("Price"),
+                    dispatchTime=bb.get("DispatchTime")
+                )
+                hpbblm.save()
+            else:
+                notSelling.append(hpbblm[0])
+        
+        for i in notSelling:
+            i.delete()
+
+            
 
 class OrderModule(Order):
     def __dateConverter__(self, date):
