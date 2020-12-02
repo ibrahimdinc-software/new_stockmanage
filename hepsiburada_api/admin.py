@@ -30,7 +30,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     inlines = [HepsiProductBuyBoxListModelTabularInline]
 
-    actions = ['send_list']
+    actions = ['send_list', 'getBuyBoxes']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -76,7 +76,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     send_list.short_description = "Seçili ürünleri hepsiburadaya gönder."
     getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
-    
+
 @admin.register(UpdateStatusModel)
 class UpdateStatusModelAdmin(admin.ModelAdmin):
 
