@@ -36,7 +36,7 @@ class HepsiUpdateQueueModel(models.Model):
     date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
 
 class HepsiProductBuyBoxListModel(models.Model):
-    hpm = models.ForeignKey(HepsiMedProductModel, on_delete=models.CASCADE)
+    hpm = models.ForeignKey(HepsiProductModel, on_delete=models.CASCADE)
     rank = models.IntegerField(verbose_name="Sıralama")
     merchantName = models.CharField(verbose_name="Satıcı Adı", max_length=255)
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
