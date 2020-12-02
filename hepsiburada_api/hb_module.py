@@ -98,43 +98,44 @@ class ProductModule(Listing):
         return "Oha gerçekten nasıl başarılı olabilir ya?"
 
     def buyboxList(self,hpm):
-        bbList = self.getBuyboxList(hpm.HepsiburadaSku)
-        hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)
+        if hpm.is_salable:            
+            bbList = self.getBuyboxList(hpm.HepsiburadaSku)
+            hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)
 
-        notSelling = []
+            notSelling = []
+            if bbList:
+                for bb in bbList:
+                    hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
+                    if hpbblm:
+                        hpbblm = hpbblm[0]
+                        hpbblm.rank = bb.get("Rank")
+                        hpbblm.merchantName = bb.get("MerchantName")
+                        hpbblm.price = bb.get("Price")
+                        hpbblm.dispatchTime = bb.get("DispatchTime")
+                        hpbblm.save()
+                    elif not hpbblm:
+                        hpbblm = HepsiProductBuyBoxListModel(
+                            hpm=hpm,
+                            rank=bb.get("Rank"),
+                            merchantName=bb.get("MerchantName"),
+                            price=bb.get("Price"),
+                            dispatchTime=bb.get("DispatchTime")
+                        )
+                        hpbblm.save()
+                    else:
+                        notSelling.append(hpbblm[0])
 
-        if bbList:
-            for bb in bbList:
-                hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
-                if hpbblm:
-                    hpbblm = hpbblm[0]
-                    hpbblm.rank = bb.get("Rank")
-                    hpbblm.merchantName = bb.get("MerchantName")
-                    hpbblm.price = bb.get("Price")
-                    hpbblm.dispatchTime = bb.get("DispatchTime")
-                    hpbblm.save()
-                elif not hpbblm:
-                    hpbblm = HepsiProductBuyBoxListModel(
-                        hpm=hpm,
-                        rank=bb.get("Rank"),
-                        merchantName=bb.get("MerchantName"),
-                        price=bb.get("Price"),
-                        dispatchTime=bb.get("DispatchTime")
-                    )
-                    hpbblm.save()
-                else:
-                    notSelling.append(hpbblm[0])
-
-                if bb.get("MerchantName") == "Meow Meow":
-                    hpm.buyBoxRank = bb.get("Rank")
-                    hpm.save()
-            
-            for i in notSelling:
-                i.delete()
-            return None 
+                    if bb.get("MerchantName") == "Meow Meow":
+                        hpm.buyBoxRank = bb.get("Rank")
+                        hpm.save()
+                
+                for i in notSelling:
+                    i.delete()
+                return None 
+            else:
+                return "Hata var!"
         else:
-            return "Hata var!"
-            
+            return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"   
 
 class OrderModule(Order):
     def __dateConverter__(self, date):

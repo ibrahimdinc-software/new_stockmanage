@@ -38,10 +38,8 @@ class ProductModule():
         hpms = HepsiProductModel.objects.all()
 
         for hpm in hpms:
-            if hpm.buyBoxRank != 1:
+            if hpm.buyBoxRank != 1 and hpm.is_salable:
                 losedBuybox.append(hpm)
-
-        
 
         return losedBuybox
 
