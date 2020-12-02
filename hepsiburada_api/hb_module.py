@@ -124,6 +124,10 @@ class ProductModule(Listing):
                     hpbblm.save()
                 else:
                     notSelling.append(hpbblm[0])
+
+                if bb.get("MerchantName") == "Meow Meow":
+                    hpm.buyBoxRank = bb.get("Rank")
+                    hpm.save()
             
             for i in notSelling:
                 i.delete()

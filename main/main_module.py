@@ -1,5 +1,5 @@
 from storage.models import ProductModel,BaseProductModel
-from hepsiburada_api.models import HepsiProductModel
+from hepsiburada_api.models import HepsiProductModel, HepsiProductBuyBoxListModel
 from trendyol_api.models import TrendProductModel
 
 
@@ -32,7 +32,18 @@ class ProductModule():
                 unassigned.append(tpm)
         return unassigned
 
+    def getLosedBuyboxesHB(self):
+        losedBuybox = []
 
+        hpms = HepsiProductModel.objects.all()
+
+        for hpm in hpms:
+            if hpm.buyBoxRank != 1:
+                losedBuybox.append(hpm)
+
+        
+
+        return losedBuybox
 
 
 

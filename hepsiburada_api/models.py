@@ -14,6 +14,8 @@ class HepsiProductModel(models.Model):
     CargoCompany2 = models.CharField(verbose_name="Kargo Firması 2", max_length=200, blank=True, null=True)
     CargoCompany3 = models.CharField(verbose_name="Kargo Firması 3", max_length=200, blank=True, null=True)
     is_salable = models.BooleanField(verbose_name="Satılabilir mi?")
+    buyBoxRank = models.IntegerField(verbose_name="Buybox Sıralaması", blank=True, null=True)
+
 
     def __str__(self):
         return self.MerchantSku + " / " + self.HepsiburadaSku
