@@ -52,6 +52,13 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
         self.message_user(request, "Bekleme listesine eklendi.")
 
+    def getBuyBoxes(self, request, queryset):
+        import time
+        for q in queryset:
+            ProductModule().buyboxList(q)
+            time.sleep(.100)
+        self.message_user(request, "Hadi H.O.")
+
     def response_change(self, request, obj):
         if "update" in request.POST:
             obj.save()
@@ -68,7 +75,8 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
         return super().response_change(request, obj)
 
     send_list.short_description = "Seçili ürünleri hepsiburadaya gönder."
-
+    getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
+    
 @admin.register(UpdateStatusModel)
 class UpdateStatusModelAdmin(admin.ModelAdmin):
 
