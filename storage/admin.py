@@ -89,8 +89,15 @@ class BaseProductModelAdmin(admin.ModelAdmin):
         if "setStock" in request.POST:
             obj.setMedProductStock()
             self.message_user(request, "Güncellendi.")
-
             return HttpResponseRedirect(".")
+        if "setPiece" in request.POST:
+            message = obj.getPiece()
+            if message:
+                self.message_user(request, message)
+            else:
+                self.message_user(request, "Güncellendi.")
+            return HttpResponseRedirect(".")
+            
         return super().response_change(request, obj)
 
     def set_stock(self, request, queryset):

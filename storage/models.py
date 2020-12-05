@@ -1,5 +1,5 @@
 from django.db import models
-
+from new_stockmanage.mail import outOfStockMail
 from hepsiburada_api.hb_module import ProductModule
 
 # Create your models here.
@@ -48,22 +48,25 @@ class ProductModel(models.Model):
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
     barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
-    piece = models.IntegerField(verbose_name="Adet")
-    cost = models.FloatField(verbose_name="Maliyet")
-    nexdPiece = models.IntegerField(verbose_name="Son Kullanma Tarihi Yakın Adet")
+    piece = models.IntegerField(verbose_name="Adet (Canlı Stok)")
     def __str__(self):
         return self.name
 
-    def getCost(self):
-        cdm = self.costdetailmodel_set.all()
+    def getPiece(self):
+        cdm = self.getActiveStock()
         if cdm:
-            nearExpDate = cdm[0].expDate
-            for c in cdm:
-                if nearExpDate > c.expDate:
-                    nearExpDate = c.expDate
-            self.cost = nearExpDate.cost
-            self.nexdPiece = nearExpDate.piece
+            self.piece = cdm.piece
             self.save()
+            return None
+        else:
+            return "Hiç alım girilmemiş veya aktif alım yok."
+
+    def getActiveStock(self):
+        cdms = self.costdetailmodel_set.all().filter(active=True)
+        if cdms:
+            return cdms[0]
+        else:
+            return None
 
     def setMedProductStock(self):
         meds = self.medproductmodel_set.all()
@@ -73,21 +76,42 @@ class BaseProductModel(models.Model):
             m.product.setMedProductStocks()
 
     def dropStock(self, quantity):
-        self.piece -= quantity
-        self.save()
+        cdm = self.getActiveStock()
+        if cdm:
+            cdm.dropStock(quantity)
+            self.getPiece()
+        else:
+            self.piece -= quantity
+            self.save()
         self.setMedProductStock()
     
     def increaseStock(self, quantity):
-        self.piece += quantity
-        self.save()
+        cdm = self.getActiveStock()
+        if cdm:
+            cdm.increaseStock(quantity)
+            self.getPiece()
+        else:
+            self.piece += quantity
+            self.save()
         self.setMedProductStock()
 
 class CostDetailModel(models.Model):
     baseProduct = models.ForeignKey(BaseProductModel, verbose_name="Ürün", on_delete=models.CASCADE)
-    expDate = models.DateTimeField(verbose_name="SKT")
+    buyDate = models.DateTimeField(verbose_name="Alım Tarihi", blank=True, null=True)
     piece = models.IntegerField(verbose_name="Adet")
-    amount = models.FloatField(verbose_name="Tutar")
+    cost = models.FloatField(verbose_name="Tutar")
+    active = models.BooleanField(verbose_name="Satışta Mı?")
 
+    def dropStock(self, quantity):
+        self.piece -= quantity
+        if self.piece == 0:
+            self.active = False
+            outOfStockMail(self)
+        self.save()
+
+    def increaseStock(self, quantity):
+        self.piece += quantity
+        self.save()
 
 class MedProductModel(models.Model):
     product = models.ForeignKey(ProductModel, on_delete=models.CASCADE)

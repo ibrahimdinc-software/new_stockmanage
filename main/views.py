@@ -14,6 +14,7 @@ def index(request):
         'unassignedTR': len(ProductModule().getUnassignedTR()),
         'losedBuyboxHB': len(ProductModule().getLosedBuyboxesHB())
     }
+
     return render(request, "main/index.html", context=context)
 
 
