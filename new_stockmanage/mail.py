@@ -7,7 +7,7 @@ def sendMail(subject, message):
 def outOfStockMail(cdm):
     sendMail(
         'Stok Bitti', 
-        cdm.baseProduct + ' ürününün ' + cdm.buyDate + ' alım tarihli stoğu bitti! \n Acilen güncelleme yapılmalı.'
+        cdm.baseProduct.name + ' ürününün ' + cdm.buyDate + ' alım tarihli stoğu bitti! \n Acilen güncelleme yapılmalı.'
         )
 
 def testMail():

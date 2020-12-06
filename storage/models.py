@@ -49,6 +49,7 @@ class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
     barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
     piece = models.IntegerField(verbose_name="Adet (Canlı Stok)")
+    
     def __str__(self):
         return self.name
 
