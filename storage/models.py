@@ -81,6 +81,8 @@ class BaseProductModel(models.Model):
         if cdm:
             cdm.dropStock(quantity)
             self.getPiece()
+            cdm.active = False
+            cdm.save()
         else:
             self.piece -= quantity
             self.save()
@@ -106,7 +108,6 @@ class CostDetailModel(models.Model):
     def dropStock(self, quantity):
         self.piece -= quantity
         if self.piece == 0:
-            self.active = False
             outOfStockMail(self)
         self.save()
 
