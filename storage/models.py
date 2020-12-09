@@ -65,7 +65,7 @@ class BaseProductModel(models.Model):
     def getActiveStock(self):
         cdms = self.costdetailmodel_set.all().filter(active=True)
         if cdms:
-            return cdms[0]
+            return cdms.first()
         else:
             return None
 
@@ -80,9 +80,6 @@ class BaseProductModel(models.Model):
         cdm = self.getActiveStock()
         if cdm:
             cdm.dropStock(quantity)
-            self.getPiece()
-            cdm.active = False
-            cdm.save()
         else:
             self.piece -= quantity
             self.save()
@@ -107,8 +104,14 @@ class CostDetailModel(models.Model):
 
     def dropStock(self, quantity):
         self.piece -= quantity
+
+        baseProduct.piece = self.piece
+        baseProduct.save()
+        
         if self.piece == 0:
             outOfStockMail(self)
+            self.active=False
+        
         self.save()
 
     def increaseStock(self, quantity):
