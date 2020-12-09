@@ -105,8 +105,8 @@ class CostDetailModel(models.Model):
     def dropStock(self, quantity):
         self.piece -= quantity
 
-        baseProduct.piece = self.piece
-        baseProduct.save()
+        self.baseProduct.piece = self.piece
+        self.baseProduct.save()
         
         if self.piece == 0:
             outOfStockMail(self)
