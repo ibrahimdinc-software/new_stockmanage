@@ -4,9 +4,9 @@ from rangefilter.filter import DateTimeRangeFilter
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel, HepsiPaymentModel, HepsiBillModel
 
-from .hb_module import ProductModule, OrderModule
+from .hb_module import ProductModule, OrderModule, AccountingModule
 
 # Register your models here.
 
@@ -20,6 +20,7 @@ class HepsiProductBuyBoxListModelTabularInline (admin.TabularInline):
     model = HepsiProductBuyBoxListModel
     extra = 0
     ordering = ('rank',)
+
 @admin.register(HepsiProductModel)
 class HepsiProductModelAdmin(admin.ModelAdmin):
     change_list_template = "hepsiburada_api/admin/get_productlist.html"
@@ -122,21 +123,38 @@ class HepsiOrderDetailModelTabularInline(admin.TabularInline):
     extra = 0
 
 
+class HepsiBillModelTabularInline(admin.TabularInline):
+    model = HepsiBillModel
+    extra = 0
+
+
 @admin.register(HepsiOrderModel)
 class HepsiOrderModelAdmin(admin.ModelAdmin):
+    inlines = [HepsiOrderDetailModelTabularInline, HepsiBillModelTabularInline]
+
     change_list_template = "hepsiburada_api/admin/get_hborder.html"
     change_form_template = "hepsiburada_api/admin/cancelOrder.html"
-    inlines = [HepsiOrderDetailModelTabularInline]
+    
+    search_fields = ["orderNumber","customerName","packageNumber",]
 
-    list_display = ["__str__", "customerName", "totalPrice", "orderDate", "getDetailCount"]
-    list_filter = [("orderDate",DateTimeRangeFilter)]
+    list_display = ["__str__", "customerName", "totalPrice", "orderDate", "status", "getDetailCount",]
+    list_filter = [("orderDate",DateTimeRangeFilter), "status"]
+
+    ordering = ["-orderDate"]
 
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
             path('gethborders/', self.get_hb_order),
+            path('getoldorders/', self.getOldOrders),
+            path('getPackageDetails/', self.getPackageDetails),
         ]
         return my_urls + urls
+
+    def getOldOrders(self, request):
+        OrderModule().getOldOrders(request.FILES.get("excel"))
+        self.message_user(request, "Siparişler gelmiştir ha...")
+        return HttpResponseRedirect("../")
 
     def get_hb_order(self, request):
     
@@ -144,6 +162,12 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
         
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
+
+    def getPackageDetails(self, request):
+        OrderModule().getPackageDetails()
+        self.message_user(request, "Paket detaylarını getirelim")
+        return HttpResponseRedirect("../")
+
 
     def response_change(self, request, obj):
         if "cancelOrder" in request.POST:
@@ -153,7 +177,28 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
 
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
-    
 
 
+@admin.register(HepsiPaymentModel)
+class HepsiPaymentModelAdmin(admin.ModelAdmin):
+    inlines = [HepsiBillModelTabularInline]
+
+    list_display = ["__str__", "totalPayment"]
+    ordering = ["-date"]
+
+    change_form_template = "hepsiburada_api/admin/HepsiPaymentModelAdmin.html"
+
+
+    def response_change(self, request, obj):
+        if "getBills" in request.POST:
+            AccountingModule().getBills(obj)
+            self.message_user(request, "Faturalar geldi.")
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
+@admin.register(HepsiBillModel)
+class HepsiBillModelAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "paymentDate", "invoiceDate", "hom", "totalAmount"]
+    list_filter = [("invoiceDate",DateTimeRangeFilter), "transactionType", "hpm"]
+    ordering = ["paymentDate"]
 #class HepsiOrderCancelModel(models.Mode)
