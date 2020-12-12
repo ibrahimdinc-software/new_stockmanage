@@ -103,35 +103,24 @@ class ProductModule(Listing):
             bbList = self.getBuyboxList(hpm.HepsiburadaSku)
             hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)
 
-            notSelling = []
             if bbList:
+                for hpbblm in hpbblms:
+                    hpbblm.delete()
+                
                 for bb in bbList:
-                    hpbblm = hpbblms.filter(merchantName=bb.get("MerchantName"))
-                    if hpbblm:
-                        hpbblm = hpbblm[0]
-                        hpbblm.rank = bb.get("Rank")
-                        hpbblm.merchantName = bb.get("MerchantName")
-                        hpbblm.price = bb.get("Price")
-                        hpbblm.dispatchTime = bb.get("DispatchTime")
-                        hpbblm.save()
-                    elif not hpbblm:
-                        hpbblm = HepsiProductBuyBoxListModel(
-                            hpm=hpm,
-                            rank=bb.get("Rank"),
-                            merchantName=bb.get("MerchantName"),
-                            price=bb.get("Price"),
-                            dispatchTime=bb.get("DispatchTime")
-                        )
-                        hpbblm.save()
-                    else:
-                        notSelling.append(hpbblm[0])
-
+                    hpbblm = HepsiProductBuyBoxListModel(
+                        hpm=hpm,
+                        rank=bb.get("Rank"),
+                        merchantName=bb.get("MerchantName"),
+                        price=bb.get("Price"),
+                        dispatchTime=bb.get("DispatchTime")
+                    )
+                    hpbblm.save()
+                
                     if bb.get("MerchantName") == "Meow Meow":
                         hpm.buyBoxRank = bb.get("Rank")
                         hpm.save()
                 
-                for i in notSelling:
-                    i.delete()
                 return None 
             else:
                 return "Hata var!"
