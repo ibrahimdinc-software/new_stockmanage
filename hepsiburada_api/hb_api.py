@@ -155,11 +155,18 @@ class Listing:
         if response.status_code != 200:
             return None
         js = xmldict(response.content)
-        return(js["Result"]["Variants"]["Variant"]["BuyboxOrders"]["BuyboxOrder"])
+
+        data = js["Result"]["Variants"]["Variant"]
+        data = data.get("BuyboxOrders").get("BuyboxOrder")
+
+        if type(data) != list:
+            return [data]
+        return data
 
 
 
 class Order:
+
     url = "https://oms-external.hepsiburada.com/orders/merchantid/"
     headers = {
         "Authorization": encode(),
@@ -174,11 +181,12 @@ class Order:
 
         for order in response["items"]:
             o = {
-                "name": order["shippingAddress"]["name"],
+                "name": order["customerName"],
                 "orderNumber": order.get("orderNumber"),
                 "orderId": order.get("orderId"),
                 "orderDate": order.get("orderDate"),
-                "totalPrice": order["totalPrice"]["amount"]
+                "totalPrice": order["totalPrice"]["amount"],
+                "status": order["status"]
             }
             orders.append(o)
 
@@ -198,9 +206,70 @@ class Order:
             d = {
                 "sku": detail.get("sku"),
                 "id": detail.get("id"),
-                "totalPrice": detail.get("totalPrice").get("amount"),
+                "priceToBilling": detail.get("totalPrice").get("amount"),
+                "totalHbDiscount": detail.get("hbDiscount").get("totalPrice").get("amount"),
                 "quantity": detail.get("quantity")
             }
             details.append(d)
 
         return details
+
+    def getPackageDetails(self):
+        response = json.loads(
+            requests.get(
+                "https://oms-external.hepsiburada.com/packages/merchantid/"+merchant_id+"?timespan=120",
+                headers=self.headers
+            ).content
+        )
+        data = []
+        for r in response:
+            data.append({
+                "orderNumber": r["items"][0]["orderNumber"],
+                "packageNumber": r["packageNumber"]
+            })
+        
+        return data
+
+
+class Accounting:
+    url = "https://mpfinance-external.hepsiburada.com/invoices/merchantid/"
+    headers = {
+        "Authorization": encode(),
+        'Content-Type': 'application/json'
+    }
+
+    def getWoffset(self, offset, endDate, startDate, tType):
+        response = json.loads(
+            requests.get(self.url+merchant_id+"/transactiontype/"+tType+"?offset="+str(offset)+"&endDate="+endDate+"&startDate="+startDate+"&useInvoiceDate=false",
+                headers=self.headers).content
+        )
+
+        return response
+
+    def get(self, tType, endDate, startDate):
+        response = self.getWoffset(offset=0, endDate=endDate, startDate=startDate, tType=tType)
+
+        count = response["count"]
+        offset = 10
+        limit = 10
+
+        print(tType)
+        data = response["items"]
+        while count > offset:
+            response = self.getWoffset(offset=offset, endDate=endDate, startDate=startDate, tType=tType)
+            data += response["items"]
+            print(offset, len(data))
+            offset += limit
+
+        return data
+
+
+
+
+
+
+
+
+
+
+
