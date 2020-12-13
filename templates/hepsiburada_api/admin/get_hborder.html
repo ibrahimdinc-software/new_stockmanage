@@ -6,6 +6,19 @@
             {% csrf_token %}
                 <button type="submit">Siparişleri Getir la</button>
         </form>
+        <form action="getPackageDetails/" method="POST">
+            {% csrf_token %}
+                <button type="submit">Paketleri hazırlayacaksan bas!</button>
+        </form>
+    </div>
+    <br />
+    <div>
+        <form action="getoldorders/" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            <input type="file" name="excel" id="id_excel">
+            <br>
+            <button type="submit">Haydii Yükle </button>
+        </form>
     </div>
     <br />
     {{ block.super }}
