@@ -307,6 +307,7 @@ class OrderModule(Order):
                         quantity=detail.get("quantity")
                     )
                     hodm.save()
+                    hodm.dropStock()
 
                 order.setTotalPrice()
                 order.setPriceToBilling()
