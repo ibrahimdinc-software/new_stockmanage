@@ -164,7 +164,7 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
         return HttpResponseRedirect("../")
 
     def getPackageDetails(self, request):
-        OrderModule().getPackageDetails()
+        OrderModule().setPackageDetails()
         self.message_user(request, "Paket detaylarını getirelim")
         return HttpResponseRedirect("../")
 

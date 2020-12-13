@@ -164,7 +164,6 @@ class Listing:
         return data
 
 
-
 class Order:
 
     url = "https://oms-external.hepsiburada.com/orders/merchantid/"
@@ -172,6 +171,7 @@ class Order:
         "Authorization": encode(),
         'Content-Type': 'application/json'
     }
+    
     def get(self):
         req = requests.get(self.url+merchant_id, headers=self.headers).content
         
@@ -223,10 +223,26 @@ class Order:
         )
         data = []
         for r in response:
-            data.append({
+            d = {
+                "customerName": r["recipientName"],
                 "orderNumber": r["items"][0]["orderNumber"],
-                "packageNumber": r["packageNumber"]
-            })
+                "orderDate": r["orderDate"],
+                "packageNumber": r["packageNumber"],
+                "status": r["status"],
+                "priceToBilling": r["totalPrice"]["amount"],
+                "detail": []
+            }
+            for detail in r["items"]:
+                det = {
+                    "hepsiBuradaSku":detail["hbSku"],
+                    "totalHbDiscount": detail["totalHBDiscount"]["amount"],
+                    "priceToBilling": detail["merchantTotalPrice"]["amount"],
+                    "totalPrice": detail["totalPrice"]["amount"],
+                    "quantity": detail["quantity"]
+                }
+                d["detail"].append(det)
+            data.append(d)
+            
         
         return data
 

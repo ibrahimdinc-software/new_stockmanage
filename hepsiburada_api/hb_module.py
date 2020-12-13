@@ -196,7 +196,6 @@ class OrderModule(Order):
                 hom.setPriceToBilling()
                 hom.setTotalPrice()
 
-
     def getOldOrders(self, ordersFile):
         orders = []
 
@@ -243,8 +242,7 @@ class OrderModule(Order):
                     })
 
         self.createOrder(orders)
-
-     
+   
     def getOrders(self):
         orders = self.get()
 
@@ -289,6 +287,29 @@ class OrderModule(Order):
                 order = orders.get(orderNumber=d.get("orderNumber"))
                 order.packageNumber = d.get("packageNumber")
                 order.save()
+            else:
+                order = HepsiOrderModel(
+                    customerName=d.get("customerName"),
+                    orderNumber=d.get("orderNumber"),
+                    orderDate=self.__dateConverter__(d.get("orderDate")),
+                    priceToBilling=d.get("priceToBilling"),
+                    packageNumber=d.get("packageNumber"),
+                    status=d.get("status")
+                )
+                order.save()
+                for detail in d.get("detail"):
+                    hodm = HepsiOrderDetailModel(
+                        hpm=HepsiProductModel.objects.get(HepsiburadaSku=detail.get("hepsiBuradaSku")),
+                        totalPrice=detail.get("totalPrice"),
+                        priceToBilling=detail.get("priceToBilling"),
+                        hom=order,
+                        totalHbDiscount=detail.get("totalHbDiscount"),
+                        quantity=detail.get("quantity")
+                    )
+                    hodm.save()
+
+                order.setTotalPrice()
+                order.setPriceToBilling()
 
 class AccountingModule(Accounting):
     
