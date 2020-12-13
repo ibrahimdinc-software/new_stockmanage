@@ -318,7 +318,8 @@ class AccountingModule(Accounting):
         
         homs = HepsiOrderModel.objects.all()
         hpms = HepsiProductModel.objects.all()
-        
+        hbms = HepsiBillModel.objects.filter(hpm=obj)
+
         date = obj.date.strftime("%Y-%m-%d")
 
         dateConvert = lambda date: OrderModule().__dateConverter__(date) 
@@ -326,41 +327,43 @@ class AccountingModule(Accounting):
 
         from .models import TRANSACTION_TYPE
 
+        if hbms:
+            for hbm in hbms:
+                hbm.delete() 
+
         for tType in TRANSACTION_TYPE:
             bills = self.get(tType=tType[0], endDate=date, startDate=date)
 
             for bill in bills:
                 hom = None
+                hodm = None
+
                 if bill.get("orderNumber"):
                     hom = homs.filter(orderNumber=numConverter(bill.get("orderNumber"))).first()
                 if not hom and bill.get("packageNumber"):
                     hom = homs.filter(packageNumber=numConverter(bill.get("packageNumber"))).first()
 
                 if hom:
-                    print(hom.orderNumber)
-                    print(bill.get("sku"))
                     hodms = hom.hepsiorderdetailmodel_set.all()
                     hodm = hodms.get(hpm=hpms.get(HepsiburadaSku=bill.get("sku")))
 
 
-                    hbm = HepsiBillModel(
-                            hpm=obj,
-                            hodm=hodm,
-                            hom=hom,
-                            quantity=int(bill.get("quantity")),
-                            totalAmount=float(bill.get("totalAmount").replace(',', '.')),
-                            taxAmount=float(bill.get("taxAmount").replace(',', '.')),
-                            netAmount=float(bill.get("netAmount").replace(',', '.')),
-                            dueDate=dateConvert(bill.get("dueDate")),
-                            invoiceDate=dateConvert(bill.get("invoiceDate")),
-                            paymentDate=dateConvert(bill.get("paymentDate")),
-                            invoiceNumber=bill.get("invoiceNumber"),
-                            invoiceExplanation=bill.get("invoiceExplanation"),
-                            transactionType=bill.get("transactionType")
-                        )
-                    hbm.save()
-                else:
-                    print("YOK: \norderNumber "+bill.get("orderNumber")+"\npackageNumber: "+bill.get("packageNumber"))
+                hbm = HepsiBillModel(
+                        hpm=obj,
+                        hodm=hodm,
+                        hom=hom,
+                        quantity=int(bill.get("quantity")),
+                        totalAmount=float(bill.get("totalAmount").replace(',', '.')),
+                        taxAmount=float(bill.get("taxAmount").replace(',', '.')),
+                        netAmount=float(bill.get("netAmount").replace(',', '.')),
+                        dueDate=dateConvert(bill.get("dueDate")),
+                        invoiceDate=dateConvert(bill.get("invoiceDate")),
+                        paymentDate=dateConvert(bill.get("paymentDate")),
+                        invoiceNumber=bill.get("invoiceNumber"),
+                        invoiceExplanation=bill.get("invoiceExplanation"),
+                        transactionType=bill.get("transactionType")
+                    )
+                hbm.save()
 
 
 

@@ -5,21 +5,23 @@ from django.db import models
 
 TRANSACTION_TYPE = [
     ('Payment', 'Sipariş Tutarı'),
-    ('Commission', 'Komisyon Tutarı'),
     ('CommissionSettlement', 'Komisyon mahsuplaşma tutarı (Komisyon-Kampanya)'),
+    ('ShipmentCostSharingIncome', 'Kargo Katkı Payı Gideri'),
+    ('Return', 'İade Tutarı'),
+    ('CommissionInvoiceRefund', 'Komisyon Fatura İadesi'),
+    ('ProcessingFeeIncome', 'İşlem Ücret Gideri'),
     ('CommissionReturnPriceDifference', 'Komisyon İade Tutarı'),
+    ('Commission', 'Komisyon Tutarı'),
     ('CustomerSatisfaction', 'Hediye Çeki Tutarı'),
     ('RevenueIncome', 'Ciro Gideri'),
     ('RevenueExpense', 'Ciro Geliri'),
     ('StudioIncome', 'Stüdyo Gideri'),
-    ('ShipmentCostSharingIncome', 'Kargo Katkı Payı Gideri'),
     ('ShipmentCostSharingExpense', 'Kargo Katkı Payı Geliri'),
     ('MarketingIncome', 'Pazarlama Gideri'),
     ('MarketingExpense', 'Pazarlama Geliri'),
     ('PriceDifferenceIncome', 'Fiyat Farkı Gideri'),
     ('PriceDifferenceExpense', 'Fiyat Farkı Geliri'),
     ('LateInterestIncome', 'Vade Farkı Gideri'),
-    ('Return', 'İade Tutarı'),
     ('CampaignDiscount', 'Kampanya İndirimleri Tutarı'),
     ('CargoCompensationIncome', 'Kargo Tazmin Gideri'),
     ('CargoCompensationExpense', 'Kargo Tazmin Geliri'),
@@ -201,8 +203,8 @@ class HepsiPaymentModel(models.Model):
 
 class HepsiBillModel(models.Model):
     transactionType = models.CharField(verbose_name="İşlem Tipi", max_length=255, choices=TRANSACTION_TYPE)
-    hom = models.ForeignKey(HepsiOrderModel, on_delete=models.CASCADE)
-    hodm = models.ForeignKey(HepsiOrderDetailModel, on_delete=models.CASCADE)
+    hom = models.ForeignKey(HepsiOrderModel, on_delete=models.CASCADE, blank=True, null=True)
+    hodm = models.ForeignKey(HepsiOrderDetailModel, on_delete=models.CASCADE, blank=True, null=True)
     hpm = models.ForeignKey(HepsiPaymentModel, on_delete=models.CASCADE)
     quantity = models.IntegerField(verbose_name="Adet")
     totalAmount = models.FloatField(verbose_name="Toplam Tutar")

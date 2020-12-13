@@ -141,6 +141,7 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
     list_filter = [("orderDate",DateTimeRangeFilter), "status"]
 
     ordering = ["-orderDate"]
+    
 
     def get_urls(self):
         urls = super().get_urls()
@@ -201,4 +202,6 @@ class HepsiBillModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "paymentDate", "invoiceDate", "hom", "totalAmount"]
     list_filter = [("invoiceDate",DateTimeRangeFilter), "transactionType", "hpm"]
     ordering = ["paymentDate"]
+
+    autocomplete_fields=["hom",]
 #class HepsiOrderCancelModel(models.Mode)
