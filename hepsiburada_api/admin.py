@@ -126,6 +126,7 @@ class HepsiOrderDetailModelTabularInline(admin.TabularInline):
 class HepsiBillModelTabularInline(admin.TabularInline):
     model = HepsiBillModel
     extra = 0
+    raw_id_fields = ["hom","hodm","hpm"]
 
 
 @admin.register(HepsiOrderModel)
@@ -199,7 +200,7 @@ class HepsiPaymentModelAdmin(admin.ModelAdmin):
 
 @admin.register(HepsiBillModel)
 class HepsiBillModelAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "paymentDate", "invoiceDate", "hom", "totalAmount"]
+    list_display = ["__str__", "getOrderDate", "paymentDate", "invoiceDate", "hom", "totalAmount"]
     list_filter = [("invoiceDate",DateTimeRangeFilter), "transactionType", "hpm"]
     ordering = ["paymentDate"]
 

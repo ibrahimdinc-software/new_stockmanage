@@ -49,6 +49,7 @@ ORDER_STATUS = [
     ('Refunded', 'İade/İptal - Geri Ödeme Yapılmış'),
 ]
 
+
 class HepsiProductModel(models.Model):
     HepsiburadaSku = models.CharField(verbose_name="Hepsiburada SKU", max_length=100,unique=True)
     MerchantSku = models.CharField(verbose_name="Satıcı SKU", max_length=100)
@@ -74,14 +75,15 @@ class HepsiProductModel(models.Model):
         return str(self.Price).replace('.',',')
 
 
-
 class HepsiMedProductModel(models.Model):
     product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)
-    
+
+
 class HepsiUpdateQueueModel(models.Model):
     hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)
     date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
+
 
 class HepsiProductBuyBoxListModel(models.Model):
     hpm = models.ForeignKey(HepsiProductModel, on_delete=models.CASCADE)
@@ -104,7 +106,6 @@ class UpdateStatusModel(models.Model):
         message = ProductModule().updateControl(self.control_id)
 
         return message
-
 
 
 
@@ -184,6 +185,7 @@ class HepsiOrderDetailModel(models.Model):
         from .hb_module import ProductModule
         ProductModule().increaseStock(self.hpm, self.quantity)
 
+
 class HepsiPaymentModel(models.Model):
     date = models.DateField(verbose_name="Ödeme Tarihi", auto_now=False, auto_now_add=False)
     incomingAmount = models.FloatField(verbose_name="Gelen Tutar")
@@ -198,6 +200,7 @@ class HepsiPaymentModel(models.Model):
         for detail in details:
             price += detail.totalAmount
         return price
+
 
 class HepsiBillModel(models.Model):
     transactionType = models.CharField(verbose_name="İşlem Tipi", max_length=255, choices=TRANSACTION_TYPE)
@@ -217,9 +220,8 @@ class HepsiBillModel(models.Model):
     def __str__(self):
         return self.get_transactionType_display()
     
-
-
-
-
-
-
+    def getOrderDate(self):
+        if self.hom:
+            return self.hom.orderDate
+        else:
+            return "Sipariş Yok"

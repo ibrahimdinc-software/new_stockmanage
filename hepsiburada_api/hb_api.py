@@ -29,10 +29,8 @@ def authenticate(request=None):
     }
     return requests.post(base_url+"api/authenticate", json=request)
 
-
 def xmldict(xml):
     return xmltodict.parse(xml)
-
 
 
 class Listing:
@@ -165,7 +163,6 @@ class Listing:
 
 
 class Order:
-
     url = "https://oms-external.hepsiburada.com/orders/merchantid/"
     headers = {
         "Authorization": encode(),

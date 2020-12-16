@@ -127,6 +127,7 @@ class ProductModule(Listing):
         else:
             return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"   
 
+
 class OrderModule(Order):
     def __dateConverter__(self, date):
         return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
@@ -312,8 +313,8 @@ class OrderModule(Order):
                 order.setTotalPrice()
                 order.setPriceToBilling()
 
+
 class AccountingModule(Accounting):
-    
     def getBills(self, obj):
         
         homs = HepsiOrderModel.objects.all()
@@ -364,7 +365,4 @@ class AccountingModule(Accounting):
                         transactionType=bill.get("transactionType")
                     )
                 hbm.save()
-
-
-
 
