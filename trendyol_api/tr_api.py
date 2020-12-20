@@ -13,6 +13,7 @@ def encode():
     b64_encode = base64.b64encode(up_encode)
     return "Basic " + str(b64_encode, 'utf-8')
 
+
 class Product:
     headers = {
         "Authorization": encode()
@@ -20,16 +21,17 @@ class Product:
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/products"
 
     def batchControl(self, controlId):
-        response = requests.get(self.url+"/batch-requests/"+controlId, headers=self.headers)
+        response = requests.get(
+            self.url+"/batch-requests/"+controlId, headers=self.headers)
         result = response.content.decode("utf-8")
         print(result)
         return json.loads(result)
 
     def getWPage(self, page):
-        response = requests.get(self.url+"?page="+str(page), headers=self.headers)
+        response = requests.get(
+            self.url+"?page="+str(page), headers=self.headers)
         result = json.loads(response.content.decode("utf-8"))
         return result
-
 
     def get(self):
         n_res = []
@@ -37,7 +39,7 @@ class Product:
         page = 0
         totalPages = 2
 
-        while totalPages != page :
+        while totalPages != page:
             result = self.getWPage(page)
             n_res += result.get("content")
 
@@ -46,15 +48,19 @@ class Product:
 
         return n_res
 
-    def update(self,p_list):
+    def update(self, p_list):
         data = {
-            "items":p_list
+            "items": p_list
         }
-        response = requests.post(self.url+"/price-and-inventory", json=data, headers=self.headers)
+        response = requests.post(
+            self.url+"/price-and-inventory", json=data, headers=self.headers)
         result = json.loads(response.content)
-        
+
         return result.get("batchRequestId")
 
+    def getBuyboxList(self, barcode):
+
+        pass
 
 
 class Order:
@@ -62,21 +68,21 @@ class Order:
     headers = {
         "Authorization": encode()
     }
-    def getWPage(self,page):
+
+    def getWPage(self, page, status):
         response = requests.get(
-            self.url+"?status=Awaiting,Created,Picking&page="+str(page), 
+            self.url+"?status="+status+"&page="+str(page),
             headers=self.headers
         )
         return json.loads(response.content)
 
-
-    def get(self):        
+    def get(self, status):
         n_res = []
 
         page = 0
         totalPages = 2
-        while totalPages != page :
-            result = self.getWPage(page)
+        while totalPages != page:
+            result = self.getWPage(page, status)
             n_res += result.get("content")
 
             page += 1

@@ -71,6 +71,12 @@ class HepsiProductModel(models.Model):
         from .hb_module import ProductModule
         ProductModule().updateQueue(self)
     
+    def removeFromSale(self):
+        self.is_salable = False
+        self.AvailableStock = 0
+        self.save()
+        self.updateStock()
+
     def get_price(self):
         return str(self.Price).replace('.',',')
 
@@ -78,7 +84,7 @@ class HepsiProductModel(models.Model):
 class HepsiMedProductModel(models.Model):
     product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)
-
+    isSalable = models.BooleanField(verbose_name="Satılabilir mi?")
 
 class HepsiUpdateQueueModel(models.Model):
     hpm = models.ForeignKey(HepsiProductModel, verbose_name="Hepsiburada Ürünü", on_delete=models.CASCADE)

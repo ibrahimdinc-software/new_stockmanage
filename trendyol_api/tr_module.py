@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from .tr_api import Product, Order
 
-from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel
+from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
 
  
 class ProductModule(Product):
@@ -87,9 +87,50 @@ class ProductModule(Product):
 
     #! Add update control methods
 
+    def buyboxList(self,tpm):
+        if tpm.onSale:            
+            bbList = self.getBuyboxList(tpm.HepsiburadaSku)
+            tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
+
+            notSelling = []
+            if bbList:
+                for bb in bbList:
+                    tpbblm = tpbblms.filter(merchantName=bb.get("MerchantName"))
+                    if tpbblm:
+                        tpbblm = tpbblm[0]
+                        tpbblm.rank = bb.get("Rank")
+                        tpbblm.merchantName = bb.get("MerchantName")
+                        tpbblm.price = bb.get("Price")
+                        tpbblm.dispatchTime = bb.get("DispatchTime")
+                        tpbblm.save()
+                    elif not tpbblm:
+                        tpbblm = TrendProductBuyBoxListModel(
+                            tpm=tpm,
+                            rank=bb.get("Rank"),
+                            merchantName=bb.get("MerchantName"),
+                            price=bb.get("Price"),
+                            dispatchTime=bb.get("DispatchTime")
+                        )
+                        tpbblm.save()
+                    else:
+                        notSelling.append(tpbblm[0])
+
+                    if bb.get("MerchantName") == "Meow Meow":
+                        tpm.buyBoxRank = bb.get("Rank")
+                        tpm.save()
+                
+                for i in notSelling:
+                    i.delete()
+                return None 
+            else:
+                return "Hata var!"
+        else:
+            return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"   
+
+
 class OrderModule(Order):
-    def getOrders(self):
-        orders = self.get()
+    def getOrders(self, status):
+        orders = self.get(status)
 
         trendOrders = TrendOrderModel.objects.all()
         trendProducts = TrendProductModel.objects.all()
@@ -103,7 +144,8 @@ class OrderModule(Order):
                     customerName=order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"],
                     orderNumber=order.get("orderNumber"),
                     orderDate=date,
-                    totalPrice=order.get("totalPrice")
+                    totalPrice=order.get("totalPrice"),
+                    orderStatus=order.get("shipmentPackageStatus")
                 )
                 tom.save()
 
@@ -111,7 +153,7 @@ class OrderModule(Order):
 
                 for d in details:
                     todm = TrendOrderDetailModel(
-                        tpm = trendProducts.get(sku=d.get("merchantSku"),barcode=d.get("sku")),
+                        tpm = trendProducts.get(barcode=d.get("sku")),
                         totalPrice= d.get("price"),
                         tom = tom,
                         quantity = d.get("quantity")
@@ -119,3 +161,5 @@ class OrderModule(Order):
                     todm.save()
                     todm.dropStock()
 
+    def getOldOrders(self, startDate):
+        pass

@@ -205,4 +205,5 @@ class HepsiBillModelAdmin(admin.ModelAdmin):
     ordering = ["paymentDate"]
 
     autocomplete_fields=["hom",]
-#class HepsiOrderCancelModel(models.Mode)
+
+    
