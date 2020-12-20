@@ -129,8 +129,8 @@ class ProductModule(Product):
 
 
 class OrderModule(Order):
-    def getOrders(self, status):
-        orders = self.get(status)
+    def getOrders(self):
+        orders = self.get("Awaiting,Created,Picking,Invoiced")
 
         trendOrders = TrendOrderModel.objects.all()
         trendProducts = TrendProductModel.objects.all()
