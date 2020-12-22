@@ -19,14 +19,20 @@ class ProductModel(models.Model):
         hmpm = self.hepsimedproductmodel_set.all()
         tmpm = self.trendmedproductmodel_set.all()
         for m in hmpm:
-            m.hpm.AvailableStock = self.piece
-            m.hpm.save()
-            m.hpm.updateStock()
+            if m.isSalable:
+                m.hpm.AvailableStock = self.piece
+                m.hpm.save()
+                m.hpm.updateStock()
+            else:
+                m.hpm.removeFromSale()
         del hmpm
         for m in tmpm:
-            m.tpm.piece = self.piece
-            m.tpm.save()
-            m.tpm.updateStock()
+            if m.isSalable:
+                m.tpm.piece = self.piece
+                m.tpm.save()
+                m.tpm.updateStock()
+            else:
+                m.tpm.removeFromSale()
         del tmpm
 
     def stockMethod(self):
