@@ -11,7 +11,7 @@ class ScrapperClass:
 
         from sys import platform
         if platform == "linux" or platform == "linux2":
-            driverPath = "/opt/spry/geckodriver"
+            driverPath = "/opt/spry/new_stockmanage/geckodriver"
         elif platform == "win32":
             driverPath = "geckodriver.exe"
 
