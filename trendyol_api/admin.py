@@ -1,16 +1,14 @@
+from datetime import date
 from django.contrib import admin
 from rangefilter.filter import DateTimeRangeFilter
 
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import TrendProductModel, TrendMedProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel
+from .models import TrendProductModel, TrendMedProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
 
 from .tr_module import ProductModule, OrderModule
 # Register your models here.
-
-
-
 
 
 class TrendMedProductModelTabularInline(admin.TabularInline):
@@ -18,15 +16,25 @@ class TrendMedProductModelTabularInline(admin.TabularInline):
     extra = 0
     autocomplete_fields = ["tpm"]
 
+class TrendProductBuyBoxListModelTabularInline(admin.TabularInline):
+    model = TrendProductBuyBoxListModel
+    extra = 0
+    ordering = ('rank',)
+
 @admin.register(TrendProductModel)
 class TrendProductModelAdmin(admin.ModelAdmin):
     change_list_template = ["trendyol_api/admin/get_products.html"]
     change_form_template = "trendyol_api/admin/updateProduct.html"
     
     search_fields = ["sku","barcode","name"]
-    actions = ['send_list']
-    list_display = ['__str__', 'sku', 'barcode', 'salePrice', 'piece', 'onSale']
+    actions = ['send_list', 'getBuyBoxes']
 
+    list_filter = ["onSale"]
+    list_display = ['name', 'salePrice', 'piece', 'onSale', 'buyBoxRank']
+    
+    readonly_fields = ["productLinkF"]
+
+    inlines = [TrendProductBuyBoxListModelTabularInline]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -50,21 +58,48 @@ class TrendProductModelAdmin(admin.ModelAdmin):
         
         self.message_user(request, "Bekleme listesine eklendi.")
 
+    def getBuyBoxes(self, request, queryset):
+        import time, datetime
+
+        from scrapper.scrapper import ScrapperClass
+
+        st = datetime.datetime.now()
+        
+        sc = ScrapperClass()
+        driver = sc.driver
+
+        for q in queryset:
+            ProductModule().buyboxList(q, driver)
+            time.sleep(.100)
+        self.message_user(request, "Hadi H.O.")
+
+        sc.closeDriver()
+
+        print(abs((datetime.datetime.now()-st).seconds))
 
     def response_change(self, request, obj):
         if "update" in request.POST:
             obj.save()
             obj.updateStock()
-
-
             self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
-
             return HttpResponseRedirect(".")
+        if "getBuyBox" in request.POST:
+            from scrapper.scrapper import ScrapperClass
+            sc = ScrapperClass()
+            driver = sc.driver
+            message = ProductModule().buyboxList(obj, driver)
+            if message:
+                self.message_user(request, message)
+            else:
+                self.message_user(request, "Geldi mi bak")
+            sc.closeDriver()
+            return HttpResponseRedirect(".")
+
         return super().response_change(request, obj)
 
 
-
     send_list.short_description = "Seçili ürünleri trendyola gönder."
+    getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
 
 
 @admin.register(TrendUpdateQueueModel)

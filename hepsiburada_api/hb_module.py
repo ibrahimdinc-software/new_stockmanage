@@ -98,7 +98,6 @@ class ProductModule(Listing):
         return "Oha gerçekten nasıl başarılı olabilir ya?"
 
     def buyboxList(self,hpm):
-        print(hpm.MerchantSku)
         if hpm.is_salable:            
             bbList = self.getBuyboxList(hpm.HepsiburadaSku)
             hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)

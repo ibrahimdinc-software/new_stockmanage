@@ -2,6 +2,7 @@ import requests
 import base64
 import json
 
+
 supplierId = "230796"
 apiKey = "TkgLO3JguKqXJUjk7Kmh"
 apiSecret = "eSLkr1XC7Jf9fASQf2zm"
@@ -58,9 +59,34 @@ class Product:
 
         return result.get("batchRequestId")
 
-    def getBuyboxList(self, barcode):
 
-        pass
+
+    def getBuyboxList(self, link, driver):
+        
+        
+        driver.get(link)
+
+        data = driver.execute_script("return __PRODUCT_DETAIL_APP_INITIAL_STATE__")
+
+        lastData = [
+                {
+                    "rank": 1,
+                    "merchantName": data["product"]["merchant"]["name"],
+                    "price": data["product"]["price"]["sellingPrice"]["value"]
+                }
+            ]
+
+        r = 2
+        for i in data["product"]["otherMerchants"]:
+            lastData.append({
+                    "rank": r,
+                    "merchantName": i["merchant"]["name"],
+                    "price": i["price"]["sellingPrice"]["value"]
+                })
+            r += 1
+
+
+        return lastData
 
 
 class Order:

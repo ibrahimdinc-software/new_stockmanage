@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import format_html
 
 # Create your models here.
 
@@ -25,6 +26,7 @@ class TrendProductModel(models.Model):
     salePrice = models.FloatField(verbose_name="Satış Fiyatı")
     piece = models.IntegerField(verbose_name="Adet")
     onSale = models.BooleanField(verbose_name="Satışta Mı?")
+    productLink = models.CharField(verbose_name="Link", max_length=255)
     buyBoxRank = models.IntegerField(
         verbose_name="Buybox Sıralaması", blank=True, null=True)
 
@@ -40,6 +42,13 @@ class TrendProductModel(models.Model):
     def updateStock(self):
         from .tr_module import ProductModule
         ProductModule().updateQueue(self)
+
+    def productLinkF(self):
+        return format_html(
+            '<a href="{0}" target="_blank">{1}</a>',
+            self.productLink,
+            "Ürün Linki",
+        )
 
 
 class TrendMedProductModel(models.Model):
@@ -62,7 +71,6 @@ class TrendProductBuyBoxListModel(models.Model):
     rank = models.IntegerField(verbose_name="Sıralama")
     merchantName = models.CharField(verbose_name="Satıcı Adı", max_length=255)
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
-    dispatchTime = models.IntegerField("Kargoya Verme Süresi")
 
     def __str__(self):
         return str(self.rank)

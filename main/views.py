@@ -12,7 +12,8 @@ def index(request):
         'unassigned': len(ProductModule().getUnassigned()),
         'unassignedHB': len(ProductModule().getUnassignedHB()),
         'unassignedTR': len(ProductModule().getUnassignedTR()),
-        'losedBuyboxHB': len(ProductModule().getLosedBuyboxesHB())
+        'losedBuyboxHB': len(ProductModule().getLosedBuyboxesHB()),
+        'losedBuyboxTR': len(ProductModule().getLosedBuyboxesTR())
     }
 
     return render(request, "main/index.html", context=context)
@@ -43,4 +44,10 @@ class LosedBuyboxHBListView(ListView):
     
     def get_queryset(self):
         return ProductModule().getLosedBuyboxesHB()
+    
+class LosedBuyboxTRListView(ListView):
+    template_name = "main/losedBuyboxTR.html"
+    
+    def get_queryset(self):
+        return ProductModule().getLosedBuyboxesTR()
     

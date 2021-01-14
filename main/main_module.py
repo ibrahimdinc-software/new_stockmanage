@@ -1,5 +1,5 @@
 from storage.models import ProductModel,BaseProductModel
-from hepsiburada_api.models import HepsiProductModel, HepsiProductBuyBoxListModel
+from hepsiburada_api.models import HepsiProductModel
 from trendyol_api.models import TrendProductModel
 
 
@@ -43,19 +43,16 @@ class ProductModule():
 
         return losedBuybox
 
+    def getLosedBuyboxesTR(self):
+        losedBuybox = []
+
+        tpms = TrendProductModel.objects.all()
+
+        for tpm in tpms:
+            if tpm.buyBoxRank != 1 and tpm.onSale:
+                losedBuybox.append(tpm)
+
+        return losedBuybox
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-        

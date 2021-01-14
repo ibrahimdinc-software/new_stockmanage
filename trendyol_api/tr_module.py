@@ -11,8 +11,6 @@ class ProductModule(Product):
         tpms = TrendProductModel.objects.all()
         if products:
             for p in products:
-                print(p)
-                print(type(p))
                 tpm = tpms.filter(barcode=p.get("barcode"))
                 if not tpm:
                     tpm = TrendProductModel(
@@ -22,7 +20,8 @@ class ProductModule(Product):
                         piece=p.get("quantity"),
                         onSale=p.get("onSale"),
                         sku=p.get("stockCode"),
-                        salePrice=p.get("salePrice")
+                        salePrice=p.get("salePrice"),
+                        productLink="https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId"))
                     )
                     tpm.save()
                 else:
@@ -32,6 +31,10 @@ class ProductModule(Product):
                     tpm.salePrice = p.get("salePrice")
                     tpm.piece = p.get("quantity")
                     tpm.onSale = p.get("onSale")
+                    tpm.productLink = "https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId")) if p.get("productContentId") != None else "ContentId Not Found!"
+
+                    if p.get("productContentId") == None:
+                        print(p.get("barcode"))
 
                     tpm.save()
         else:
@@ -87,40 +90,28 @@ class ProductModule(Product):
 
     #! Add update control methods
 
-    def buyboxList(self,tpm):
+    def buyboxList(self,tpm, driver):
         if tpm.onSale:            
-            bbList = self.getBuyboxList(tpm.HepsiburadaSku)
+            bbList = self.getBuyboxList(tpm.productLink, driver)
             tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
 
-            notSelling = []
             if bbList:
-                for bb in bbList:
-                    tpbblm = tpbblms.filter(merchantName=bb.get("MerchantName"))
-                    if tpbblm:
-                        tpbblm = tpbblm[0]
-                        tpbblm.rank = bb.get("Rank")
-                        tpbblm.merchantName = bb.get("MerchantName")
-                        tpbblm.price = bb.get("Price")
-                        tpbblm.dispatchTime = bb.get("DispatchTime")
-                        tpbblm.save()
-                    elif not tpbblm:
-                        tpbblm = TrendProductBuyBoxListModel(
-                            tpm=tpm,
-                            rank=bb.get("Rank"),
-                            merchantName=bb.get("MerchantName"),
-                            price=bb.get("Price"),
-                            dispatchTime=bb.get("DispatchTime")
-                        )
-                        tpbblm.save()
-                    else:
-                        notSelling.append(tpbblm[0])
+                for tpbblm in tpbblms:
+                    tpbblm.delete()
 
-                    if bb.get("MerchantName") == "Meow Meow":
-                        tpm.buyBoxRank = bb.get("Rank")
+                for bb in bbList:
+                    tpbblm = TrendProductBuyBoxListModel(
+                        tpm=tpm,
+                        rank=bb.get("rank"),
+                        merchantName=bb.get("merchantName"),
+                        price=bb.get("price"),
+                    )
+                    tpbblm.save()
+
+                    if bb.get("merchantName") == "Meow Meow":
+                        tpm.buyBoxRank = bb.get("rank")
                         tpm.save()
-                
-                for i in notSelling:
-                    i.delete()
+
                 return None 
             else:
                 return "Hata var!"

@@ -9,4 +9,5 @@ urlpatterns = [
     path('unassignedHB/', views.UnassignedProductHBListView.as_view()),
     path('losedBuyboxHB/', views.LosedBuyboxHBListView.as_view()),
     path('unassignedTR/', views.UnassignedProductTRListView.as_view()),
+    path('losedBuyboxTR/', views.LosedBuyboxTRListView.as_view()),
 ]
