@@ -12,13 +12,8 @@ class ScrapperClass:
 
     async def __create__(self):
         self.browser = await launch(
-            headless=True,
             args=[
-                '--no-sandbox',
-                '--single-process',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--no-zygote'
+                '--no-sandbox'
             ],
             handleSIGINT=False, 
             handleSIGTERM=False, 
