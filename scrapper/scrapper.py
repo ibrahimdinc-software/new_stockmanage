@@ -16,7 +16,9 @@ class ScrapperClass:
             args=[
                 '--no-sandbox',
                 '--single-process',
+                '--disable-dev-shm-usage',
                 '--disable-gpu',
+                '--no-zygote'
             ],
             handleSIGINT=False, 
             handleSIGTERM=False, 
