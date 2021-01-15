@@ -11,7 +11,16 @@ class ScrapperClass:
         super().__init__()
 
     async def __create__(self):
-        self.browser = await launch(handleSIGINT=False, handleSIGTERM=False, handleSIGHUP=False)
+        self.browser = await launch(
+            headless=True,
+            args=[
+                '--no-sandbox',
+                '--single-process',
+                '--disable-gpu',
+            ],
+            handleSIGINT=False, 
+            handleSIGTERM=False, 
+            handleSIGHUP=False, )
         self.page = await self.browser.newPage()
             
 
