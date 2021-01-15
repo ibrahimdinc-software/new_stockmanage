@@ -63,11 +63,8 @@ class Product:
 
     def getBuyboxList(self, link, driver):
         
-        
-        driver.get(link)
-
-        data = driver.execute_script("return __PRODUCT_DETAIL_APP_INITIAL_STATE__")
-
+        driver.getDataWithLink(link, '''() => {return __PRODUCT_DETAIL_APP_INITIAL_STATE__}''')
+        data = driver.data
         lastData = [
                 {
                     "rank": 1,

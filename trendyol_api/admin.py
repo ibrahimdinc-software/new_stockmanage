@@ -59,23 +59,8 @@ class TrendProductModelAdmin(admin.ModelAdmin):
         self.message_user(request, "Bekleme listesine eklendi.")
 
     def getBuyBoxes(self, request, queryset):
-        import time, datetime
-
-        from scrapper.scrapper import ScrapperClass
-
-        st = datetime.datetime.now()
+        ProductModule().buyboxList(queryset)
         
-        sc = ScrapperClass()
-        driver = sc.driver
-
-        for q in queryset:
-            ProductModule().buyboxList(q, driver)
-            time.sleep(.100)
-        self.message_user(request, "Hadi H.O.")
-
-        sc.closeDriver()
-
-        print(abs((datetime.datetime.now()-st).seconds))
 
     def response_change(self, request, obj):
         if "update" in request.POST:
@@ -84,15 +69,11 @@ class TrendProductModelAdmin(admin.ModelAdmin):
             self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
             return HttpResponseRedirect(".")
         if "getBuyBox" in request.POST:
-            from scrapper.scrapper import ScrapperClass
-            sc = ScrapperClass()
-            driver = sc.driver
-            message = ProductModule().buyboxList(obj, driver)
+            message = ProductModule().buyboxList([obj])
             if message:
                 self.message_user(request, message)
             else:
                 self.message_user(request, "Geldi mi bak")
-            sc.closeDriver()
             return HttpResponseRedirect(".")
 
         return super().response_change(request, obj)

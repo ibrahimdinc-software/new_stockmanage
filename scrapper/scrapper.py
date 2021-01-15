@@ -1,24 +1,34 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from time import asctime
+from pyppeteer import launch
+import asyncio
+
 
 class ScrapperClass:
-
-    def __init__(self) -> None:
-        options = Options()
-        options.headless = True
-
-        driverPath = ""
-
-        from sys import platform
-        if platform == "linux" or platform == "linux2":
-            driverPath = "/opt/spry/new_stockmanage/geckodriver"
-        elif platform == "win32":
-            driverPath = "geckodriver.exe"
-
-        self.driver = webdriver.Firefox(executable_path=driverPath, options=options)
+    
+    def __init__(self):
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.__create__())
         super().__init__()
 
+    async def __create__(self):
+        self.browser = await launch(handleSIGINT=False, handleSIGTERM=False, handleSIGHUP=False)
+        self.page = await self.browser.newPage()
+            
+
+    async def goToPage(self, link):
+        await self.page.goto(link)
+    
+    async def runCommand(self, command):
+        self.data = await self.page.evaluate(command)
+
+
+    async def __closeDriver__(self):
+        await self.browser.close()
+
     def closeDriver(self):
-        self.driver.close()
+        self.loop.run_until_complete(self.browser.close())
 
-
+    def getDataWithLink(self, link, command):
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_until_complete(self.goToPage(link))
+        self.loop.run_until_complete(self.runCommand(command))
