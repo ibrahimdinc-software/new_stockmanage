@@ -22,7 +22,13 @@ class ScrapperClass:
             
 
     async def goToPage(self, link):
-        await self.page.goto(link)
+        await self.page.goto(
+            link,
+            {
+                "waitUntil": "load",
+                "timeout": 0
+            }  
+        )
     
     async def runCommand(self, command):
         self.data = await self.page.evaluate(command)
