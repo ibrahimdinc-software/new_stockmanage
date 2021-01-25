@@ -99,6 +99,7 @@ class Order:
             self.url+"?status="+status+"&page="+str(page),
             headers=self.headers
         )
+        print(response.content)
         return json.loads(response.content)
 
     def get(self, status):
@@ -106,7 +107,7 @@ class Order:
 
         page = 0
         totalPages = 2
-        while totalPages != page:
+        while page < totalPages:
             result = self.getWPage(page, status)
             n_res += result.get("content")
 
