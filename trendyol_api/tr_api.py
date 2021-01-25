@@ -17,7 +17,8 @@ def encode():
 
 class Product:
     headers = {
-        "Authorization": encode()
+        "Authorization": encode(),
+        "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
     }
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/products"
 
@@ -89,7 +90,8 @@ class Product:
 class Order:
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/orders"
     headers = {
-        "Authorization": encode()
+        "Authorization": encode(),
+        "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
     }
 
     def getWPage(self, page, status):
