@@ -17,6 +17,10 @@ ORDER_STATUS = (
     ('UnDeliveredAndReturned', 'Ulaştırılamadı ve Geri Döndü'),
 )
 
+TRANSACTION_TYPE = (
+    ('a', 'a'),
+)
+
 
 class TrendProductModel(models.Model):
     name = models.CharField(verbose_name="Ürün Adı", max_length=500)
@@ -49,6 +53,9 @@ class TrendProductModel(models.Model):
             self.productLink,
             "Ürün Linki",
         )
+
+    def countOfRelated(self):
+        return len(self.trendmedproductmodel_set.all())
 
 
 class TrendMedProductModel(models.Model):
@@ -99,11 +106,12 @@ class TrendOrderModel(models.Model):
 
 
 class TrendOrderDetailModel(models.Model):
-    tom = models.ForeignKey(TrendOrderModel, verbose_name="Trendyol Sipariş Modeli", on_delete=models.CASCADE)
-    tpm = models.ForeignKey( TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
+    tom = models.ForeignKey(
+        TrendOrderModel, verbose_name="Trendyol Sipariş Modeli", on_delete=models.CASCADE)
+    tpm = models.ForeignKey(
+        TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
     totalPrice = models.FloatField(verbose_name="Tutar")
     quantity = models.IntegerField(verbose_name="Adet")
-
 
     def dropStock(self):
         from .tr_module import ProductModule
@@ -118,3 +126,29 @@ class TrendOrderCostModel(models.Model):
     tom = models.ForeignKey(TrendOrderModel, on_delete=models.CASCADE)
     name = models.CharField(verbose_name="Maliyet Adı", max_length=255)
     price = models.FloatField(verbose_name="Tutar")
+
+
+class TrendPaymentModel(models.Model):
+    date = models.DateField(verbose_name="Ödeme Tarihi",
+                            auto_now=False, auto_now_add=False)
+    incomingAmount = models.FloatField(verbose_name="Gelen Tutar")
+    amountToCome = models.FloatField(verbose_name="Gelmesi Gereken Tutar")
+
+    def __str__(self):
+        return str(self.date)
+
+    def totalPayment(self):
+        details = self.trendbillmodel_set.all()
+        price = 0
+        for detail in details:
+            price += detail.totalAmount
+        return price
+
+
+class TrendBillModel(models.Model):
+    transactionType = models.CharField(
+        verbose_name="İşlem Tipi", max_length=255, choices=TRANSACTION_TYPE)
+    hom = models.ForeignKey(
+        TrendOrderModel, on_delete=models.CASCADE, blank=True, null=True)
+    hodm = models.ForeignKey(TrendOrderDetailModel,
+                             on_delete=models.CASCADE, blank=True, null=True)

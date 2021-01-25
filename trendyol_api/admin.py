@@ -29,12 +29,12 @@ class TrendProductModelAdmin(admin.ModelAdmin):
     search_fields = ["sku","barcode","name"]
     actions = ['send_list', 'getBuyBoxes']
 
-    list_filter = ["onSale"]
-    list_display = ['name', 'salePrice', 'piece', 'onSale', 'buyBoxRank']
+    list_filter = ["onSale",]
+    list_display = ['name', 'salePrice', 'piece', 'onSale', 'buyBoxRank', "countOfRelated"]
     
     readonly_fields = ["productLinkF"]
 
-    inlines = [TrendProductBuyBoxListModelTabularInline]
+    inlines = [TrendMedProductModelTabularInline, TrendProductBuyBoxListModelTabularInline,]
 
     def get_urls(self):
         urls = super().get_urls()
