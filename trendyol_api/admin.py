@@ -32,7 +32,7 @@ class TrendProductModelAdmin(admin.ModelAdmin):
     list_filter = ["onSale",]
     list_display = ['name', 'salePrice', 'piece', 'onSale', 'buyBoxRank', "countOfRelated"]
     
-    readonly_fields = ["productLinkF"]
+    readonly_fields = ["productLinkF", "related"]
 
     inlines = [TrendMedProductModelTabularInline, TrendProductBuyBoxListModelTabularInline,]
 

@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 
 # Create your models here.
 
@@ -56,6 +56,13 @@ class TrendProductModel(models.Model):
 
     def countOfRelated(self):
         return len(self.trendmedproductmodel_set.all())
+
+    def related(self):
+        return format_html_join(
+            "\n",
+            '<a href="/admin/storage/productmodel/{0}/change/" target="_blank">{1}</a>',
+            ((tpm.product.id, tpm.product.name) for tpm in self.trendmedproductmodel_set.all())
+        )
 
 
 class TrendMedProductModel(models.Model):
