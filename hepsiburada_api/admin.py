@@ -27,7 +27,9 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
     change_form_template = "hepsiburada_api/admin/updateProduct.html"
 
     search_fields = ["HepsiburadaSku","MerchantSku",]
-    list_display = ['MerchantSku','HepsiburadaSku',  'is_salable',]
+    list_display = ['MerchantSku','Price', 'AvailableStock', 'buyBoxRank', 'is_salable',]
+
+    list_filter = ['is_salable',]
 
     inlines = [HepsiProductBuyBoxListModelTabularInline]
 
