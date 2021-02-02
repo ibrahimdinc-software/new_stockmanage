@@ -1,7 +1,7 @@
 from django.contrib import admin
 from rangefilter.filter import DateTimeRangeFilter
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, request
 from django.urls import path
 
 from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel, HepsiPaymentModel, HepsiBillModel
@@ -79,6 +79,20 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     send_list.short_description = "Seçili ürünleri hepsiburadaya gönder."
     getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
+
+@admin.register(HepsiMedProductModel)
+class HepsiMedProductModelAdmin(admin.ModelAdmin):
+    list_display = ['product', 'hpm', 'isSalable',]
+    def outOfStock(self, request, queryset):
+        for q in queryset:
+            q.isSalable = False
+            q.updateStock()
+            q.save()
+        self.message_user(request, "Stoklar sıfırlandı.")
+
+    outOfStock.short_description = "Seçili ürünlerin satışını kapat."
+
+
 
 @admin.register(UpdateStatusModel)
 class UpdateStatusModelAdmin(admin.ModelAdmin):
