@@ -83,6 +83,8 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 @admin.register(HepsiMedProductModel)
 class HepsiMedProductModelAdmin(admin.ModelAdmin):
     list_display = ['product', 'hpm', 'isSalable',]
+    actions = ["outOfStock"]
+
     def outOfStock(self, request, queryset):
         for q in queryset:
             q.isSalable = False
