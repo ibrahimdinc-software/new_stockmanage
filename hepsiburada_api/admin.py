@@ -88,7 +88,7 @@ class HepsiMedProductModelAdmin(admin.ModelAdmin):
     def outOfStock(self, request, queryset):
         for q in queryset:
             q.isSalable = False
-            q.updateStock()
+            q.hpm.updateStock()
             q.save()
         self.message_user(request, "Stoklar sıfırlandı.")
 
