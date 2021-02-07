@@ -72,7 +72,6 @@ class TrendMedProductModel(models.Model):
         TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
     isSalable = models.BooleanField(verbose_name="Satılabilir mi?")
 
-
 class TrendUpdateQueueModel(models.Model):
     tpm = models.ForeignKey(
         TrendProductModel, verbose_name="Trendyol Ürünü", on_delete=models.CASCADE)
