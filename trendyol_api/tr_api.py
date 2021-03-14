@@ -3,9 +3,9 @@ import base64
 import json
 
 
-supplierId = "230796"
-apiKey = "TkgLO3JguKqXJUjk7Kmh"
-apiSecret = "eSLkr1XC7Jf9fASQf2zm"
+supplierId = "356587"
+apiKey = "YFZDBDCCxRRy1YBkwrrL"
+apiSecret = "iaNnyoGaqnJEi0g3Pw9b"
 
 
 def encode():
@@ -18,7 +18,7 @@ def encode():
 class Product:
     headers = {
         "Authorization": encode(),
-        "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
+        "User-Agent": "356587 - YFZDBDCCxRRy1YBkwrrL"
     }
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/products"
 
