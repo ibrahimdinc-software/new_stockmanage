@@ -72,7 +72,6 @@ class BaseProductModelAdmin(admin.ModelAdmin):
         for product in excel.iloc:
             barcode = 0 if math.isnan(product.get("Barcode")) else product.get("Barcode")
             p = products.filter(name=product.get("Item"),barcode=barcode)
-            print(p)
             if not p:
                 p = BaseProductModel(
                     name=product.get("Item"),
