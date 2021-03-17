@@ -4,6 +4,7 @@ from .tr_api import Product, Order
 
 from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
 
+from new_stockmanage.mail import loseBuyboxMail
  
 class ProductModule(Product):
     def getProducts(self):
@@ -90,31 +91,50 @@ class ProductModule(Product):
 
     #! Add update control methods
 
+    def _getBuyBox(self, tpm, notif):
+        if tpm.onSale:
+            bbList = self.getBuyboxList(tpm.productLink)
+            tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
+
+            if bbList:
+                for tpbblm in tpbblms:
+                    tpbblm.delete()
+                lastRank = tpm.buyBoxRank
+                for bb in bbList:
+                    tpbblm = TrendProductBuyBoxListModel(
+                        tpm=tpm,
+                        rank=bb.get("rank"),
+                        merchantName=bb.get("merchantName"),
+                        price=bb.get("price"),
+                    )
+                    tpbblm.save()
+            
+                    if bb.get("merchantName") == "PetiFest":
+                        tpm.buyBoxRank = bb.get("rank")
+                        tpm.save()
+
+                if notif:
+                    if lastRank != tpm.buyBoxRank:
+                        return {
+                            "lastRank": lastRank, 
+                            "currentRank": tpm.buyBoxRank,
+                            "tpm": tpm.sku,
+                            "url": "http://dev.petifest.com/admin/trendyol_api/trendproductmodel/{}/change/".format(tpm.id)
+                        }
 
     def buyboxList(self,tpms):
         for tpm in tpms:
-            if tpm.onSale:            
-                bbList = self.getBuyboxList(tpm.productLink)
-                tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
-
-                if bbList:
-                    for tpbblm in tpbblms:
-                        tpbblm.delete()
-
-                    for bb in bbList:
-                        tpbblm = TrendProductBuyBoxListModel(
-                            tpm=tpm,
-                            rank=bb.get("rank"),
-                            merchantName=bb.get("merchantName"),
-                            price=bb.get("price"),
-                        )
-                        tpbblm.save()
-
-                        if bb.get("merchantName") == "PetiFest":
-                            tpm.buyBoxRank = bb.get("rank")
-                            tpm.save()
+            self._getBuyBox(tpm, False)
         return "Bitti ?"
 
+    def cronBuyBox(self):
+        tpms = TrendProductModel.objects.filter(onSale=True)
+        infos = []
+        for tpm in tpms:
+            infos.append(self._getBuyBox(tpm, True))
+        
+        loseBuyboxMail(infos)
+        
            
 
 
