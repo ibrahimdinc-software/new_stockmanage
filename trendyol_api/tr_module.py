@@ -116,10 +116,15 @@ class ProductModule(Product):
                 if notif:
                     if lastRank != tpm.buyBoxRank:
                         return {
+                            "status": "change",
                             "lastRank": lastRank, 
                             "currentRank": tpm.buyBoxRank,
                             "tpm": tpm.sku,
                             "url": "http://dev.petifest.com/admin/trendyol_api/trendproductmodel/{}/change/".format(tpm.id)
+                        }
+                    else:
+                        return {
+                            "status": "same"
                         }
 
     def buyboxList(self,tpms):
@@ -131,9 +136,11 @@ class ProductModule(Product):
         tpms = TrendProductModel.objects.filter(onSale=True)
         infos = []
         for tpm in tpms:
-            infos.append(self._getBuyBox(tpm, True))
-        
-        loseBuyboxMail(infos)
+            m = self._getBuyBox(tpm, True)
+            if m.get("status") == "change":
+                infos.append()
+        if len(infos) > 0:
+            loseBuyboxMail(infos)
         
            
 
