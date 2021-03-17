@@ -1,6 +1,7 @@
 import requests
 import base64
 import json
+from bs4 import BeautifulSoup
 
 
 supplierId = "356587"
@@ -62,24 +63,24 @@ class Product:
 
 
 
-    def getBuyboxList(self, link, driver):
-        
-        driver.getDataWithLink(link, '''() => {return __PRODUCT_DETAIL_APP_INITIAL_STATE__}''')
-        data = driver.data
+    def getBuyboxList(self, link):
+        page = requests.get(link)
+        soup = BeautifulSoup(page.content, 'html.parser')
+
         lastData = [
                 {
                     "rank": 1,
-                    "merchantName": data["product"]["merchant"]["name"],
-                    "price": data["product"]["price"]["sellingPrice"]["value"]
+                    "merchantName":soup.find("div", attrs={"class":"sl-nm"}).find("a").text,
+                    "price": float(soup.find("span", attrs={"class":"prc-slg"}).text.replace(" TL", "").replace(",", "."))
                 }
             ]
 
         r = 2
-        for i in data["product"]["otherMerchants"]:
+        for i in soup.find_all("div", attrs={"class":"pr-mc-w gnr-cnt-br"}):
             lastData.append({
                     "rank": r,
-                    "merchantName": i["merchant"]["name"],
-                    "price": i["price"]["sellingPrice"]["value"]
+                    "merchantName": i.find("div",attrs={"class": "pr-mb-mn"}).find("a").text,
+                    "price": float(i.find("span",attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
                 })
             r += 1
 

@@ -90,9 +90,10 @@ class ProductModule(Product):
 
     #! Add update control methods
 
-    def _getBuyBox(self, tpm, driver):
+
+    def buyboxList(self,tpm):
         if tpm.onSale:            
-            bbList = self.getBuyboxList(tpm.productLink, driver)
+            bbList = self.getBuyboxList(tpm.productLink)
             tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
 
             if bbList:
@@ -117,16 +118,6 @@ class ProductModule(Product):
                 return "Hata var!"
         else:
             return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"
-
-    def buyboxList(self,tpm):
-        from scrapper.scrapper import ScrapperClass
-        import asyncio
-
-        driver = ScrapperClass()
-        for t in tpm:
-            self._getBuyBox(t,driver)
-        
-        driver.closeDriver()
 
            
 
