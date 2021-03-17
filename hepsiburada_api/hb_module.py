@@ -116,7 +116,7 @@ class ProductModule(Listing):
                     )
                     hpbblm.save()
                 
-                    if bb.get("MerchantName") == "Meow Meow":
+                    if bb.get("MerchantName") == "PetiFest":
                         hpm.buyBoxRank = bb.get("Rank")
                         hpm.save()
                 

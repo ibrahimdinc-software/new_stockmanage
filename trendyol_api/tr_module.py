@@ -108,7 +108,7 @@ class ProductModule(Product):
                     )
                     tpbblm.save()
 
-                    if bb.get("merchantName") == "Meow Meow":
+                    if bb.get("merchantName") == "PetiFest":
                         tpm.buyBoxRank = bb.get("rank")
                         tpm.save()
 
