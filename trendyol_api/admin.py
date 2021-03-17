@@ -63,7 +63,8 @@ class TrendProductModelAdmin(admin.ModelAdmin):
         self.message_user(request, "Bekleme listesine eklendi.")
 
     def getBuyBoxes(self, request, queryset):
-        ProductModule().buyboxList(queryset)
+        message = ProductModule().buyboxList(queryset)
+        self.message_user(request, message)
 
     def response_change(self, request, obj):
         if "update" in request.POST:
