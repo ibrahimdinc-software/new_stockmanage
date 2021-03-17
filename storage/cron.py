@@ -10,3 +10,7 @@ def getOrders():
     tr_Order().getOrders()
     hb_Order().getOrders()
     productUpdate()
+
+
+def getBuyBoxes():
+    tr_Product().cronBuyBox()
