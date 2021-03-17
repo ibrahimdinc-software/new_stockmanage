@@ -91,33 +91,34 @@ class ProductModule(Product):
     #! Add update control methods
 
 
-    def buyboxList(self,tpm):
-        if tpm.onSale:            
-            bbList = self.getBuyboxList(tpm.productLink)
-            tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
+    def buyboxList(self,tpms):
+        for tpm in tpms:
+            if tpm.onSale:            
+                bbList = self.getBuyboxList(tpm.productLink)
+                tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
 
-            if bbList:
-                for tpbblm in tpbblms:
-                    tpbblm.delete()
+                if bbList:
+                    for tpbblm in tpbblms:
+                        tpbblm.delete()
 
-                for bb in bbList:
-                    tpbblm = TrendProductBuyBoxListModel(
-                        tpm=tpm,
-                        rank=bb.get("rank"),
-                        merchantName=bb.get("merchantName"),
-                        price=bb.get("price"),
-                    )
-                    tpbblm.save()
+                    for bb in bbList:
+                        tpbblm = TrendProductBuyBoxListModel(
+                            tpm=tpm,
+                            rank=bb.get("rank"),
+                            merchantName=bb.get("merchantName"),
+                            price=bb.get("price"),
+                        )
+                        tpbblm.save()
 
-                    if bb.get("merchantName") == "PetiFest":
-                        tpm.buyBoxRank = bb.get("rank")
-                        tpm.save()
+                        if bb.get("merchantName") == "PetiFest":
+                            tpm.buyBoxRank = bb.get("rank")
+                            tpm.save()
 
-                return None 
+                    return None 
+                else:
+                    return "Hata var!"
             else:
-                return "Hata var!"
-        else:
-            return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"
+                return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"
 
            
 
