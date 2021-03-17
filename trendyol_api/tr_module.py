@@ -138,7 +138,7 @@ class ProductModule(Product):
         for tpm in tpms:
             m = self._getBuyBox(tpm, True)
             if m.get("status") == "change":
-                infos.append()
+                infos.append(m)
         if len(infos) > 0:
             loseBuyboxMail(infos)
         
