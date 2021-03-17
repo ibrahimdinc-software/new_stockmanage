@@ -8,10 +8,10 @@ from xml.etree import ElementTree as et
 
 base_url = "https://mpop.hepsiburada.com/"
 
-dev_user = "meowmeow_dev"
-dev_pass = "!jqZKsyIKeIfHE"
+dev_user = "PetiFest_Dev"
+dev_pass = "!IasvVxJkMXIzu"
 
-merchant_id = "99222e7e-4470-45d2-82d4-5e1d6c67958d"
+merchant_id = "6555aefb-86d4-4fd8-bd85-232cbd8f23ab"
 
 
 
