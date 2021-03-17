@@ -1,3 +1,4 @@
+from django.core.checks import messages
 from django.core.mail import send_mail
 
 def sendMail(subject, message):
@@ -13,3 +14,12 @@ def outOfStockMail(cdm):
 def testMail():
     sendMail('Test', 'test mesaj')
 
+def loseBuyboxMail(data):
+    message = ""
+    for m in data:
+        message += "{} stok kodlu ürünün buybox sıralaması {}'den {}'ye düşmüştür. {}\n".format(m.get("tpm"), m.get("lastRank"), m.get("currentRank"), m.get("url"))
+
+    send_mail(
+        "BuyBox Kaybedildi!!!",
+        message
+    )
