@@ -113,12 +113,6 @@ class ProductModule(Product):
                         if bb.get("merchantName") == "PetiFest":
                             tpm.buyBoxRank = bb.get("rank")
                             tpm.save()
-
-                    return None 
-                else:
-                    return "Hata var!"
-            else:
-                return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"
         return "Bitti ?"
 
            
