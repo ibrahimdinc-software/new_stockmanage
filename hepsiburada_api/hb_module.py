@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel, HepsiBillModel
 
@@ -97,7 +98,7 @@ class ProductModule(Listing):
             return "Hata var kontrol et!"
         return "Oha gerçekten nasıl başarılı olabilir ya?"
 
-    def buyboxList(self,hpm):
+    def _getBuyBox(self, hpm, notif):
         if hpm.is_salable:            
             bbList = self.getBuyboxList(hpm.HepsiburadaSku)
             hpbblms = HepsiProductBuyBoxListModel.objects.filter(hpm=hpm)
@@ -105,7 +106,7 @@ class ProductModule(Listing):
             if bbList:
                 for hpbblm in hpbblms:
                     hpbblm.delete()
-                
+                lastRank = hpm.buyBoxRank
                 for bb in bbList:
                     hpbblm = HepsiProductBuyBoxListModel(
                         hpm=hpm,
@@ -119,13 +120,45 @@ class ProductModule(Listing):
                     if bb.get("MerchantName") == "PetiFest":
                         hpm.buyBoxRank = bb.get("Rank")
                         hpm.save()
-                
-                return None 
-            else:
-                return "Hata var!"
-        else:
-            return "Satışta olmayan bir ürünün buybox bilgilerini getiremem ki :/"   
 
+                if notif:
+                    if lastRank != hpm.buyBoxRank:
+                        return {
+                            "status": "change",
+                            "lastRank": lastRank, 
+                            "currentRank": hpm.buyBoxRank,
+                            "tpm": hpm.MerchantSku,
+                            "url": "http://dev.petifest.com/admin/hepsiburada_api/hepsiproductmodel/{}/change/".format(hpm.id)
+                        }
+                    else:
+                        return {
+                            "status": "same"
+                        }
+
+                time.sleep(.100)
+                return "{} -- Başarılı".format(hpm.MerchantSku)
+            else:
+                return "{} -- Hata var!".format(hpm.MerchantSku)
+        else:
+            return "{} -- Satışta değil!!".format(hpm.MerchantSku)
+
+    def buyboxList(self,hpms):
+        messages = ""
+        for hpm in hpms:
+            messages += self._getBuyBox(hpm, False)
+            messages += "\n"
+        return messages
+
+    def cronBuyBox(self):
+        hpms = HepsiProductModel.objects.filter(is_salable=True)
+        infos = []
+        for hpm in hpms:
+            m = self._getBuyBox(hpm, True)
+            if m.get("status") == "change":
+                infos.append(m)
+        if len(infos) > 0:
+            return infos
+        return []
 
 class OrderModule(Order):
     def __dateConverter__(self, date):

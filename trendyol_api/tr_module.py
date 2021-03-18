@@ -4,7 +4,6 @@ from .tr_api import Product, Order
 
 from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
 
-from new_stockmanage.mail import loseBuyboxMail
  
 class ProductModule(Product):
     def getProducts(self):
@@ -100,6 +99,7 @@ class ProductModule(Product):
                 for tpbblm in tpbblms:
                     tpbblm.delete()
                 lastRank = tpm.buyBoxRank
+
                 for bb in bbList:
                     tpbblm = TrendProductBuyBoxListModel(
                         tpm=tpm,
@@ -126,6 +126,11 @@ class ProductModule(Product):
                         return {
                             "status": "same"
                         }
+                return "{} -- Başarılı".format(tpm.sku)
+            else:
+                return "{} -- Hata var!".format(tpm.sku)
+        else:
+            return "{} -- Satışta değil!!".format(tpm.sku)
 
     def buyboxList(self,tpms):
         for tpm in tpms:
@@ -140,7 +145,8 @@ class ProductModule(Product):
             if m.get("status") == "change":
                 infos.append(m)
         if len(infos) > 0:
-            loseBuyboxMail(infos)
+            return infos
+        return []
         
            
 
