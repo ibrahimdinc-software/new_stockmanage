@@ -18,3 +18,5 @@ def getBuyBoxes():
     infos += tr_Product().cronBuyBox()
     infos += hb_Product().cronBuyBox()
 
+    loseBuyboxMail(infos)
+
