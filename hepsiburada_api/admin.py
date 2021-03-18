@@ -56,10 +56,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
         self.message_user(request, "Bekleme listesine eklendi.")
 
     def getBuyBoxes(self, request, queryset):
-        import time
-        for q in queryset:
-            ProductModule().buyboxList(q)
-            time.sleep(.100)
+        ProductModule().buyboxList(queryset)
         self.message_user(request, "Hadi H.O.")
 
     def response_change(self, request, obj):
@@ -69,7 +66,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
             self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
             return HttpResponseRedirect(".")
         if "getBuyBox" in request.POST:
-            message = ProductModule().buyboxList(obj)
+            message = ProductModule().buyboxList([obj])
             if message:
                 self.message_user(request, message)
             else:

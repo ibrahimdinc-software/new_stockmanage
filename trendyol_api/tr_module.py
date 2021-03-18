@@ -99,7 +99,6 @@ class ProductModule(Product):
                 for tpbblm in tpbblms:
                     tpbblm.delete()
                 lastRank = tpm.buyBoxRank
-
                 for bb in bbList:
                     tpbblm = TrendProductBuyBoxListModel(
                         tpm=tpm,
@@ -107,6 +106,7 @@ class ProductModule(Product):
                         merchantName=bb.get("merchantName"),
                         price=bb.get("price"),
                     )
+                    
                     tpbblm.save()
             
                     if bb.get("merchantName") == "PetiFest":
