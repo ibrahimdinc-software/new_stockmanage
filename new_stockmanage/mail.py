@@ -17,7 +17,7 @@ def testMail():
 def loseBuyboxMail(data):
     message = ""
     for m in data:
-        message += "{} stok kodlu ürünün buybox sıralaması {}'den {}'ye düşmüştür. {}\n".format(m.get("tpm"), m.get("lastRank"), m.get("currentRank"), m.get("url"))
+        message += "{} stok kodlu ürünün buybox sıralaması {}'den {}'ye düşmüştür\n. {}\n".format(m.get("tpm"), m.get("lastRank"), m.get("currentRank"), m.get("url"))
 
     sendMail(
         "BuyBox Kaybedildi!!!",
