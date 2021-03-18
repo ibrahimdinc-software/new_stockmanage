@@ -122,7 +122,7 @@ class ProductModule(Listing):
                         hpm.save()
 
                 if notif:
-                    if lastRank != hpm.buyBoxRank:
+                    if str(lastRank) != str(hpm.buyBoxRank):
                         return {
                             "status": "change",
                             "lastRank": lastRank, 
