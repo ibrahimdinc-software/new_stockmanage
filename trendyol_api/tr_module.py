@@ -126,7 +126,16 @@ class ProductModule(Product):
                         return {
                             "status": "same"
                         }
-                return "{} -- Başarılı".format(tpm.sku)
+                else:
+                    return "{} -- Başarılı".format(tpm.sku)
+            elif notif:
+                return {
+                    "status": "change",
+                    "lastRank": "-", 
+                    "currentRank": "-",
+                    "tpm": tpm.sku,
+                    "url": "HATALI"
+                }
             else:
                 return "{} -- Hata var!".format(tpm.sku)
         else:

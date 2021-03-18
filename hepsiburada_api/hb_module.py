@@ -134,9 +134,17 @@ class ProductModule(Listing):
                         return {
                             "status": "same"
                         }
-
-                time.sleep(.100)
-                return "{} -- Başarılı".format(hpm.MerchantSku)
+                else:
+                    time.sleep(.100)
+                    return "{} -- Başarılı".format(hpm.MerchantSku)
+            elif notif:
+                return {
+                    "status": "change",
+                    "lastRank": "-", 
+                    "currentRank": "-",
+                    "tpm": hpm.MerchantSku,
+                    "url": "HATALI"
+                }
             else:
                 return "{} -- Hata var!".format(hpm.MerchantSku)
         else:
