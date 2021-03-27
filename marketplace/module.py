@@ -35,11 +35,11 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             hpmList = []
             tpmList = []
             for muq in muqs:
-                p = muq.mpm
-                if type(p) == HepsiProductModel:
-                    hpmList.append(p)
-                elif type(p) == TrendProductModel:
-                    tpmList.append(p)
+                p = self.marketType(muq.mpm)
+                if p[0] == HepsiProductModel:
+                    hpmList.append(p[1])
+                elif p[0] == TrendProductModel:
+                    tpmList.append(p[1])
                 muq.isUpdated = True
                 muq.save()
 

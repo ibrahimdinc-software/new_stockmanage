@@ -56,7 +56,7 @@ class HepsiProductModel(MarketProductModel):
     CargoCompany3 = models.CharField(verbose_name="Kargo Firması 3", max_length=200, blank=True, null=True)
 
     def get_price(self):
-        return str(self.Price).replace('.',',')
+        return str(self.salePrice).replace('.',',')
 
 class HepsiOrderModel(MarketOrderModel):
     status = models.CharField(verbose_name="Sipariş Durumu", choices=ORDER_STATUS, max_length=255, blank=True, null=True)
@@ -147,8 +147,8 @@ class UpdateStatusModel(models.Model):
     date = models.DateTimeField(verbose_name="Tarih",auto_created=True, auto_now_add=True)
 
     def control(self):
-        from .hb_module import ProductModule
+        from .hb_module import HepsiProductModule
 
-        message = ProductModule().updateControl(self.control_id)
+        message = HepsiProductModule().updateControl(self.control_id)
 
         return message
