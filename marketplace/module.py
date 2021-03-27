@@ -112,12 +112,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 "status": "change",
                 "lastRank": lastRank,
                 "currentRank": mpm.buyBoxRank,
-                "mpm": mpm.sellerSku
+                "mpm": mpm.sellerSku,
+                "url":"http://dev.petifest.com/admin/marketplace/marketproductmodel/{}/change/".format(mpm.id)
             }
-        if self.marketType(mpm)[0] == HepsiProductModel:
-            d["url"] = "http://dev.petifest.com/admin/hepsiburada_api/hepsiproductmodel/{}/change/".format(mpm.id)
-            #!TO-DO
-        return
+        return d
 
     def _getBuyBox(self, mpm, notif):
         self.cleanBbModel(mpm)
