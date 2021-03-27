@@ -50,7 +50,7 @@ class TrendProductAPI:
 
         return n_res
 
-    def update(self, p_list):
+    def trendUpdate(self, p_list):
         data = {
             "items": p_list
         }

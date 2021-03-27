@@ -49,7 +49,7 @@ class TrendProductModule(TrendProductAPI):
                 }
                 l.append(item)
 
-            result = self.update(l)
+            result = self.trendUpdate(l)
             
             return self.batchControl(result)
 
