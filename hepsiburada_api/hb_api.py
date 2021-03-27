@@ -36,13 +36,13 @@ def xmldict(xml):
 class Listing:
     listing_url = "https://listing-external.hepsiburada.com/listings/merchantid/"
     
-    headers = {
+    hepiHeaders = {
         "Authorization": encode(),
         'Content-Type': 'application/xml'
     }
 
-    def get(self):
-        a = requests.get(self.listing_url+merchant_id, headers=self.headers).content
+    def getHepsiProductAPI(self):
+        a = requests.get(self.listing_url+merchant_id, headers=self.hepiHeaders).content
         
         result = xmldict(a)
         result = result["Result"]["Listings"]["Listing"]
@@ -68,17 +68,17 @@ class Listing:
 
         data = et.tostring(listings)
         
-        response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=self.headers, data=data).content
+        response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=self.hepiHeaders, data=data).content
 
         js = xmldict(response)
         return js.get("Result")
 
     def controlListing(self,id):
-        response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=self.headers).content
+        response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=self.hepiHeaders).content
         js = xmldict(response)
         return js.get("Result")
 
-    def getBuyboxList(self,hbSku):
+    def getHepsiBuyboxList(self,hbSku):
         """
         Örnek Cevap
         <?xml version="1.0"?>
@@ -149,7 +149,7 @@ class Listing:
         </Result>
         """
         url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList="+str(hbSku)
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.hepiHeaders)
         if response.status_code != 200:
             return None
         js = xmldict(response.content)
@@ -162,15 +162,15 @@ class Listing:
         return data
 
 
-class Order:
-    url = "https://oms-external.hepsiburada.com/orders/merchantid/"
-    headers = {
+class HepsiOrderAPI:
+    hepsiurl = "https://oms-external.hepsiburada.com/orders/merchantid/"
+    hepsiHeaders = {
         "Authorization": encode(),
         'Content-Type': 'application/json'
     }
     
-    def get(self):
-        req = requests.get(self.url+merchant_id, headers=self.headers).content
+    def hepsiGet(self):
+        req = requests.get(self.hepsiurl+merchant_id, headers=self.hepsiHeaders).content
         
         response = json.loads(req.decode('utf-8'))
 
@@ -192,8 +192,8 @@ class Order:
     def getDetails(self,orderNumber):
         response = json.loads(
             requests.get(
-                self.url+merchant_id+"/ordernumber/"+orderNumber, 
-                headers=self.headers
+                self.hepsiurl+merchant_id+"/ordernumber/"+orderNumber, 
+                headers=self.hepsiHeaders
             ).content
         )
 
@@ -231,7 +231,7 @@ class Order:
             }
             for detail in r["items"]:
                 det = {
-                    "hepsiBuradaSku":detail["hbSku"],
+                    "marketplaceSku":detail["hbSku"],
                     "totalHbDiscount": detail["totalHBDiscount"]["amount"],
                     "priceToBilling": detail["merchantTotalPrice"]["amount"],
                     "totalPrice": detail["totalPrice"]["amount"],

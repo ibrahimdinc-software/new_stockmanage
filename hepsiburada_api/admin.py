@@ -1,37 +1,32 @@
 from django.contrib import admin
 from rangefilter.filter import DateTimeRangeFilter
 
-from django.http import HttpResponseRedirect, request
+from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiMedProductModel, HepsiUpdateQueueModel, HepsiProductBuyBoxListModel, HepsiPaymentModel, HepsiBillModel
+from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiPaymentModel, HepsiBillModel
 
-from .hb_module import ProductModule, OrderModule, AccountingModule
+from .hb_module import HepsiProductModule, HepsiOrderModule, AccountingModule
+
+from marketplace.module import ProductModule
+from marketplace.admin import MarketProductBuyBoxListModelTabularInline, MarketMedProductModelTabularInline
+
 
 # Register your models here.
-
-
-class HepsiMedProductModelTabularInline(admin.TabularInline):
-    model = HepsiMedProductModel
-    extra = 0
-    autocomplete_fields = ["hpm"]
-
-class HepsiProductBuyBoxListModelTabularInline (admin.TabularInline):
-    model = HepsiProductBuyBoxListModel
-    extra = 0
-    ordering = ('rank',)
 
 @admin.register(HepsiProductModel)
 class HepsiProductModelAdmin(admin.ModelAdmin):
     change_list_template = "hepsiburada_api/admin/get_productlist.html"
     change_form_template = "hepsiburada_api/admin/updateProduct.html"
 
-    search_fields = ["HepsiburadaSku","MerchantSku",]
-    list_display = ['MerchantSku','Price', 'AvailableStock', 'buyBoxRank', 'is_salable',]
+    search_fields = ["marketplaceSku", "sellerSku", ]
+    list_display = ['sellerSku', 'salePrice',
+                    'availableStock', 'buyBoxRank', 'onSale', ]
 
-    list_filter = ['is_salable',]
+    list_filter = ['onSale', ]
 
-    inlines = [HepsiProductBuyBoxListModelTabularInline]
+    inlines = [MarketMedProductModelTabularInline,
+               MarketProductBuyBoxListModelTabularInline]
 
     actions = ['send_list', 'getBuyBoxes']
 
@@ -43,9 +38,9 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def get_list(self, request):
-        
-        ProductModule().getProducts()
-        
+
+        HepsiProductModule().getHepsiProducts()
+
         self.message_user(request, "Ürünler geldii hanıım...")
         return HttpResponseRedirect("../")
 
@@ -63,7 +58,8 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
         if "update" in request.POST:
             obj.save()
             obj.updateStock()
-            self.message_user(request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
+            self.message_user(
+                request, "Bekleme listesine alındı en geç 5 dk içinde güncellenecek.\n Elle güncelleyebilirsiniz.")
             return HttpResponseRedirect(".")
         if "getBuyBox" in request.POST:
             message = ProductModule().buyboxList([obj])
@@ -77,27 +73,12 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
     send_list.short_description = "Seçili ürünleri hepsiburadaya gönder."
     getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
 
-@admin.register(HepsiMedProductModel)
-class HepsiMedProductModelAdmin(admin.ModelAdmin):
-    list_display = ['product', 'hpm', 'isSalable',]
-    actions = ["outOfStock"]
-
-    def outOfStock(self, request, queryset):
-        for q in queryset:
-            q.isSalable = False
-            q.hpm.removeFromSale()
-            q.save()
-        self.message_user(request, "Stoklar sıfırlandı.")
-
-    outOfStock.short_description = "Seçili ürünlerin satışını kapat."
-
-
 
 @admin.register(UpdateStatusModel)
 class UpdateStatusModelAdmin(admin.ModelAdmin):
 
     change_form_template = "hepsiburada_api/admin/list_update_control.html"
-    list_display = ['control_id', 'date',]
+    list_display = ['control_id', 'date', ]
     readonly_fields = ['date']
 
     def response_change(self, request, obj):
@@ -105,32 +86,10 @@ class UpdateStatusModelAdmin(admin.ModelAdmin):
 
             message = obj.control()
 
-
             self.message_user(request, message)
 
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
-
-@admin.register(HepsiUpdateQueueModel)
-class HepsiUpdateQueueModelAdmin(admin.ModelAdmin):
-    list_display = ["hpm", "date"]
-    change_list_template = "hepsiburada_api/admin/hbUpdateQueue.html"
-
-    readonly_fields = ["date"]
-
-    def get_urls(self):
-        urls = super().get_urls()
-        my_urls = [
-            path('updateQueue/', self.updateQueue),
-        ]
-        return my_urls + urls
-
-    def updateQueue(self, request):
-        
-        ProductModule().updateProducts()
-        
-        self.message_user(request, "Ürünler gitti loo...")
-        return HttpResponseRedirect("../")
 
 
 class HepsiOrderDetailModelTabularInline(admin.TabularInline):
@@ -141,7 +100,7 @@ class HepsiOrderDetailModelTabularInline(admin.TabularInline):
 class HepsiBillModelTabularInline(admin.TabularInline):
     model = HepsiBillModel
     extra = 0
-    raw_id_fields = ["hom","hodm","hpm"]
+    raw_id_fields = ["hom", "hodm", "hpm"]
 
 
 @admin.register(HepsiOrderModel)
@@ -150,14 +109,14 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
 
     change_list_template = "hepsiburada_api/admin/get_hborder.html"
     change_form_template = "hepsiburada_api/admin/cancelOrder.html"
-    
-    search_fields = ["orderNumber","customerName","packageNumber",]
 
-    list_display = ["__str__", "customerName", "totalPrice", "orderDate", "status", "getDetailCount",]
-    list_filter = [("orderDate",DateTimeRangeFilter), "status"]
+    search_fields = ["orderNumber", "customerName", "packageNumber", ]
+
+    list_display = ["__str__", "customerName", "totalPrice",
+                    "orderDate", "status", "getDetailCount", ]
+    list_filter = [("orderDate", DateTimeRangeFilter), "status"]
 
     ordering = ["-orderDate"]
-    
 
     def get_urls(self):
         urls = super().get_urls()
@@ -169,22 +128,21 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def getOldOrders(self, request):
-        OrderModule().getOldOrders(request.FILES.get("excel"))
+        HepsiOrderModule().getOldOrders(request.FILES.get("excel"))
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 
     def get_hb_order(self, request):
-    
-        OrderModule().getOrders()
-        
+
+        HepsiOrderModule().getHepsiOrders()
+
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 
     def getPackageDetails(self, request):
-        OrderModule().setPackageDetails()
+        HepsiOrderModule().setPackageDetails()
         self.message_user(request, "Paket detaylarını getirelim")
         return HttpResponseRedirect("../")
-
 
     def response_change(self, request, obj):
         if "cancelOrder" in request.POST:
@@ -205,7 +163,6 @@ class HepsiPaymentModelAdmin(admin.ModelAdmin):
 
     change_form_template = "hepsiburada_api/admin/HepsiPaymentModelAdmin.html"
 
-
     def response_change(self, request, obj):
         if "getBills" in request.POST:
             AccountingModule().getBills(obj)
@@ -213,12 +170,13 @@ class HepsiPaymentModelAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
+
 @admin.register(HepsiBillModel)
 class HepsiBillModelAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "getOrderDate", "paymentDate", "invoiceDate", "hom", "totalAmount"]
-    list_filter = [("invoiceDate",DateTimeRangeFilter), "transactionType", "hpm"]
+    list_display = ["__str__", "getOrderDate",
+                    "paymentDate", "invoiceDate", "hom", "totalAmount"]
+    list_filter = [("invoiceDate", DateTimeRangeFilter),
+                   "transactionType", "hpm"]
     ordering = ["paymentDate"]
 
-    autocomplete_fields=["hom",]
-
-    
+    autocomplete_fields = ["hom", ]

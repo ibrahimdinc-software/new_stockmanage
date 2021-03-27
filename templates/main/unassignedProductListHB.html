@@ -1,5 +1,5 @@
 <ul>
     {% for obj in object_list %}
-        <li><a href="/admin/hepsiburada_api/hepsiproductmodel/{{obj.id}}/change/">{{obj}}</a> ||| <a href="https://www.hepsiburada.com/--p-{{obj.HepsiburadaSku}}">Hepsiburada Linki</a></li>
+        <li><a href="/admin/hepsiburada_api/hepsiproductmodel/{{obj.id}}/change/">{{obj}}</a> ||| <a href="https://www.hepsiburada.com/--p-{{obj.marketplaceSku}}">Hepsiburada Linki</a></li>
     {% endfor %}
 </ul>

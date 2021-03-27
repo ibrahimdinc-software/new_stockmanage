@@ -1,0 +1,87 @@
+from datetime import date
+from django.db import models
+from django.db.models.base import Model
+
+# Create your models here.
+
+
+
+
+class MarketProductModel(models.Model):
+    productName = models.CharField(verbose_name="Ürün Adı", max_length=200, blank=True, null=True)
+    marketplaceSku = models.CharField(verbose_name="Pazaryeri SKU", max_length=100)
+    sellerSku = models.CharField(verbose_name="Satıcı SKU", max_length=100)
+    salePrice = models.FloatField(verbose_name="Satış Fiyatı")
+    onSale = models.BooleanField(verbose_name="Satılabilir mi?")
+    availableStock = models.IntegerField(verbose_name="Mevcut Stok")
+    buyBoxRank = models.IntegerField(verbose_name="Buybox Sıralaması", blank=True, null=True)
+    
+    def __str__(self):
+        return self.sellerSku
+
+    def updateStock(self):
+        from .module import ProductModule
+        ProductModule().updateQueue(self)
+
+    def removeFromSale(self):
+        self.onSale = False
+        self.availableStock = 0
+        self.save()
+        self.updateStock()
+    
+class MarketMedProductModel(models.Model):
+    product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
+    mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
+    isSalable = models.BooleanField(verbose_name="Satılabilir mi?")
+
+    
+class MarketUpdateQueueModel(models.Model):
+    mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
+    date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
+    isUpdated = models.BooleanField(verbose_name="Güncellendi mi?", default=False)
+
+class MarketProductBuyBoxListModel(models.Model):
+    mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
+    rank = models.IntegerField(verbose_name="Sıralama")
+    merchantName = models.CharField(verbose_name="Satıcı Adı", max_length=255)
+    price = models.FloatField(verbose_name="Satıcının Fiyatı")
+    dispatchTime = models.IntegerField("Kargoya Verme Süresi", blank=True, null=True) 
+
+    def __str__(self):
+        return str(self.rank)
+
+
+class MarketOrderModel(models.Model):
+    customerName = models.CharField(verbose_name="Müşteri Adı", max_length=200)
+    orderNumber = models.CharField(verbose_name="Sipariş No", max_length=100)
+    packageNumber = models.CharField(verbose_name="Paket Numarası",max_length=100, blank=True, null=True)
+    orderDate = models.DateTimeField(verbose_name="Sipariş Tarihi")
+    totalPrice = models.FloatField(verbose_name="Toplam Tutar", blank=True, null=True)
+    priceToBilling = models.FloatField(verbose_name="Faturalandırılacak Tutar", blank=True, null=True)
+
+    def __str__(self):
+        return str(self.orderNumber)
+
+    def getDetailCount(self):
+        return self.marketorderdetailmodel_set.all().count()
+
+    def canceledOrder(self):
+        modms = self.marketorderdetailmodel_set.all()
+        if modms:
+            for modm in modms:
+                modm.increaseStock()
+        
+
+class MarketOrderDetailModel(models.Model):
+    mom = models.ForeignKey(MarketOrderModel, verbose_name="Sipariş Modeli", on_delete=models.CASCADE)
+    mpm = models.ForeignKey(MarketProductModel, verbose_name="Market Ürünü", on_delete=models.CASCADE)
+    totalPrice = models.FloatField(verbose_name="Tutar", blank=True, null=True)
+    quantity = models.IntegerField(verbose_name="Adet")
+
+    def dropStock(self):
+        from .module import ProductModule
+        ProductModule().dropStock(self.mpm, self.quantity)
+
+    def increaseStock(self):
+        from .module import ProductModule
+        ProductModule().increaseStock(self.mpm, self.quantity)

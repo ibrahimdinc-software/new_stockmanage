@@ -5,22 +5,17 @@ from rangefilter.filter import DateTimeRangeFilter
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import TrendProductModel, TrendMedProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
+from import_export.admin import ImportExportModelAdmin
+from .resources import TrendOrderModelResource
 
-from .tr_module import ProductModule, OrderModule
+from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel
+
+from .tr_module import TrendProductModule, TrendOrderModule
+
+from marketplace.module import ProductModule
+from marketplace.admin import MarketProductBuyBoxListModelTabularInline, MarketMedProductModelTabularInline
 # Register your models here.
 
-
-class TrendMedProductModelTabularInline(admin.TabularInline):
-    model = TrendMedProductModel
-    extra = 0
-    autocomplete_fields = ["tpm"]
-
-
-class TrendProductBuyBoxListModelTabularInline(admin.TabularInline):
-    model = TrendProductBuyBoxListModel
-    extra = 0
-    ordering = ('rank',)
 
 
 @admin.register(TrendProductModel)
@@ -28,17 +23,17 @@ class TrendProductModelAdmin(admin.ModelAdmin):
     change_list_template = ["trendyol_api/admin/get_products.html"]
     change_form_template = "trendyol_api/admin/updateProduct.html"
 
-    search_fields = ["sku", "barcode", "name"]
+    search_fields = ["sellerSku", "marketplaceSku", "productName"]
     actions = ['send_list', 'getBuyBoxes']
 
     list_filter = ["onSale", ]
-    list_display = ['name', 'salePrice', 'piece',
+    list_display = ['productName', 'salePrice', 'availableStock',
                     'onSale', 'buyBoxRank', "countOfRelated"]
 
     readonly_fields = ["productLinkF", "related"]
 
-    inlines = [TrendMedProductModelTabularInline,
-               TrendProductBuyBoxListModelTabularInline, ]
+    inlines = [MarketMedProductModelTabularInline,
+               MarketProductBuyBoxListModelTabularInline, ]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -49,7 +44,7 @@ class TrendProductModelAdmin(admin.ModelAdmin):
 
     def get_list(self, request):
 
-        result = ProductModule().getProducts()
+        result = TrendProductModule().getTrendProducts()
         if result:
             self.message_user(request, result)
         else:
@@ -87,50 +82,13 @@ class TrendProductModelAdmin(admin.ModelAdmin):
     getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
 
 
-@admin.register(TrendMedProductModel)
-class TrendMedProductModelAdmin(admin.ModelAdmin):
-    list_display = ['product', 'tpm', 'isSalable']
-    actions = ["outOfStock"]
-
-    def outOfStock(self, request, queryset):
-        for q in queryset:
-            q.isSalable = False
-            q.tpm.removeFromSale()
-            q.save()
-        self.message_user(request, "Stoklar sıfırlandı.")
-
-    outOfStock.short_description = "Seçili ürünlerin satışını kapat."
-
-
-@admin.register(TrendUpdateQueueModel)
-class TrendUpdateQueueModelAdmin(admin.ModelAdmin):
-    list_display = ["tpm", "date"]
-    change_list_template = "trendyol_api/admin/trUpdateQueue.html"
-
-    readonly_fields = ["date"]
-
-    def get_urls(self):
-        urls = super().get_urls()
-        my_urls = [
-            path('updateQueue/', self.updateQueue),
-        ]
-        return my_urls + urls
-
-    def updateQueue(self, request):
-
-        ProductModule().updateProducts()
-
-        self.message_user(request, "Ürünler gitti loo...")
-        return HttpResponseRedirect("../")
-
-
 class TrendOrderDetailModelTabularInline(admin.TabularInline):
     model = TrendOrderDetailModel
     extra = 0
 
 
 @admin.register(TrendOrderModel)
-class TrendOrderModelAdmin(admin.ModelAdmin):
+class TrendOrderModelAdmin(ImportExportModelAdmin):
     inlines = [TrendOrderDetailModelTabularInline]
 
     change_list_template = "trendyol_api/admin/get_trorder.html"
@@ -139,6 +97,8 @@ class TrendOrderModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "customerName",
                     "totalPrice", "orderDate", "getDetailCount"]
     list_filter = [("orderDate", DateTimeRangeFilter)]
+
+    resource_class = TrendOrderModelResource
 
     def get_urls(self):
         urls = super().get_urls()
@@ -149,7 +109,7 @@ class TrendOrderModelAdmin(admin.ModelAdmin):
 
     def get_tr_order(self, request):
 
-        OrderModule().getOrders()
+        TrendOrderModule().getTrendOrders()
         print("WORK")
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")

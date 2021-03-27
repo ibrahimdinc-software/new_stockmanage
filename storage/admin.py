@@ -1,3 +1,4 @@
+from django.utils.translation import activate
 import pandas as pd
 import math
 
@@ -8,8 +9,7 @@ from django.urls import path
 
 from .models import ProductModel, BaseProductModel, MedProductModel, CostDetailModel
 
-from hepsiburada_api.admin import HepsiMedProductModelTabularInline
-from trendyol_api.admin import TrendMedProductModelTabularInline
+from marketplace.admin import MarketMedProductModelTabularInline
 
 # Register your models here.
 
@@ -26,8 +26,7 @@ class MedProductModelTabularInline(admin.TabularInline):
 class ProductModelAdmin(admin.ModelAdmin):
     inlines = [
         MedProductModelTabularInline, 
-        HepsiMedProductModelTabularInline,
-        TrendMedProductModelTabularInline
+        MarketMedProductModelTabularInline
     ]
 
     list_display=["name", "sku", "piece"]
@@ -78,10 +77,18 @@ class BaseProductModelAdmin(admin.ModelAdmin):
                     barcode=barcode,
                     piece=product.get("Quantity")
                 )
+                p.save()
+                cdm = CostDetailModel(
+                    baseProduct=p,
+                    piece=product.get("Quantity"),
+                    cost=product.get("Cost"),
+                    active=True
+                )
+                cdm.save()
             else:
                 p = p[0]
                 p.piece = product.get("Quantity")
-            p.save()
+                p.save()
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):

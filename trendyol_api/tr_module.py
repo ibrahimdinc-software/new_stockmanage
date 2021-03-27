@@ -1,25 +1,26 @@
 from datetime import datetime, timedelta
 
-from .tr_api import Product, Order
+from .tr_api import TrendProductAPI, TrendOrderAPI
 
-from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel, TrendUpdateQueueModel, TrendProductBuyBoxListModel
+from .models import TrendProductModel, TrendOrderModel
 
  
-class ProductModule(Product):
-    def getProducts(self):
-        products = self.get()
+class TrendProductModule(TrendProductAPI):
+    def getTrendProducts(self):
+        products = self.getTrendProductAPI()
         tpms = TrendProductModel.objects.all()
         if products:
             for p in products:
-                tpm = tpms.filter(barcode=p.get("barcode"))
+                tpm = tpms.filter(marketplaceSku=p.get("barcode"))
                 if not tpm:
+                    print(p)
                     tpm = TrendProductModel(
-                        barcode=p.get("barcode"),
-                        name=p.get("title"),
+                        marketplaceSku=p.get("barcode"),
+                        productName=p.get("title"),
                         listPrice=p.get("listPrice"),
-                        piece=p.get("quantity"),
+                        availableStock=p.get("quantity"),
                         onSale=p.get("onSale"),
-                        sku=p.get("stockCode"),
+                        sellerSku=p.get("stockCode"),
                         salePrice=p.get("salePrice"),
                         productLink="https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId"))
                     )
@@ -29,7 +30,7 @@ class ProductModule(Product):
                     
                     tpm.listPrice = p.get("listPrice")
                     tpm.salePrice = p.get("salePrice")
-                    tpm.piece = p.get("quantity")
+                    tpm.availableStock = p.get("quantity")
                     tpm.onSale = p.get("onSale")
                     tpm.productLink = "https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId")) if p.get("productContentId") != None else "ContentId Not Found!"
 
@@ -40,128 +41,30 @@ class ProductModule(Product):
         else:
             return "Hata var lo!"
 
-    def updateQueue(self, qs):
-        tuqMs = TrendUpdateQueueModel.objects.all()
-        if not 'count' in dir(qs):
-            if not tuqMs.filter(tpm=qs):
-                tuq = TrendUpdateQueueModel(tpm=qs)
-                tuq.save()
-        elif qs.count() > 1:
-            for p in qs:
-                if not tuqMs.filter(tpm=p):
-                    tuq = TrendUpdateQueueModel(tpm=p)
-                    tuq.save()
-        else:
-            if not tuqMs.filter(tpm=qs[0]):
-                tuq = TrendUpdateQueueModel(tpm=qs[0])
-                tuq.save()
-
-    def updateProducts(self):
-        p_list = []
-        tuqs = TrendUpdateQueueModel.objects.all()
-        if tuqs:
-            for tuq in tuqs:
-                p = tuq.tpm
+    def updateTrendProducts(self, tpms):
+        l = []
+        if tpms:
+            for tpm in tpms:
                 item={
-                    "barcode": p.barcode,
-                    "quantity": p.piece,
-                    "salePrice": p.salePrice,
-                    "listPrice": p.listPrice
+                    "barcode": tpm.marketplaceSku,
+                    "quantity": tpm.availableStock,
+                    "salePrice": tpm.salePrice,
+                    "listPrice": tpm.listPrice
                 }
-                p_list.append(item)
-                tuq.delete()
-            result = self.update(p_list)
-            print(result, "\n TR_MODULE.PY \n LINE:45")
+                l.append(item)
+
+            result = self.update(l)
+            
             return self.batchControl(result)
-
-    def dropStock(self, product, quantity):
-        tmpms = product.trendmedproductmodel_set.all()
-        for tmpm in tmpms:
-            mpms = tmpm.product.medproductmodel_set.all()
-            for mpm in mpms:
-                mpm.base_product.dropStock(quantity*mpm.piece)
-
-    def increaseStock(self, product, quantity):
-        tmpms = product.trendmedproductmodel_set.all()
-        for tmpm in tmpms:
-            mpms = tmpm.product.medproductmodel_set.all()
-            for mpm in mpms:
-                mpm.base_product.increaseStock(quantity*mpm.piece)
 
     #! Add update control methods
 
-    def _getBuyBox(self, tpm, notif):
-        if tpm.onSale:
-            bbList = self.getBuyboxList(tpm.productLink)
-            tpbblms = TrendProductBuyBoxListModel.objects.filter(tpm=tpm)
-
-            if bbList:
-                for tpbblm in tpbblms:
-                    tpbblm.delete()
-                lastRank = tpm.buyBoxRank
-                for bb in bbList:
-                    tpbblm = TrendProductBuyBoxListModel(
-                        tpm=tpm,
-                        rank=bb.get("rank"),
-                        merchantName=bb.get("merchantName"),
-                        price=bb.get("price"),
-                    )
-                    
-                    tpbblm.save()
-            
-                    if bb.get("merchantName") == "PetiFest":
-                        tpm.buyBoxRank = bb.get("rank")
-                        tpm.save()
-
-                if notif:
-                    if lastRank != tpm.buyBoxRank:
-                        return {
-                            "status": "change",
-                            "lastRank": lastRank, 
-                            "currentRank": tpm.buyBoxRank,
-                            "tpm": tpm.sku,
-                            "url": "http://dev.petifest.com/admin/trendyol_api/trendproductmodel/{}/change/".format(tpm.id)
-                        }
-                    else:
-                        return {
-                            "status": "same"
-                        }
-                else:
-                    return "{} -- Başarılı".format(tpm.sku)
-            elif notif:
-                return {
-                    "status": "change",
-                    "lastRank": "-", 
-                    "currentRank": "-",
-                    "tpm": tpm.sku,
-                    "url": "HATALI"
-                }
-            else:
-                return "{} -- Hata var!".format(tpm.sku)
-        else:
-            return "{} -- Satışta değil!!".format(tpm.sku)
-
-    def buyboxList(self,tpms):
-        for tpm in tpms:
-            self._getBuyBox(tpm, False)
-        return "Bitti ?"
-
-    def cronBuyBox(self):
-        tpms = TrendProductModel.objects.filter(onSale=True)
-        infos = []
-        for tpm in tpms:
-            m = self._getBuyBox(tpm, True)
-            if m.get("status") == "change":
-                infos.append(m)
-        if len(infos) > 0:
-            return infos
-        return []
-        
-           
+    def _getTrendBuyBox(self, mpm):
+        return self.getTrendBuyboxList(mpm.productLink)
 
 
-class OrderModule(Order):
-    def getOrders(self):
+class TrendOrderModule(TrendOrderAPI):
+    def getTrendOrders(self):
         orders = self.get("Awaiting,Created,Picking,Invoiced")
 
         trendOrders = TrendOrderModel.objects.all()
@@ -174,20 +77,24 @@ class OrderModule(Order):
                 print(date)
                 tom = TrendOrderModel(
                     customerName=order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"],
+                    packageNumber=order.get("id"),
                     orderNumber=order.get("orderNumber"),
                     orderDate=date,
-                    totalPrice=order.get("totalPrice"),
+                    totalPrice=order.get("grossAmount"),
+                    priceToBilling=order.get("totalPrice"),
                     orderStatus=order.get("shipmentPackageStatus")
                 )
                 tom.save()
 
                 details = order.get("lines")
 
+                from marketplace.models import MarketOrderDetailModel
+
                 for d in details:
-                    todm = TrendOrderDetailModel(
-                        tpm = trendProducts.get(barcode=d.get("sku")),
+                    todm = MarketOrderDetailModel(
+                        mpm = trendProducts.get(marketplaceSku=d.get("sku")),
                         totalPrice= d.get("price"),
-                        tom = tom,
+                        mom = tom,
                         quantity = d.get("quantity")
                     )
                     todm.save()

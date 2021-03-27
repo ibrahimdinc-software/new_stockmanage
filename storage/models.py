@@ -1,9 +1,7 @@
 from django.db import models
 from new_stockmanage.mail import outOfStockMail
-from hepsiburada_api.hb_module import ProductModule
 
 # Create your models here.
-
 
 
 class ProductModel(models.Model):
@@ -16,24 +14,16 @@ class ProductModel(models.Model):
     
 
     def setMedProductStocks(self):
-        hmpm = self.hepsimedproductmodel_set.all()
-        tmpm = self.trendmedproductmodel_set.all()
-        for m in hmpm:
-            if m.isSalable:
-                m.hpm.AvailableStock = self.piece
-                m.hpm.save()
-                m.hpm.updateStock()
+        marketMedProductModels = self.marketmedproductmodel_set.all()
+
+        for mmpm in marketMedProductModels:
+            if mmpm.isSalable:
+                mmpm.mpm.availableStock = self.piece
+                mmpm.mpm.save()
+                mmpm.mpm.updateStock()
             else:
-                m.hpm.removeFromSale()
-        del hmpm
-        for m in tmpm:
-            if m.isSalable:
-                m.tpm.piece = self.piece
-                m.tpm.save()
-                m.tpm.updateStock()
-            else:
-                m.tpm.removeFromSale()
-        del tmpm
+                mmpm.mpm.removeFromSale()
+       
 
     def stockMethod(self):
         meds = self.medproductmodel_set.all()
@@ -54,7 +44,7 @@ class ProductModel(models.Model):
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
     barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
-    piece = models.IntegerField(verbose_name="Adet (Canlı Stok)")
+    piece = models.IntegerField(verbose_name="Adet (Canlı Stok)", blank=True, null=True)
     
     def __str__(self):
         return self.name
@@ -103,7 +93,7 @@ class BaseProductModel(models.Model):
 
 class CostDetailModel(models.Model):
     baseProduct = models.ForeignKey(BaseProductModel, verbose_name="Ürün", on_delete=models.CASCADE)
-    buyDate = models.DateTimeField(verbose_name="Alım Tarihi", blank=True, null=True)
+    buyDate = models.DateTimeField(verbose_name="Alım Tarihi", auto_now_add=True, blank=True, null=True)
     piece = models.IntegerField(verbose_name="Adet")
     cost = models.FloatField(verbose_name="Tutar")
     active = models.BooleanField(verbose_name="Satışta Mı?")

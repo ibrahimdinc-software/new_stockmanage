@@ -9,34 +9,34 @@ apiKey = "YFZDBDCCxRRy1YBkwrrL"
 apiSecret = "iaNnyoGaqnJEi0g3Pw9b"
 
 
-def encode():
+def encodeTrend():
     up_encode = apiKey+":"+apiSecret
     up_encode = up_encode.encode("utf-8")
     b64_encode = base64.b64encode(up_encode)
     return "Basic " + str(b64_encode, 'utf-8')
 
 
-class Product:
-    headers = {
-        "Authorization": encode(),
+class TrendProductAPI:
+    trendHeaders = {
+        "Authorization": encodeTrend(),
         "User-Agent": "356587 - YFZDBDCCxRRy1YBkwrrL"
     }
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/products"
 
     def batchControl(self, controlId):
         response = requests.get(
-            self.url+"/batch-requests/"+controlId, headers=self.headers)
+            self.url+"/batch-requests/"+controlId, headers=self.trendHeaders)
         result = response.content.decode("utf-8")
         print(result)
         return json.loads(result)
 
     def getWPage(self, page):
         response = requests.get(
-            self.url+"?page="+str(page), headers=self.headers)
+            self.url+"?page="+str(page), headers=self.trendHeaders)
         result = json.loads(response.content.decode("utf-8"))
         return result
 
-    def get(self):
+    def getTrendProductAPI(self):
         n_res = []
 
         page = 0
@@ -56,14 +56,14 @@ class Product:
             "items": p_list
         }
         response = requests.post(
-            self.url+"/price-and-inventory", json=data, headers=self.headers)
+            self.url+"/price-and-inventory", json=data, headers=self.trendHeaders)
         result = json.loads(response.content)
 
         return result.get("batchRequestId")
 
 
 
-    def getBuyboxList(self, link):
+    def getTrendBuyboxList(self, link):
         page = requests.get(link)
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -84,21 +84,20 @@ class Product:
                 })
             r += 1
 
-
         return lastData
 
 
-class Order:
-    url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/orders"
-    headers = {
-        "Authorization": encode(),
+class TrendOrderAPI:
+    trendurl = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/orders"
+    trendHeaders = {
+        "Authorization": encodeTrend(),
         "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
     }
 
     def getWPage(self, page, status):
         response = requests.get(
-            self.url+"?status="+status+"&page="+str(page),
-            headers=self.headers
+            self.trendurl+"?status="+status+"&page="+str(page),
+            headers=self.trendHeaders
         )
         print(response.content)
         return json.loads(response.content)
