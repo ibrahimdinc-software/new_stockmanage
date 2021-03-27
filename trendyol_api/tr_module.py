@@ -33,8 +33,6 @@ class TrendProductModule(TrendProductAPI):
                     tpm.onSale = p.get("onSale")
                     tpm.productLink = "https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId")) if p.get("productContentId") != None else "ContentId Not Found!"
 
-                    if p.get("productContentId") == None:
-
                     tpm.save()
         else:
             return "Hata var lo!"
