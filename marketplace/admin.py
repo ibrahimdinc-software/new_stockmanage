@@ -149,7 +149,6 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
     def getOrder(self, request):
 
         OrderModule().getOrders()
-        print("WORK")
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 

@@ -110,7 +110,6 @@ class TrendOrderModelAdmin(ImportExportModelAdmin):
     def get_tr_order(self, request):
 
         TrendOrderModule().getTrendOrders()
-        print("WORK")
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 

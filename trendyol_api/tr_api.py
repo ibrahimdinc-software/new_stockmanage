@@ -27,7 +27,6 @@ class TrendProductAPI:
         response = requests.get(
             self.url+"/batch-requests/"+controlId, headers=self.trendHeaders)
         result = response.content.decode("utf-8")
-        print(result)
         return json.loads(result)
 
     def getWPage(self, page):
@@ -99,7 +98,6 @@ class TrendOrderAPI:
             self.trendurl+"?status="+status+"&page="+str(page),
             headers=self.trendHeaders
         )
-        print(response.content)
         return json.loads(response.content)
 
     def get(self, status):

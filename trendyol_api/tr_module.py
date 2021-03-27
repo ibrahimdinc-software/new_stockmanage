@@ -13,7 +13,6 @@ class TrendProductModule(TrendProductAPI):
             for p in products:
                 tpm = tpms.filter(marketplaceSku=p.get("barcode"))
                 if not tpm:
-                    print(p)
                     tpm = TrendProductModel(
                         marketplaceSku=p.get("barcode"),
                         productName=p.get("title"),
@@ -35,7 +34,6 @@ class TrendProductModule(TrendProductAPI):
                     tpm.productLink = "https://www.trendyol.com/marka/urun-p-"+str(p.get("productContentId")) if p.get("productContentId") != None else "ContentId Not Found!"
 
                     if p.get("productContentId") == None:
-                        print(p.get("barcode"))
 
                     tpm.save()
         else:
@@ -72,9 +70,7 @@ class TrendOrderModule(TrendOrderAPI):
 
         for order in orders:
             if not trendOrders.filter(orderNumber=order.get("orderNumber")):
-                print(order.get("orderDate"))
                 date = datetime.fromtimestamp(order.get("orderDate")/1000)-timedelta(hours=3)
-                print(date)
                 tom = TrendOrderModel(
                     customerName=order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"],
                     packageNumber=order.get("id"),

@@ -27,13 +27,10 @@ class ProductModel(models.Model):
 
     def stockMethod(self):
         meds = self.medproductmodel_set.all()
-        print(meds)
         if meds:
             piece = meds[0].base_product.piece / meds[0].piece
-            print(piece)
             for m in meds:
                 if piece > m.base_product.piece / m.piece:
-                    print(piece)                
                     piece = m.base_product.piece / m.piece
             return piece
 

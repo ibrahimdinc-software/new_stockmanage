@@ -266,12 +266,10 @@ class Accounting:
         offset = 10
         limit = 10
 
-        print(tType)
         data = response["items"]
         while count > offset:
             response = self.getWoffset(offset=offset, endDate=endDate, startDate=startDate, tType=tType)
             data += response["items"]
-            print(offset, len(data))
             offset += limit
 
         return data
