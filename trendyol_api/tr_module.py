@@ -29,8 +29,10 @@ class TrendProductModule(TrendProductAPI):
 
     def updateTrendProducts(self, tpms):
         l = []
+        trendProductModels = TrendProductModel.objects.all()
         if tpms:
             for tpm in tpms:
+                tpm = trendProductModels.get(id=tpm.id)
                 item={
                     "barcode": tpm.marketplaceSku,
                     "quantity": tpm.availableStock,

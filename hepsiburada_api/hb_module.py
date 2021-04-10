@@ -34,8 +34,10 @@ class HepsiProductModule(Listing):
 
     def updateHepsiProducts(self, hpms):
         l = []
+        hepsiProductModels = HepsiProductModel.objects.all()
         if hpms:
             for hpm in hpms:
+                hpm = hepsiProductModels.get(id=hpm.id)
                 d = {
                     "HepsiburadaSku": hpm.marketplaceSku,
                     "MerchantSku": hpm.sellerSku,
