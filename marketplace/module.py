@@ -25,8 +25,8 @@ class ExtraMethods():
 class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
     def getProducts(self):
         productList = []
-        productList += self.getTrendProducts()
         productList += self.getHepsiProducts()
+        productList += self.getTrendProducts()
 
         mpms = MarketProductModel.objects.all()
         for p in productList:
@@ -64,11 +64,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 hpm = HepsiProductModel(
                     marketproductmodel_ptr_id=marketProduct.id)
                 hpm.__dict__.update(marketProduct.__dict__)
-
                 hpm.DispatchTime = p.get("DispatchTime")
-                hpm.CargoCompany1 = p.get("CargoCompany1"),
-                hpm.CargoCompany2 = p.get("CargoCompany2"),
-                hpm.CargoCompany3 = p.get("CargoCompany3"),
+                hpm.CargoCompany1 = p.get("CargoCompany1")
+                hpm.CargoCompany2 = p.get("CargoCompany2")
+                hpm.CargoCompany3 = p.get("CargoCompany3")
 
                 hpm.save()
 

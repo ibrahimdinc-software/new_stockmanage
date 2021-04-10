@@ -46,7 +46,6 @@ class Listing:
         
         result = xmldict(a)
         result = result["Result"]["Listings"]["Listing"]
-
         return result
 
     def update(self,product):
@@ -71,6 +70,7 @@ class Listing:
         response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=self.hepiHeaders, data=data).content
 
         js = xmldict(response)
+        
         return js.get("Result")
 
     def controlListing(self,id):

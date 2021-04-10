@@ -29,7 +29,6 @@ class HepsiProductModule(Listing):
                 "CargoCompany2": p.get("CargoCompany2"),
                 "CargoCompany3": p.get("CargoCompany3"),
             })
-
         return productList
 
     def updateHepsiProducts(self, hpms):
