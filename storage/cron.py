@@ -10,6 +10,8 @@ def getOrders():
     OrderModule().getOrders()
     productUpdate()
 
+def getDeliverdOrders():
+    OrderModule().getDeliveredOrders()
 
 def getBuyBoxes():
     infos = ProductModule().cronBuyBox()

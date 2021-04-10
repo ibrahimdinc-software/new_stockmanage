@@ -113,8 +113,8 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
     search_fields = ["orderNumber", "customerName", "packageNumber", ]
 
     list_display = ["__str__", "customerName", "totalPrice",
-                    "orderDate", "status", "getDetailCount", ]
-    list_filter = [("orderDate", DateTimeRangeFilter), "status"]
+                    "orderDate", "getDetailCount", ]
+    list_filter = [("orderDate", DateTimeRangeFilter), ]
 
     ordering = ["-orderDate"]
 

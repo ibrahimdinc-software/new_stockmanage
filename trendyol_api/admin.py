@@ -13,7 +13,7 @@ from .models import TrendProductModel, TrendOrderModel, TrendOrderDetailModel
 from .tr_module import TrendProductModule, TrendOrderModule
 
 from marketplace.module import ProductModule
-from marketplace.admin import MarketProductBuyBoxListModelTabularInline, MarketMedProductModelTabularInline
+from marketplace.admin import MarketProductBuyBoxListModelTabularInline, MarketMedProductModelTabularInline, MarketOrderDetailModelTabularInline
 # Register your models here.
 
 
@@ -82,14 +82,10 @@ class TrendProductModelAdmin(admin.ModelAdmin):
     getBuyBoxes.short_description = "Seçili ürünlerin BuyBoxını getir."
 
 
-class TrendOrderDetailModelTabularInline(admin.TabularInline):
-    model = TrendOrderDetailModel
-    extra = 0
-
 
 @admin.register(TrendOrderModel)
 class TrendOrderModelAdmin(ImportExportModelAdmin):
-    inlines = [TrendOrderDetailModelTabularInline]
+    inlines = [MarketOrderDetailModelTabularInline]
 
     change_list_template = "trendyol_api/admin/get_trorder.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"

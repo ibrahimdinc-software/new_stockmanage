@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 
 from rangefilter.filter import DateTimeRangeFilter
 from import_export.admin import ImportExportActionModelAdmin
+import requests
 
 from .resources import MarketOrderModelResource
 from .models import MarketMedProductModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel
@@ -15,26 +16,30 @@ class MarketProductBuyBoxListModelTabularInline (admin.TabularInline):
     model = MarketProductBuyBoxListModel
     extra = 0
     ordering = ('rank',)
-    
+
+
 class MarketMedProductModelTabularInline(admin.TabularInline):
     model = MarketMedProductModel
     extra = 0
     autocomplete_fields = ["mpm"]
+
 
 @admin.register(MarketProductModel)
 class MarketProductModelAdmin(admin.ModelAdmin):
     change_list_template = ["trendyol_api/admin/get_products.html"]
     change_form_template = "trendyol_api/admin/updateProduct.html"
 
-    search_fields = ["marketplaceSku","sellerSku",]
+    search_fields = ["marketplaceSku", "sellerSku", ]
     actions = ['send_list', 'getBuyBoxes']
 
-    list_filter = ["onSale", ]
+    list_filter = ["onSale", "marketType"]
     list_display = ['sellerSku', 'salePrice', 'availableStock',
                     'onSale', 'buyBoxRank']
 
     inlines = [MarketMedProductModelTabularInline,
                MarketProductBuyBoxListModelTabularInline, ]
+
+    readonly_fields = ["productLinkF"]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -51,7 +56,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
         else:
             self.message_user(request, "Ürünler geldii hanıım...")
         return HttpResponseRedirect("../")
-    
+
     def send_list(self, request, queryset):
 
         ProductModule().updateQueue(queryset)
@@ -61,7 +66,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
     def getBuyBoxes(self, request, queryset):
         message = ProductModule().buyboxList(queryset)
         self.message_user(request, message)
-    
+
     def response_change(self, request, obj):
         if "update" in request.POST:
             obj.save()
@@ -86,7 +91,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
 @admin.register(MarketUpdateQueueModel)
 class MarketUpdateQueueModelAdmin(admin.ModelAdmin):
     list_display = ["date", "mpm", "isUpdated"]
-    list_filter = ["isUpdated"]
+    list_filter = ["isUpdated", ]
     change_list_template = "market/admin/updateQueue.html"
 
     readonly_fields = ["date"]
@@ -99,16 +104,16 @@ class MarketUpdateQueueModelAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def updateQueue(self, request):
-        
+
         ProductModule().updateProducts()
-        
+
         self.message_user(request, "Ürünler gitti loo...")
-        return HttpResponseRedirect("../")    
+        return HttpResponseRedirect("../")
 
 
 @admin.register(MarketMedProductModel)
 class MarketMedProductModelAdmin(admin.ModelAdmin):
-    list_display = ['product', 'mpm', 'isSalable',]
+    list_display = ['product', 'mpm', 'isSalable', ]
     actions = ["outOfStock"]
 
     def outOfStock(self, request, queryset):
@@ -133,22 +138,37 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
     change_list_template = "market/admin/get_order.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
 
-    list_display = ["__str__", "customerName",
-                    "totalPrice", "orderDate", "getDetailCount"]
-    list_filter = [("orderDate", DateTimeRangeFilter)]
+    list_display = ["__str__", "marketType", "customerName",
+                    "totalPrice", "orderDate", "getDetailCount", "orderStatus"]
+    list_filter = [
+        "marketType",
+        ("orderDate", DateTimeRangeFilter),
+        ("deliveryDate", DateTimeRangeFilter),
+        "orderStatus"]
 
     resource_class = MarketOrderModelResource
 
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path('gettrorders/', self.getOrder),
+            path('getorders/', self.getOrder),
+            path('getoldorders/', self.getOldOrders),
+            path('getdeliverdorders/', self.getdeliverdorders),
         ]
         return my_urls + urls
 
     def getOrder(self, request):
-
         OrderModule().getOrders()
+        self.message_user(request, "Siparişler gelmiştir ha...")
+        return HttpResponseRedirect("../")
+
+    def getOldOrders(self, request):
+        OrderModule().getOldOrders(request.POST.get("date"))
+        self.message_user(request, "Siparişler gelmiştir ha...")
+        return HttpResponseRedirect("../")
+
+    def getdeliverdorders(self, request):
+        OrderModule().getDeliveredOrders()
         self.message_user(request, "Siparişler gelmiştir ha...")
         return HttpResponseRedirect("../")
 

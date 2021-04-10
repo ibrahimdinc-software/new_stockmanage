@@ -60,27 +60,25 @@ class TrendProductAPI:
 
         return result.get("batchRequestId")
 
-
-
     def getTrendBuyboxList(self, link):
         page = requests.get(link)
         soup = BeautifulSoup(page.content, 'html.parser')
 
         lastData = [
-                {
-                    "rank": 1,
-                    "merchantName":soup.find("div", attrs={"class":"sl-nm"}).find("a").text,
-                    "price": float(soup.find("span", attrs={"class":"prc-slg"}).text.replace(" TL", "").replace(",", "."))
-                }
-            ]
+            {
+                "rank": 1,
+                "merchantName": soup.find("div", attrs={"class": "sl-nm"}).find("a").text,
+                "price": float(soup.find("span", attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
+            }
+        ]
 
         r = 2
-        for i in soup.find_all("div", attrs={"class":"pr-mc-w gnr-cnt-br"}):
+        for i in soup.find_all("div", attrs={"class": "pr-mc-w gnr-cnt-br"}):
             lastData.append({
-                    "rank": r,
-                    "merchantName": i.find("div",attrs={"class": "pr-mb-mn"}).find("a").text,
-                    "price": float(i.find("span",attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
-                })
+                "rank": r,
+                "merchantName": i.find("div", attrs={"class": "pr-mb-mn"}).find("a").text,
+                "price": float(i.find("span", attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
+            })
             r += 1
 
         return lastData
@@ -93,23 +91,47 @@ class TrendOrderAPI:
         "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
     }
 
-    def getWPage(self, page, status):
+    def getWPage(self, url, page, status=None, date=None, endDate=None, orderNumber=None):
+        queryStr = ""
+
+        queries = {
+            "status": "status="+status if status else "",
+            "page": "page="+str(page) if page else "",
+            "date": "startDate="+str(date) if date else "",
+            "endDate": "endDate="+str(endDate) if endDate else "",
+            "orderNumber": "orderNumber"+str(orderNumber) if orderNumber else ""
+        }
+
+        for k in queries:
+            if "?" in queryStr and len(queries[k]) > 0:
+                queryStr += "&"+queries[k]
+            elif len(queries[k]) > 0:
+                queryStr += "?"+queries[k]
+
+        url = url+queryStr
         response = requests.get(
-            self.trendurl+"?status="+status+"&page="+str(page),
+            url,
             headers=self.trendHeaders
         )
         return json.loads(response.content)
 
-    def get(self, status):
+    def get(self, status=None, date=None, endDate=None, orderNumber=None):
         n_res = []
 
         page = 0
         totalPages = 2
         while page < totalPages:
-            result = self.getWPage(page, status)
+            result = self.getWPage(
+                self.trendurl,
+                page,
+                status if status else None,
+                date if date else None,
+                endDate if endDate else None,
+                orderNumber if orderNumber else None
+            )
             n_res += result.get("content")
 
             page += 1
             totalPages = result.get("totalPages")
-
         return n_res
+    

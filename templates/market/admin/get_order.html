@@ -5,10 +5,16 @@
 
 {% block object-tools %}
 <div>
-    <form action="gettrorders/" method="POST">
+    <a href="getorders" class="button">Siparişleri Getir la</a>
+    <a href="getdeliverdorders" class="button">Teslim edilen siparişleri kontrol et</a>
+    <br>
+    <br>
+    <form action="getoldorders/" method="post">
         {% csrf_token %}
-        <button type="submit">Siparişleri Getir la</button>
+        <input type="date" name="date" id="id_date">
+        <button type="submit" class="button">Eski Siparişleri Alayım</button>
     </form>
+
 </div>
 <br />
 <ul class="object-tools">
@@ -22,3 +28,4 @@
     {% endblock %}
 </ul>
 {% endblock %}
+

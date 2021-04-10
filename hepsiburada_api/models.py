@@ -39,15 +39,6 @@ TRANSACTION_TYPE = [
     ('CampaignDiscountRefund', 'Kampanya İndirimleri İadesi'),
 ]
 
-ORDER_STATUS = [
-    ('Delivered', 'Teslim Edildi'),
-    ('Undelivered', 'Teslim Edilemedi'),
-    ('InTransit', 'Taşıma Durumunda'),
-    ('Open', 'Paketlenecek'),
-    ('Packaged', 'Paketlendi'),
-    ('Unpacked', 'Paket Bozuldu'),
-    ('Refunded', 'İade/İptal - Geri Ödeme Yapılmış'),
-]
 
 class HepsiProductModel(MarketProductModel):
     DispatchTime = models.IntegerField(verbose_name="Kargoya Verilme Süresi")
@@ -59,7 +50,6 @@ class HepsiProductModel(MarketProductModel):
         return str(self.salePrice).replace('.',',')
 
 class HepsiOrderModel(MarketOrderModel):
-    status = models.CharField(verbose_name="Sipariş Durumu", choices=ORDER_STATUS, max_length=255, blank=True, null=True)
 
     def getTotalPrice(self):
         hodm = HepsiOrderDetailModel.objects.filter(mom=self)
