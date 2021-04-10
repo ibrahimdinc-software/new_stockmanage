@@ -43,6 +43,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     productLink=p.get("productLink")
                 )
             else:
+                marketProduct.marketType = p.get("marketType"),
                 marketProduct.productName = p.get("productName")
                 marketProduct.onSale = p.get("onSale")
                 marketProduct.sellerSku = p.get("sellerSku")
@@ -50,7 +51,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 marketProduct.productLink = p.get("productLink")
                 
             marketProduct.save()
-            
+
             if p.get("marketType") == "trendyol":
                 tpm = TrendProductModel(
                     marketproductmodel_ptr_id=marketProduct.id)
