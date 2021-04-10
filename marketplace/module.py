@@ -43,7 +43,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     productLink=p.get("productLink")
                 )
             else:
-                marketProduct.marketType = p.get("marketType"),
+                marketProduct.marketType = p.get("marketType")
                 marketProduct.productName = p.get("productName")
                 marketProduct.onSale = p.get("onSale")
                 marketProduct.sellerSku = p.get("sellerSku")
