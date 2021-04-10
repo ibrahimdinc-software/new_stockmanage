@@ -1,4 +1,3 @@
-from billing.models import CurrentModel
 from datetime import datetime, time, timedelta
 
 from .tr_api import TrendProductAPI, TrendOrderAPI
