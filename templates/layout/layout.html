@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+
+{% include "layout/head.html" %}
+
+<body class="layout-app layout-sticky-subnav ">
+
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-push data-responsive-width="992px">
+        {% include "layout/drawer.html" %}
+        {% include "layout/preloader.html" %}
+
+        <div class="mdk-drawer-layout__content page-content">
+            {% include "layout/navheader.html" %}
+            {% block body %}
+
+            {% endblock body %}
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="{% static 'template/js/jquery.min.js' %}"></script>
+
+    <!-- Bootstrap -->
+    <script src="{% static 'template/js/popper.min.js' %}"></script>
+    <script src="{% static 'template/js/bootstrap.min.js' %}"></script>
+
+    <!-- Perfect Scrollbar -->
+    <script src=" {% static 'template/js/perfect-scrollbar.min.js' %}"></script>
+
+    <!-- DOM Factory -->
+    <script src="{% static 'template/js/dom-factory.js' %}"></script>
+
+    <!-- MDK -->
+    <script src="{% static 'template/js/material-design-kit.js' %}"></script>
+
+    <!-- App JS -->
+    <script src="{% static 'template/js/app.js' %}"></script>
+
+    <!-- Highlight.js -->
+    <script src="{% static 'template/js/hljs.js' %}"></script>
+
+    <!-- Global Settings -->
+    <script src="{% static 'template/js/settings.js' %}"></script>
+
+    <!-- Flatpickr -->
+    <script src="{% static 'template/js/flatpickr.min.js' %}"></script>
+    <script src="{% static 'template/js/flatpickr.js' %}"></script>
+
+    <!-- Moment.js -->
+    <script src="{% static 'template/js/moment.min.js' %}"></script>
+    <script src="{% static 'template/js/moment-range.js' %}"></script>
+
+    <!-- Chart.js -->
+    <script src="{% static 'template/js/Chart.min.js' %}"></script>
+    <script src="{% static 'template/js/chartjs.js' %}"></script>
+
+    <!-- Chart.js Samples 
+    <script src="{% static 'template/js/page.analytics-dashboard.js' %}"></script>-->
+
+    <!-- Vector Maps -->
+    <script src="{% static 'template/js/jqvmap/jquery.vmap.min.js' %}"></script>
+    <script src="{% static 'template/js/jqvmap/maps/jquery.vmap.world.js' %}"></script>
+    <script src="{% static 'template/js/vector-maps.js' %}"></script>
+
+    <!-- List.js -->
+    <script src="{% static 'template/js/list.min.js' %}"></script>
+    <script src="{% static 'template/js/list.js' %}"></script>
+
+    <!-- Tables -->
+    <script src="{% static 'template/js/toggle-check-all.js' %}"></script>
+    <script src="{% static 'template/js/check-selected-row.js' %}"></script>
+
+    <!-- App Settings (safe to remove) -->
+    <script src="{% static 'template/js/app-settings.js' %}"></script>
+    {% block script %} {% endblock script %}
+</body>
+
+</html>

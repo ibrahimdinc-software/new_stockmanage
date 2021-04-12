@@ -2,6 +2,8 @@ from datetime import date
 from django.db import models
 from django.utils.html import format_html
 
+from .manager import MarketOrderModelManager
+
 # Create your models here.
 
 ORDER_STATUS = (
@@ -87,6 +89,8 @@ class MarketOrderModel(models.Model):
     totalPrice = models.FloatField(verbose_name="Toplam Tutar", blank=True, null=True)
     priceToBilling = models.FloatField(verbose_name="Faturalandırılacak Tutar", blank=True, null=True)
     orderStatus = models.CharField(verbose_name="Siparişin Durumu", max_length=255, choices=ORDER_STATUS, blank=True, null=True)
+
+    objects = MarketOrderModelManager()
 
     def __str__(self):
         return str(self.orderNumber)
