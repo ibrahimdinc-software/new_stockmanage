@@ -2,7 +2,8 @@
 
 
 <div class="border-bottom-2 py-32pt position-relative z-1">
-    <div class="container-fluid page__container d-flex flex-column flex-md-row align-items-center text-center text-sm-left">
+    <div
+        class="container-fluid page__container d-flex flex-column flex-md-row align-items-center text-center text-sm-left">
         <div class="flex d-flex flex-column flex-sm-row align-items-center mb-24pt mb-md-0">
             <div class="mb-24pt mb-sm-0 mr-sm-24pt">
                 <h2 class="mb-0">Kontrol Paneli</h2>
@@ -13,22 +14,6 @@
             </div>
         </div>
 
-        <div class="row" role="tablist">
-            <div class="col-auto d-flex flex-column">
-                <h6 class="m-0">₺12.3k</h6>
-                <p class="text-50 mb-0 d-flex align-items-center">
-                    Kazanç
-                    <i class="material-icons text-accent ml-4pt icon-16pt">keyboard_arrow_up</i>
-                </p>
-            </div>
-            <div class="col-auto border-left">
-                <h6 class="m-0">264</h6>
-                <p class="text-50 mb-0 d-flex align-items-center">
-                    Satış
-                    <i class="material-icons text-accent ml-4pt icon-16pt">keyboard_arrow_up</i>
-                </p>
-            </div>
-        </div>
 
     </div>
 </div>
@@ -95,7 +80,8 @@
                 </div>
             </div>
             <div class=" col-md-6 card-group-row__col">
-                <div class="card card-group-row__card card-body" style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
+                <div class="card card-group-row__card card-body"
+                    style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
 
                     <div class="d-flex align-items-center">
                         <div class="h2 mb-0 mr-3">{{weeklySalesCount}}</div>
@@ -111,12 +97,14 @@
                     </div>
 
                     <div class="chart" style="height: 80px; position: absolute; left: 0; right: 0; bottom: 0;">
-                        <canvas class="chart-canvas js-update-chart-line" id="productsChart" data-chart-hide-axes="true" data-chart-line-border-color="primary"></canvas>
+                        <canvas class="chart-canvas js-update-chart-line" id="productsChart" data-chart-hide-axes="true"
+                            data-chart-line-border-color="primary"></canvas>
                     </div>
                 </div>
             </div>
             <div class=" col-md-6 card-group-row__col">
-                <div class="card card-group-row__card card-body" style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
+                <div class="card card-group-row__card card-body"
+                    style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
 
                     <div class="d-flex align-items-center">
                         <div class="h2 mb-0 mr-3">{{weeklySalesAmount|floatformat:2}}₺</div>
@@ -132,7 +120,8 @@
                     </div>
 
                     <div class="chart" style="height: 80px; position: absolute; left: 0; right: 0; bottom: 0;">
-                        <canvas class="chart-canvas js-update-chart-line-accent" id="coursesChart" data-chart-hide-axes="true" data-chart-line-border-color="teal"></canvas>
+                        <canvas class="chart-canvas js-update-chart-line-accent" id="coursesChart"
+                            data-chart-hide-axes="true" data-chart-line-border-color="teal"></canvas>
                     </div>
                 </div>
             </div>
@@ -172,11 +161,14 @@
                         <div class="row">
                             <div class="col-7">
                                 <div class="position-relative" style="height: calc(220px - 1rem * 2);">
-                                    <div class="text-center fullbleed d-flex align-items-center justify-content-center flex-column z-0">
+                                    <div
+                                        class="text-center fullbleed d-flex align-items-center justify-content-center flex-column z-0">
                                         <h3 class="mb-0">38%</h3>
                                         <small class="text-uppercase">United States</small>
                                     </div>
-                                    <canvas class="chart-canvas" id="locationDoughnutChart" data-chart-legend="#locationDoughnutChartLegend" data-chart-line-background-color="teal;primary;gray" data-chart-suffix="%">
+                                    <canvas class="chart-canvas" id="locationDoughnutChart"
+                                        data-chart-legend="#locationDoughnutChartLegend"
+                                        data-chart-line-background-color="teal;primary;gray" data-chart-suffix="%">
                                         <span style="font-size: 1rem;" class="text-muted"><strong>Location</strong>
                                             doughnut chart goes
                                             here.</span>
@@ -194,14 +186,20 @@
                 <div class="card dashboard-area-tabs" id="dashboard-area-tabs">
                     <div class="card-header p-0 nav">
                         <div class="row no-gutters flex" role="tablist">
-                            <div class="col" data-toggle="chart" data-target="#earningsTrafficChart" data-update='{"data":{"datasets":[{"label": "Traffic", "data":[10,2,5,15,10,12,15,25,22,30,25,40]}]}}' data-prefix="" data-suffix="k">
-                                <a href="#" data-toggle="tab" role="tab" aria-selected="true" class="dashboard-area-tabs__tab card-body text-center active">
+                            <div class="col" data-toggle="chart" data-target="#earningsTrafficChart"
+                                data-update='{"data":{"datasets":[{"label": "Traffic", "data":[10,2,5,15,10,12,15,25,22,30,25,40]}]}}'
+                                data-prefix="" data-suffix="k">
+                                <a href="#" data-toggle="tab" role="tab" aria-selected="true"
+                                    class="dashboard-area-tabs__tab card-body text-center active">
                                     <span class="font-weight-bold">Sessions</span>
                                     <span class="h2 mb-0 mt-n1">18.3k</span>
                                 </a>
                             </div>
-                            <div class="col border-left" data-toggle="chart" data-target="#earningsTrafficChart" data-update='{"data":{"datasets":[{"label": "Earnings", "data":[7,35,12,27,34,17,19,30,28,32,24,39]}]}}' data-prefix="$" data-suffix="k">
-                                <a href="#" data-toggle="tab" role="tab" aria-selected="false" class="dashboard-area-tabs__tab card-body text-center">
+                            <div class="col border-left" data-toggle="chart" data-target="#earningsTrafficChart"
+                                data-update='{"data":{"datasets":[{"label": "Earnings", "data":[7,35,12,27,34,17,19,30,28,32,24,39]}]}}'
+                                data-prefix="$" data-suffix="k">
+                                <a href="#" data-toggle="tab" role="tab" aria-selected="false"
+                                    class="dashboard-area-tabs__tab card-body text-center">
                                     <span class="font-weight-bold">Orders</span>
                                     <span class="h2 mb-0 mt-n1">&dollar;8.9k</span>
                                 </a>
@@ -212,7 +210,8 @@
                         <div id="earningsTrafficChartLegend" class="chart-legend mt-0 mb-24pt justify-content-start">
                         </div>
                         <div class="chart" style="height: calc(240px - 1rem * 2);">
-                            <canvas class="chart-canvas js-update-chart-line" id="earningsTrafficChart" data-chart-suffix="k" data-chart-legend="#earningsTrafficChartLegend">
+                            <canvas class="chart-canvas js-update-chart-line" id="earningsTrafficChart"
+                                data-chart-suffix="k" data-chart-legend="#earningsTrafficChartLegend">
                                 <span style="font-size: 1rem;"><strong>Website Traffic / Earnings</strong> area
                                     chart goes here.</span>
                             </canvas>
@@ -251,12 +250,14 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div id="vector-map-revenue" class="map mb-3" style="height: 328px;" data-toggle="vector-map" data-vector-map-map="world_en" data-vector-map-show-tooltip="false" data-vector-map-enable-zoom="true" data-vector-map-scale="1.1" data-vector-map-pins='{
+                        <div id="vector-map-revenue" class="map mb-3" style="height: 328px;">
+                        </div>
+                        <!--
+                        data-vector-map-pins='{
 "it": "<div class=\"map-pin blue\"><span>Vatican City</span></div>",
 "us": "<div class=\"map-pin blue\"><span>New York</span></div>",
 "au": "<div class=\"map-pin blue\"><span>Sydney</span></div>"
-}'>
-                        </div>
+}'-->
 
                         <div class="alert alert-soft-warning">
                             <div class="d-flex flex-wrap align-items-start">
@@ -273,13 +274,16 @@
                         </div>
 
                         <ul class="list-unstyled dashboard-location-tabs nav flex-column m-0" role="tablist">
-                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="us" data-animate="true">
-                                <div class="dashboard-location-tabs__tab active" data-toggle="tab" role="tab" aria-selected="true">
+                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="us"
+                                data-animate="true">
+                                <div class="dashboard-location-tabs__tab active" data-toggle="tab" role="tab"
+                                    aria-selected="true">
                                     <div><strong>New York</strong></div>
                                     <div class="d-flex align-items-center">
                                         <div class="flex mr-2">
                                             <div class="progress" style="height: 4px;">
-                                                <div class="progress-bar" role="progressbar" style="width: 72%;" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
+                                                <div class="progress-bar" role="progressbar" style="width: 72%;"
+                                                    aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
                                                 </div>
                                             </div>
                                         </div>
@@ -287,26 +291,34 @@
                                     </div>
                                 </div>
                             </li>
-                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="it" data-animate="true">
-                                <div class="dashboard-location-tabs__tab" data-toggle="tab" role="tab" aria-selected="true">
+                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="it"
+                                data-animate="true">
+                                <div class="dashboard-location-tabs__tab" data-toggle="tab" role="tab"
+                                    aria-selected="true">
                                     <div><strong>Vatican City</strong></div>
                                     <div class="d-flex align-items-center">
                                         <div class="flex mr-2">
                                             <div class="progress" style="height: 4px;">
-                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 39%;" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div class="progress-bar bg-primary" role="progressbar"
+                                                    style="width: 39%;" aria-valuenow="39" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
                                             </div>
                                         </div>
                                         <div>39k</div>
                                     </div>
                                 </div>
                             </li>
-                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="au" data-animate="true">
-                                <div class="dashboard-location-tabs__tab" data-toggle="tab" role="tab" aria-selected="true">
+                            <li data-toggle="vector-map-focus" data-target="#vector-map-revenue" data-focus="au"
+                                data-animate="true">
+                                <div class="dashboard-location-tabs__tab" data-toggle="tab" role="tab"
+                                    aria-selected="true">
                                     <div><strong>Sydney</strong></div>
                                     <div class="d-flex align-items-center">
                                         <div class="flex mr-2">
                                             <div class="progress" style="height: 4px;">
-                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div class="progress-bar bg-primary" role="progressbar"
+                                                    style="width: 25%;" aria-valuenow="25" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
                                             </div>
                                         </div>
                                         <div>25k</div>
@@ -376,12 +388,14 @@
 
         <div class="card mb-lg-32pt">
 
-            <div class="table-responsive" data-toggle="lists" data-lists-sort-by="js-lists-values-employee-name" data-lists-values='["js-lists-values-employee-name", "js-lists-values-employer-name", "js-lists-values-projects", "js-lists-values-activity", "js-lists-values-earnings"]'>
+            <div class="table-responsive" data-toggle="lists" data-lists-sort-by="js-lists-values-employee-name"
+                data-lists-values='["js-lists-values-employee-name", "js-lists-values-employer-name", "js-lists-values-projects", "js-lists-values-activity", "js-lists-values-earnings"]'>
 
                 <div class="card-header">
                     <form class="form-inline">
                         <label class="mr-sm-2 form-label" for="inlineFormFilterBy">Filter by:</label>
-                        <input type="text" class="form-control search mb-2 mr-sm-2 mb-sm-0" id="inlineFormFilterBy" placeholder="Search ...">
+                        <input type="text" class="form-control search mb-2 mr-sm-2 mb-sm-0" id="inlineFormFilterBy"
+                            placeholder="Search ...">
 
                         <label class="sr-only" for="inlineFormRole">Role</label>
                         <select id="inlineFormRole" class="custom-select mb-2 mr-sm-2 mb-sm-0">
@@ -409,31 +423,37 @@
 
                             <th style="width: 18px;" class="pr-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input js-toggle-check-all" data-target="#staff" id="customCheckAllstaff">
+                                    <input type="checkbox" class="custom-control-input js-toggle-check-all"
+                                        data-target="#staff" id="customCheckAllstaff">
                                     <label class="custom-control-label" for="customCheckAllstaff"><span
                                             class="text-hide">Toggle all</span></label>
                                 </div>
                             </th>
 
                             <th>
-                                <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-employee-name">Employee</a>
+                                <a href="javascript:void(0)" class="sort"
+                                    data-sort="js-lists-values-employee-name">Employee</a>
                             </th>
 
                             <th style="width: 150px;">
-                                <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-employer-name">Employer</a>
+                                <a href="javascript:void(0)" class="sort"
+                                    data-sort="js-lists-values-employer-name">Employer</a>
                             </th>
 
                             <th class="text-center" style="width: 48px;">
-                                <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-projects">Projects</a>
+                                <a href="javascript:void(0)" class="sort"
+                                    data-sort="js-lists-values-projects">Projects</a>
                             </th>
 
                             <th style="width: 37px;">Status</th>
 
                             <th style="width: 120px;">
-                                <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-activity">Activity</a>
+                                <a href="javascript:void(0)" class="sort"
+                                    data-sort="js-lists-values-activity">Activity</a>
                             </th>
                             <th style="width: 51px;">
-                                <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-earnings">Earnings</a>
+                                <a href="javascript:void(0)" class="sort"
+                                    data-sort="js-lists-values-earnings">Earnings</a>
                             </th>
                             <th style="width: 24px;" class="pl-0"></th>
                         </tr>
@@ -444,7 +464,8 @@
 
                             <td class="pr-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input js-check-selected-row" checked="" id="customCheck1_1">
+                                    <input type="checkbox" class="custom-control-input js-check-selected-row" checked=""
+                                        id="customCheck1_1">
                                     <label class="custom-control-label" for="customCheck1_1"><span
                                             class="text-hide">Check</span></label>
                                 </div>
@@ -455,7 +476,8 @@
                                 <div class="media flex-nowrap align-items-center" style="white-space: nowrap;">
                                     <div class="avatar avatar-32pt mr-8pt">
 
-                                        <img src="assets/images/people/110/guy-1.jpg" alt="Avatar" class="avatar-img rounded-circle">
+                                        <img src="assets/images/people/110/guy-1.jpg" alt="Avatar"
+                                            class="avatar-img rounded-circle">
 
                                     </div>
                                     <div class="media-body">
@@ -499,7 +521,8 @@
 
                             <td class="pr-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input js-check-selected-row" id="customCheck1_2">
+                                    <input type="checkbox" class="custom-control-input js-check-selected-row"
+                                        id="customCheck1_2">
                                     <label class="custom-control-label" for="customCheck1_2"><span
                                             class="text-hide">Check</span></label>
                                 </div>
@@ -553,7 +576,8 @@
 
                             <td class="pr-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input js-check-selected-row" id="customCheck1_3">
+                                    <input type="checkbox" class="custom-control-input js-check-selected-row"
+                                        id="customCheck1_3">
                                     <label class="custom-control-label" for="customCheck1_3"><span
                                             class="text-hide">Check</span></label>
                                 </div>
@@ -564,7 +588,8 @@
                                 <div class="media flex-nowrap align-items-center" style="white-space: nowrap;">
                                     <div class="avatar avatar-32pt mr-8pt">
 
-                                        <img src="assets/images/people/110/guy-2.jpg" alt="Avatar" class="avatar-img rounded-circle">
+                                        <img src="assets/images/people/110/guy-2.jpg" alt="Avatar"
+                                            class="avatar-img rounded-circle">
 
                                     </div>
                                     <div class="media-body">
@@ -607,7 +632,8 @@
 
                             <td class="pr-0">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input js-check-selected-row" checked="" id="customCheck1_4">
+                                    <input type="checkbox" class="custom-control-input js-check-selected-row" checked=""
+                                        id="customCheck1_4">
                                     <label class="custom-control-label" for="customCheck1_4"><span
                                             class="text-hide">Check</span></label>
                                 </div>
@@ -706,7 +732,8 @@
                                 Completed</a></div>
                     </div>
                     <div class="progress rounded-0" style="height: 4px;">
-                        <div class="progress-bar bg-primary" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 40%;" aria-valuenow="40"
+                            aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled list-todo" id="todo">
@@ -791,7 +818,8 @@
                                 <div class="text-50 border-right"><small>HTML</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 61%;" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 61%;"
+                                            aria-valuenow="61" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>61%</small></div>
@@ -800,7 +828,8 @@
                                 <div class="text-50 border-right"><small>CSS</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-accent" role="progressbar" style="width: 39%;" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-accent" role="progressbar" style="width: 39%;"
+                                            aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>39%</small></div>
@@ -809,7 +838,8 @@
                                 <div class="text-50 border-right"><small>JavaScript</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 76%;" aria-valuenow="76" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 76%;"
+                                            aria-valuenow="76" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>76%</small></div>
@@ -818,7 +848,8 @@
                                 <div class="text-50 border-right"><small>Rails</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-black-50" role="progressbar" style="width: 28%;" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-black-50" role="progressbar" style="width: 28%;"
+                                            aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>28%</small></div>
@@ -827,7 +858,8 @@
                                 <div class="text-50 border-right"><small>Vue.js</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-black-20" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-black-20" role="progressbar" style="width: 50%;"
+                                            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>50%</small></div>
@@ -836,7 +868,8 @@
                                 <div class="text-50 border-right"><small>Laravel</small></div>
                                 <div class="flex">
                                     <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-black-20" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-black-20" role="progressbar" style="width: 60%;"
+                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="text-70"><small>60%</small></div>
@@ -885,7 +918,8 @@
             <div class="card-header">
                 <div class="row align-items-center" style="white-space: nowrap;">
                     <div class="col-lg-auto">
-                        <form class="search-form search-form--dark d-lg-inline-flex mb-8pt mb-lg-0" action="discussions.html">
+                        <form class="search-form search-form--dark d-lg-inline-flex mb-8pt mb-lg-0"
+                            action="discussions.html">
                             <input type="text" class="form-control w-lg-auto" placeholder="Search discussions">
                             <button class="btn" type="submit" role="button"><i
                                     class="material-icons">search</i></button>
@@ -912,7 +946,8 @@
                         <div class="col-md-3 mb-8pt mb-md-0">
                             <div class="media align-items-center">
                                 <div class="media-left mr-8pt">
-                                    <a href="" class="avatar avatar-32pt"><img src="assets/images/people/110/guy-1.jpg" alt="avatar" class="avatar-img rounded-circle"></a>
+                                    <a href="" class="avatar avatar-32pt"><img src="assets/images/people/110/guy-1.jpg"
+                                            alt="avatar" class="avatar-img rounded-circle"></a>
                                 </div>
                                 <div class="d-flex flex-column media-body media-middle">
                                     <a href="" class="text-body"><strong>Laza Bogdan</strong></a>
@@ -940,7 +975,8 @@
                         <div class="col-md-3 mb-8pt mb-md-0">
                             <div class="media align-items-center">
                                 <div class="media-left mr-8pt">
-                                    <a href="" class="avatar avatar-32pt"><img src="assets/images/people/110/guy-2.jpg" alt="avatar" class="avatar-img rounded-circle"></a>
+                                    <a href="" class="avatar avatar-32pt"><img src="assets/images/people/110/guy-2.jpg"
+                                            alt="avatar" class="avatar-img rounded-circle"></a>
                                 </div>
                                 <div class="d-flex flex-column media-body media-middle">
                                     <a href="" class="text-body"><strong>Adam Curtis</strong></a>
@@ -1002,7 +1038,9 @@
         <p class="text-70 brand mb-24pt">
             <img class="brand-icon" src="assets/images/logo/black-70@2x.png" width="30" alt="Huma"> Huma
         </p>
-        <p class="measure-lead-max text-muted mb-0 small">Huma is a beautifully crafted user interface for modern Business Admin Web Applications, with examples for many pages needed for Customer Relationship Management, Enterprise Resource Planning, Human Resources, Content Management System, Project
+        <p class="measure-lead-max text-muted mb-0 small">Huma is a beautifully crafted user interface for modern
+            Business Admin Web Applications, with examples for many pages needed for Customer Relationship Management,
+            Enterprise Resource Planning, Human Resources, Content Management System, Project
             Management, Tasks, eCommerce, Messaging and Account Management.</p>
     </div>
     <div class="pb-16pt pb-lg-24pt">
@@ -1012,9 +1050,14 @@
                     <div class="col-md-2 col-sm-4 mb-24pt mb-md-0">
                         <p class="text-white-70 mb-8pt"><strong>Follow us</strong></p>
                         <nav class="nav nav-links nav--flush">
-                            <a href="#" class="nav-link mr-8pt"><img src="assets/images/icon/footer/facebook-square@2x.png" width="24" height="24" alt="Facebook"></a>
-                            <a href="#" class="nav-link mr-8pt"><img src="assets/images/icon/footer/twitter-square@2x.png" width="24" height="24" alt="Twitter"></a>
-                            <a href="#" class="nav-link mr-8pt"><img src="assets/images/icon/footer/vimeo-square@2x.png" width="24" height="24" alt="Vimeo"></a>
+                            <a href="#" class="nav-link mr-8pt"><img
+                                    src="assets/images/icon/footer/facebook-square@2x.png" width="24" height="24"
+                                    alt="Facebook"></a>
+                            <a href="#" class="nav-link mr-8pt"><img
+                                    src="assets/images/icon/footer/twitter-square@2x.png" width="24" height="24"
+                                    alt="Twitter"></a>
+                            <a href="#" class="nav-link mr-8pt"><img src="assets/images/icon/footer/vimeo-square@2x.png"
+                                    width="24" height="24" alt="Vimeo"></a>
                             <!-- <a href="#" class="nav-link"><img src="assets/images/icon/footer/youtube-square@2x.png" width="24" height="24" alt="YouTube"></a> -->
                         </nav>
                     </div>
@@ -1057,6 +1100,24 @@
         }],
         "labels": data[0]
     })
+</script>
+
+<script>
+    $(document).ready(function () {
+        jQuery('#vector-map-revenue').vectorMap({
+            map: 'turkey',
+            selectedRegion: '81',
+            backgroundColor: '#ffffff',
+            color: '#E6E7E9',
+            hoverColor: '#03235E',
+            enableZoom: true,
+            showTooltip: true,
+            onLabelShow: function (event, label, code) {
+                label[0].innerHTML = "Satış Adedi Yaz"
+            },
+        });
+    });
+    //data-toggle="vector-map" data-vector-map-map="turkey" data-vector-map-show-tooltip="true" data-vector-map-enable-zoom="true" data-vector-map-scale="0.35" 
 </script>
 
 {% endblock script %}
