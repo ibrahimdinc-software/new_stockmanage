@@ -34,7 +34,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
 
     list_filter = ["onSale", "marketType"]
     list_display = ['sellerSku', 'salePrice', 'availableStock',
-                    'onSale', 'buyBoxRank']
+                    'onSale', 'buyBoxRank', "lastControlDate"]
 
     inlines = [MarketMedProductModelTabularInline,
                MarketProductBuyBoxListModelTabularInline, ]
