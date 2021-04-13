@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
 
-from datetime import date, datetime
 import json
 
 from .main_module import ProductModule
@@ -9,7 +9,7 @@ from marketplace.models import MarketOrderModel
 
 # Create your views here.
 
-
+@login_required
 def index(request):
     """
     context = {
