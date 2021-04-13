@@ -34,6 +34,12 @@ def index(request):
         "weeklySalesAmount": statistics.get("weeklySalesAmount"),
         "weeklySalesDifferenceAmount": statistics.get("weeklySalesDifferenceAmount"),
         "weeklySalesGraph": json.dumps(statistics.get("weeklySalesGraph")),
+
+        "monthlySalesCount": statistics.get("monthlySalesCount"),
+        "monthlySalesDifference": statistics.get("monthlySalesDifference"),
+        "monthlySalesAmount": statistics.get("monthlySalesAmount"),
+        "monthlySalesDifferenceAmount": statistics.get("monthlySalesDifferenceAmount"),
+        "monthlySalesGraph": json.dumps(statistics.get("monthlySalesGraph")),
     }
     return render(request, "main/index.html", context=context)
 

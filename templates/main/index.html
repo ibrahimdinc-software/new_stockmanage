@@ -125,6 +125,53 @@
                     </div>
                 </div>
             </div>
+
+            <div class=" col-md-6 card-group-row__col">
+                <div class="card card-group-row__card card-body"
+                    style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
+
+                    <div class="d-flex align-items-center">
+                        <div class="h2 mb-0 mr-3">{{monthlySalesCount}}</div>
+                        <div class="flex">
+                            <p class="mb-0"><strong>Aylık Sipariş</strong></p>
+                            <p class="text-50 mb-0 mt-n1 d-flex align-items-center">
+                                {{monthlySalesDifference|floatformat:0}}%
+                                <i class="material-icons text-accent ml-4pt icon-16pt">
+                                    {% if monthlySalesDifference > 0 %}keyboard_arrow_up{% elif monthlySalesDifference == 0 %}remove{% else %}keyboard_arrow_down{% endif %}
+                                </i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="chart" style="height: 80px; position: absolute; left: 0; right: 0; bottom: 0;">
+                        <canvas class="chart-canvas js-update-chart-line" id="monthlySalesCountChart" data-chart-hide-axes="true"
+                            data-chart-line-border-color="primary"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class=" col-md-6 card-group-row__col">
+                <div class="card card-group-row__card card-body"
+                    style="position: relative; padding-bottom: calc(80px - 1.25rem); overflow: hidden; z-index: 0;">
+
+                    <div class="d-flex align-items-center">
+                        <div class="h2 mb-0 mr-3">{{monthlySalesAmount|floatformat:2}}₺</div>
+                        <div class="flex">
+                            <p class="mb-0"><strong>Aylık Ciro</strong></p>
+                            <p class="text-50 mb-0 mt-n1 d-flex align-items-center">
+                                {{monthlySalesDifferenceAmount|floatformat:0}}%
+                                <i class="material-icons text-accent ml-4pt icon-16pt">
+                                    {% if monthlySalesDifferenceAmount > 0 %}keyboard_arrow_up{% elif monthlySalesDifferenceAmount == 0 %}remove{% else %}keyboard_arrow_down{% endif %}
+                                </i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="chart" style="height: 80px; position: absolute; left: 0; right: 0; bottom: 0;">
+                        <canvas class="chart-canvas js-update-chart-line-accent" id="monthlySalesAmountChart"
+                            data-chart-hide-axes="true" data-chart-line-border-color="teal"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row mb-lg-8pt">
@@ -1080,8 +1127,9 @@
 {% endblock body %} {% block script %}
 
 <script>
-    var x = '{{weeklySalesGraph|escapejs}}'
-    var data = JSON.parse(x)
+    var weeklySalesGraph = '{{weeklySalesGraph|escapejs}}'
+    var data = JSON.parse(weeklySalesGraph)
+
     Charts.create("#productsChart", "line", {}, {
         "datasets": [{
             "borderColor": "rgba(33, 150, 243, 1)",
@@ -1092,6 +1140,29 @@
         "labels": data[0]
     })
     Charts.create("#coursesChart", "line", {}, {
+        "datasets": [{
+            "borderColor": "rgba(33, 150, 243, 1)",
+            "data": data[2],
+            "label": "Haftalık Sipariş Sayısı",
+            "pointBackgroundColor": "#2196f3"
+        }],
+        "labels": data[0]
+    })
+
+    var monthlySalesGraph = '{{monthlySalesGraph|escapejs}}'
+    var data = JSON.parse(monthlySalesGraph)
+
+    
+    Charts.create("#monthlySalesCountChart", "line", {}, {
+        "datasets": [{
+            "borderColor": "rgba(33, 150, 243, 1)",
+            "data": data[1],
+            "label": "Haftalık Sipariş Sayısı",
+            "pointBackgroundColor": "#2196f3"
+        }],
+        "labels": data[0]
+    })
+    Charts.create("#monthlySalesAmountChart", "line", {}, {
         "datasets": [{
             "borderColor": "rgba(33, 150, 243, 1)",
             "data": data[2],
