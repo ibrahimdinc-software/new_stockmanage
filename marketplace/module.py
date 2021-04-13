@@ -187,7 +187,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
     def cronBuyBox(self):
         now = datetime.now()
-        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__gte=now-timedelta(minutes=10), lastControlDate__lt=now)[:20]
+        tenMinAgo = datetime.now()-timedelta(minutes=10)
+        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__lte=tenMinAgo)[:20]
         infos = []
         for mpm in mpms:
             mpm.lastControlDate = now
