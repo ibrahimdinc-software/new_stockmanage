@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import time
 
 from trendyol_api.models import TrendProductModel, TrendOrderModel
@@ -157,6 +157,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                         mpm.buyBoxRank = bb.get("rank")
                         mpm.save()
 
+            time.sleep(.100)
             if notif:
                 if str(lastRank) != str(mpm.buyBoxRank):
                     return self._buyBoxMessage(lastRank, mpm)
@@ -165,7 +166,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                         "status": "same"
                     }
             else:
-                time.sleep(.100)
                 return "{} -- Başarılı".format(mpm.sellerSku)
         elif notif:
             return {
@@ -186,9 +186,12 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
         return messages
 
     def cronBuyBox(self):
-        mpms = MarketProductModel.objects.filter(onSale=True)
+        now = datetime.now()
+        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__gte=now-timedelta(minutes=10), lastControlDate__lt=now)[:20]
         infos = []
         for mpm in mpms:
+            mpm.lastControlDate = now
+            mpm.save()
             m = self._getBuyBox(mpm, True)
             if m.get("status") == "change":
                 infos.append(m)

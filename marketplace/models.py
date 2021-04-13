@@ -1,7 +1,6 @@
-from datetime import date
 from django.db import models
 from django.utils.html import format_html
-
+from django.utils import timezone
 from .manager import MarketOrderModelManager
 
 # Create your models here.
@@ -34,6 +33,7 @@ class MarketProductModel(models.Model):
     salePrice = models.FloatField(verbose_name="Satış Fiyatı")
     onSale = models.BooleanField(verbose_name="Satılabilir mi?")
     availableStock = models.IntegerField(verbose_name="Mevcut Stok")
+    lastControlDate = models.DateTimeField(verbose_name="Son BuyBox Kontrol Tarihi", default=timezone.now)
     buyBoxRank = models.IntegerField(verbose_name="Buybox Sıralaması", blank=True, null=True)
     productLink = models.CharField(verbose_name="Link", max_length=255, blank=True, null=True)
     
