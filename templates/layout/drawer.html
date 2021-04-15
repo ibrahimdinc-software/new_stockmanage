@@ -69,92 +69,29 @@
             <div class="sidebar-heading">GENEL BAKIŞ</div>
             <ul class="sidebar-menu">
                 <li class="sidebar-menu-item active">
-                    <a class="sidebar-menu-button" href="index.html">
+                    <a class="sidebar-menu-button" href="{% url 'index' %}">
                         <span class="material-icons sidebar-menu-icon sidebar-menu-icon--left">insert_chart_outlined</span>
                         <span class="sidebar-menu-text">Kontrol Paneli</span>
                     </a>
                 </li>
-                <li class="sidebar-menu-item">
-                    <a class="sidebar-menu-button" data-toggle="collapse" href="#dashboards_menu">
-                        <span class="material-icons sidebar-menu-icon sidebar-menu-icon--left">link</span> Shortcuts
-                        <span class="ml-auto sidebar-menu-toggle-icon"></span>
-                    </a>
-                    <ul class="sidebar-submenu collapse sm-indent" id="dashboards_menu">
-                        <li class="sidebar-menu-item active">
-                            <a class="sidebar-menu-button" href="index.html">
-                                <span class="sidebar-menu-text">Analytics Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="analytics.html">
-                                <span class="sidebar-menu-text">Analytics 2 Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="projects.html">
-                                <span class="sidebar-menu-text">Projects Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="tasks-board.html">
-                                <span class="sidebar-menu-text">Tasks Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="staff.html">
-                                <span class="sidebar-menu-text">Staff Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="ecommerce.html">
-                                <span class="sidebar-menu-text">Shop Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="erp-dashboard.html">
-                                <span class="sidebar-menu-text">ERP Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="crm-dashboard.html">
-                                <span class="sidebar-menu-text">CRM Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="hr-dashboard.html">
-                                <span class="sidebar-menu-text">HR Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="cms-dashboard.html">
-                                <span class="sidebar-menu-text">CMS Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button disabled" href="ui-card-metrics.html">
-                                <span class="sidebar-menu-text">Card Metrics</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
             </ul>
 
-            <div class="sidebar-heading">Applications</div>
+            <div class="sidebar-heading">Ürün İşlemleri</div>
             <ul class="sidebar-menu">
                 <li class="sidebar-menu-item">
-                    <a class="sidebar-menu-button js-sidebar-collapse" data-toggle="collapse" href="#enterprise_menu">
-                        <span class="material-icons sidebar-menu-icon sidebar-menu-icon--left">donut_large</span> Enterprise
+                    <a class="sidebar-menu-button js-sidebar-collapse" data-toggle="collapse" href="#storageMenu">
+                        <span class="material-icons sidebar-menu-icon sidebar-menu-icon--left">donut_large</span>Ürünler
                         <span class="ml-auto sidebar-menu-toggle-icon"></span>
                     </a>
-                    <ul class="sidebar-submenu collapse sm-indent" id="enterprise_menu">
+                    <ul class="sidebar-submenu collapse sm-indent" id="storageMenu">
                         <li class="sidebar-menu-item">
-                            <a class="sidebar-menu-button" href="erp-dashboard.html">
-                                <span class="sidebar-menu-text">ERP Dashboard</span>
+                            <a class="sidebar-menu-button" href="{% url 'baseProductsListView' %}">
+                                <span class="sidebar-menu-text">Temel Ürünler</span>
                             </a>
                         </li>
                         <li class="sidebar-menu-item">
                             <a class="sidebar-menu-button" href="crm-dashboard.html">
-                                <span class="sidebar-menu-text">CRM Dashboard</span>
+                                <span class="sidebar-menu-text">Bağlı Ürünler</span>
                             </a>
                         </li>
                         <li class="sidebar-menu-item">

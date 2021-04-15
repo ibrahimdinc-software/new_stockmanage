@@ -116,4 +116,3 @@ class MedProductModel(models.Model):
     base_product = models.ForeignKey(BaseProductModel, on_delete=models.CASCADE)
     piece = models.IntegerField(verbose_name="Bağlı Üründe Kaç Tane")
 
-    

@@ -27925,6 +27925,8 @@ a:hover {
     overflow: visible
 }
 
+
+/*
 @media (min-width:768px) {
     .mdk-drawer-layout .container,
     .mdk-drawer-layout .container-fluid,
@@ -27946,6 +27948,7 @@ a:hover {
         max-width: 960px
     }
 }
+*/
 
 .sub-layout .mdk-header-layout__content {
     height: 100%
