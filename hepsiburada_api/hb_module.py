@@ -1,3 +1,4 @@
+from billing.models import CustomerModel
 import datetime
 import time
 
@@ -83,133 +84,6 @@ class HepsiOrderModule(HepsiOrderAPI):
             if (orderNumber and order.get("orderNumber") == orderNumber) or (packageNumber and order.get("packageNumber") == packageNumber):
                 return order
 
-    def createOrder(self, orders):
-        hepsiOrders = HepsiOrderModel.objects.all()
-        hepsiProducts = HepsiProductModel.objects.all()
-
-        for order in orders:
-            if hepsiOrders.filter(orderNumber=order.get("orderNumber")):
-                hom = hepsiOrders.get(orderNumber=order.get("orderNumber"))
-
-                oDetails = hom.marketorderdetailmodel_set.all()
-
-                for cod in order.get("details"):
-                    if oDetails.filter(mpm=hepsiProducts.get(marketplaceSku=cod.get("hpm"))):
-                        ood = oDetails.get(mpm=hepsiProducts.get(
-                            marketplaceSku=cod.get("hpm")))
-                        ood.totalHbDiscount = float(cod.get("totalHbDiscount").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("totalHbDiscount") else 0
-                        ood.priceToBilling = float(cod.get("priceToBilling").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("priceToBilling") else 0
-                        ood.comission = float(cod.get("comission").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("comission") else 0
-                        ood.save()
-                        ood.setTotalPrice()
-                    else:
-                        hodm = HepsiOrderDetailModel(
-                            mpm=hepsiProducts.get(
-                                marketplaceSku=cod.get("hpm")),
-                            priceToBilling=float(cod.get("priceToBilling").replace(
-                                'TRY', '').replace(',', '.')) if cod.get("priceToBilling") else 0,
-                            hom=hom,
-                            totalHbDiscount=float(cod.get("totalHbDiscount").replace(
-                                'TRY', '').replace(',', '.')) if cod.get("totalHbDiscount") else 0,
-                            quantity=cod.get("quantity"),
-                            comission=float(cod.get("comission").replace(
-                                'TRY', '').replace(',', '.')) if cod.get("comission") else 0
-                        )
-                        hodm.save()
-                        hodm.setTotalPrice()
-                hom.packageNumber = order.get("packageNumber")
-                hom.status = order.get("status")
-                hom.save()
-
-                hom.setTotalPrice()
-
-            else:
-                hom = HepsiOrderModel(
-                    marketType="hepsiburada",
-                    customerName=order.get("customerName"),
-                    orderNumber=order.get("orderNumber"),
-                    packageNumber=order.get("packageNumber"),
-                    orderDate=datetime.datetime.strptime(
-                        order.get("orderDate"), "%d-%m-%Y %H:%M:%S"),
-                    status=order.get("status")
-                )
-                hom.save()
-
-                for cod in order.get("details"):
-                    hodm = HepsiOrderDetailModel(
-                        mpm=hepsiProducts.get(marketplaceSku=cod.get("hpm")),
-                        priceToBilling=float(cod.get("priceToBilling").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("priceToBilling") else 0,
-                        mom=hom,
-                        totalHbDiscount=float(cod.get("totalHbDiscount").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("totalHbDiscount") else 0,
-                        quantity=cod.get("quantity"),
-                        comission=float(cod.get("comission").replace(
-                            'TRY', '').replace(',', '.')) if cod.get("comission") else 0
-                    )
-                    hodm.save()
-                    hodm.setTotalPrice()
-
-                hom.setPriceToBilling()
-                hom.setTotalPrice()
-
-    def getHepsiOldOrders(self, ordersFile):
-        orders = []
-
-        import pandas as pd
-
-        data = pd.read_csv(ordersFile, sep=";")
-
-        for d in data.iloc:
-            order = None
-
-            def numConverter(
-                num): return "0"+str(num) if str(num)[0] != "0" else str(num) if num else ''
-
-            def status(stat): return stat.get("Paket Durumu") if stat.get(
-                "Paket Durumu") != None else stat.get("Durum")
-            def hpmFinder(d): return d.get("Hepsiburada Ürün Kodu") if d.get(
-                "Hepsiburada Ürün Kodu") != None else d.get("Ürün Numarası")
-
-            if d.get("Sipariş Numarası"):
-                order = self.__ifexist__(
-                    orders, orderNumber=d.get("Sipariş Numarası"))
-            elif d.get("Paket Numarası"):
-                order = self.__ifexist__(
-                    orders, packageNumber=d.get("Paket Numarası"))
-
-            if order:
-                order["packageNumber"] = numConverter(
-                    d.get("Sipariş Numarası"))
-                order["orderNumber"] = numConverter(d.get("Paket Numarası"))
-                order["status"] = status(d)
-                order["details"].append({
-                    "hpm": hpmFinder(d),
-                    "totalHbDiscount": d.get("HB'nin karşıladığı kampanya tutarı (KDV dahil)"),
-                    "priceToBilling": d.get("Faturalandırılacak Satış Fiyatı"),
-                    "quantity": d.get("Adet"),
-                    "comission": d.get("Komisyon Tutarı (KDV Dahil)")
-                })
-            else:
-                orders.append({
-                    "orderNumber": numConverter(d.get("Sipariş Numarası")),
-                    "packageNumber": numConverter(d.get("Paket Numarası")),
-                    "status": status(d),
-                    "customerName": d.get("Alıcı"),
-                    "orderDate": d.get("Sipariş Tarihi"),
-                    "details": [{
-                        "hpm": hpmFinder(d),
-                        "totalHbDiscount": d.get("HB'nin karşıladığı kampanya tutarı (KDV dahil)"),
-                        "priceToBilling": d.get("Faturalandırılacak Satış Fiyatı"),
-                        "quantity": d.get("Adet"),
-                        "comission": d.get("Komisyon Tutarı (KDV Dahil)")
-                    }]
-                })
-
-        self.createOrder(orders)
 
     def getHepsiOrders(self):
         orders = self.hepsiGet()
@@ -218,16 +92,27 @@ class HepsiOrderModule(HepsiOrderAPI):
         hepsiProducts = HepsiProductModel.objects.all()
 
         for order in orders:
-            if not hepsiOrders.filter(orderNumber=order.get("orderNumber")):
+            customer, customerData = CustomerModel.objects.get_or_create(name=order["name"])
+            
+            customerData = order["shippingAddress"]
+            customerData["taxId"] = ""
+            customerData["mail"] = customerData["email"]
+            customerData["phone"] = customerData["phoneNumber"]
+            customerData["district"] = customerData["town"]
+            customerData["fullAddress"] = customerData["address"]
+
+            hom = hepsiOrders.filter(orderNumber=order.get("orderNumber"))
+            if not hom:
                 date = self.__dateConverter__(order.get("orderDate"))
                 hom = HepsiOrderModel(
                     marketType="hepsiburada",
-                    customerName=order.get("name"),
                     orderNumber=order.get("orderNumber"),
                     orderDate=date,
                     orderStatus=order.get("status")
                 )
                 hom.save()
+                
+                hom.setCustomer(customer, customerData)
 
                 details = self.getDetails(hom.orderNumber)
 
@@ -247,6 +132,11 @@ class HepsiOrderModule(HepsiOrderAPI):
 
                 hom.setTotalPrice()
                 hom.setPriceToBilling()
+            else:
+                hom = hom.first()
+                hom.setCustomer(customer, customerData)
+            
+
 
     def setPackageDetails(self):
         data = self.getPackageDetails()
@@ -259,7 +149,6 @@ class HepsiOrderModule(HepsiOrderAPI):
                 order.save()
             else:
                 order = HepsiOrderModel(
-                    customerName=d.get("customerName"),
                     orderNumber=d.get("orderNumber"),
                     orderDate=self.__dateConverter__(d.get("orderDate")),
                     priceToBilling=d.get("priceToBilling"),

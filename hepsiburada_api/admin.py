@@ -110,9 +110,9 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
     change_list_template = "hepsiburada_api/admin/get_hborder.html"
     change_form_template = "hepsiburada_api/admin/cancelOrder.html"
 
-    search_fields = ["orderNumber", "customerName", "packageNumber", ]
+    search_fields = ["orderNumber", "customerModel", "packageNumber", ]
 
-    list_display = ["__str__", "customerName", "totalPrice",
+    list_display = ["__str__", "customerModel", "totalPrice",
                     "orderDate", "getDetailCount", ]
     list_filter = [("orderDate", DateTimeRangeFilter), ]
 

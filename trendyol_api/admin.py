@@ -90,7 +90,7 @@ class TrendOrderModelAdmin(ImportExportModelAdmin):
     change_list_template = "trendyol_api/admin/get_trorder.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
 
-    list_display = ["__str__", "customerName",
+    list_display = ["__str__", "customerModel",
                     "totalPrice", "orderDate", "getDetailCount"]
     list_filter = [("orderDate", DateTimeRangeFilter)]
 

@@ -183,7 +183,8 @@ class HepsiOrderAPI:
                 "orderId": order.get("orderId"),
                 "orderDate": order.get("orderDate"),
                 "totalPrice": order["totalPrice"]["amount"],
-                "status": order["status"]
+                "status": order["status"],
+                "shippingAddress": order["shippingAddress"]
             }
             orders.append(o)
 

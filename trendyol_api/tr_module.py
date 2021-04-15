@@ -2,6 +2,7 @@ from datetime import datetime, time, timedelta
 
 from .tr_api import TrendProductAPI, TrendOrderAPI
 
+from billing.models import CustomerModel
 from .models import TrendProductModel, TrendOrderModel
 
  
@@ -67,13 +68,22 @@ class TrendOrderModule(TrendOrderAPI):
         trendProducts = TrendProductModel.objects.all()
 
         for order in orders:
+            customer, customerData = CustomerModel.objects.get_or_create(name=order["shipmentAddress"]["fullName"])
+            if not customerData:
+                customerData = order["shipmentAddress"]
+                customerData["taxId"] = order["taxNumber"]
+                customerData["mail"] = order["customerEmail"]
+
+            to = None
             if not trendOrders.filter(orderNumber=order.get("orderNumber")):
-                self.createTrendOrder(trendProducts, order)
+                to = self.createTrendOrder(trendProducts, order)
             else:
                 to = trendOrders.filter(orderNumber=order.get("orderNumber")).first()
-                to.customerName = order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"]
                 to.orderStatus = order.get("shipmentPackageStatus")
-                to.save()
+            
+            to.save()
+            to.setCustomer(customer, customerData)
+
 
             if order.get("shipmentPackageStatus") == "Cancelled":
                 to = trendOrders.filter(orderNumber=order.get("orderNumber"))
@@ -98,17 +108,23 @@ class TrendOrderModule(TrendOrderAPI):
 
 
             for order in orders:
+                customer, customerData = CustomerModel.objects.get_or_create(name=order["shipmentAddress"]["fullName"])
+                if not customerData:
+                    customerData = order["shipmentAddress"]
+                    customerData["taxId"] = order["taxNumber"]
+                    customerData["mail"] = order["customerEmail"]
+
                 if not trendOrders.filter(orderNumber=order.get("orderNumber")):
-                    self.createTrendOrder(trendProducts, order, dropStock=False)
+                    tom = self.createTrendOrder(trendProducts, order, dropStock=False)
                 else:
                     tom = trendOrders.filter(orderNumber=order.get("orderNumber")).first()
-                    tom.customerName = order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"]
                     tom.orderStatus = order.get("shipmentPackageStatus")
 
                     if order.get("shipmentPackageStatus") == "Delivered":
                         self.setDeliveryDate(tom, order.get("packageHistories"))
 
-                    tom.save()
+                tom.save()
+                tom.setCustomer(customer, customerData)
 
             if endDate > currentDate:
                 break
@@ -134,7 +150,6 @@ class TrendOrderModule(TrendOrderAPI):
         date = datetime.fromtimestamp(order.get("orderDate")/1000)-timedelta(hours=3)
         tom = TrendOrderModel(
             marketType="trendyol",
-            customerName=order["shipmentAddress"]["firstName"]+ " " + order["shipmentAddress"]["lastName"],
             packageNumber=order.get("id"),
             orderNumber=order.get("orderNumber"),
             orderDate=date,
@@ -162,6 +177,7 @@ class TrendOrderModule(TrendOrderAPI):
             if dropStock:
                 todm.dropStock() 
 
+        return tom
 
     def setDeliveryDate(self, order, packageHistories):
         deliveryDate = None 

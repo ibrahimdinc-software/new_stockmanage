@@ -81,7 +81,6 @@ class MarketProductBuyBoxListModel(models.Model):
 
 class MarketOrderModel(models.Model):
     marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
-    customerName = models.CharField(verbose_name="Müşteri Adı", max_length=200)
     customerModel = models.ForeignKey("billing.CustomerModel", blank=True, null=True, on_delete=models.CASCADE)
     orderNumber = models.CharField(verbose_name="Sipariş No", max_length=100)
     packageNumber = models.CharField(verbose_name="Paket Numarası",max_length=100, blank=True, null=True)
@@ -99,7 +98,17 @@ class MarketOrderModel(models.Model):
     def getDetailCount(self):
         return self.marketorderdetailmodel_set.all().count()
 
-
+    def setCustomer(self, customer, customerData):
+        customer.taxId = customerData.get("taxId")
+        customer.mail = customerData.get("mail")
+        customer.phone = customerData.get("phone")
+        customer.province = customerData.get("city")
+        customer.district = customerData.get("district")
+        customer.address = customerData.get("fullAddress")
+        customer.save()
+        
+        self.customerModel = customer
+        self.save()
 
     def canceledOrder(self):
         self.orderStatus = "Cancelled"

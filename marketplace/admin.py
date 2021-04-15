@@ -138,7 +138,7 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
     change_list_template = "market/admin/get_order.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
 
-    list_display = ["__str__", "marketType", "customerName",
+    list_display = ["__str__", "marketType", "customerModel",
                     "totalPrice", "orderDate", "getDetailCount", "orderStatus"]
     list_filter = [
         "marketType",
