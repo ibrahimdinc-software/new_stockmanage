@@ -82,6 +82,7 @@ class MarketProductBuyBoxListModel(models.Model):
 class MarketOrderModel(models.Model):
     marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
     customerName = models.CharField(verbose_name="Müşteri Adı", max_length=200)
+    customerModel = models.ForeignKey("billing.CustomerModel", null=True, on_delete=models.CASCADE)
     orderNumber = models.CharField(verbose_name="Sipariş No", max_length=100)
     packageNumber = models.CharField(verbose_name="Paket Numarası",max_length=100, blank=True, null=True)
     orderDate = models.DateTimeField(verbose_name="Sipariş Tarihi")

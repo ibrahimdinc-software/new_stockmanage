@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from .models import CurrentModel
+from .models import CustomerModel
 # Register your models here.
 
 
 
-@admin.register(CurrentModel)
-class CurrentModelAdmin(admin.ModelAdmin):
+@admin.register(CustomerModel)
+class CustomerModelAdmin(admin.ModelAdmin):
     pass
 
 
