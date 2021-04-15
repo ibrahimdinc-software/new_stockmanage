@@ -114,10 +114,12 @@ class TrendOrderModule(TrendOrderAPI):
                     customerData["taxId"] = order["taxNumber"]
                     customerData["mail"] = order["customerEmail"]
 
+                tom = None
                 if not trendOrders.filter(orderNumber=order.get("orderNumber")):
                     tom = self.createTrendOrder(trendProducts, order, dropStock=False)
                 else:
                     tom = trendOrders.filter(orderNumber=order.get("orderNumber")).first()
+                    tom.marketType = "trendyol"
                     tom.orderStatus = order.get("shipmentPackageStatus")
 
                     if order.get("shipmentPackageStatus") == "Delivered":
