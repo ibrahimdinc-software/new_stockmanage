@@ -43,7 +43,6 @@ class ExtraMethods():
             if bb.get("merchantName") == "PetiFest":
                 mpm.buyBoxRank = bb.get("rank")
                 mpm.save()
-        print(bbs)
         self.cleanBbModel(bbs)
 
 class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
@@ -174,48 +173,36 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 time.sleep(.100)
                 if notif:
                     rivals = mpm.marketproductbuyboxlistmodel_set.exclude(merchantName = "PetiFest")
-                    print(rivals)
                     if len(rivals) < 1:
-                        print("LOG1")
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                     else:
                         for bb in rivals:
-                            print(bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp)
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 price = mpm.salePrice if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
-                                print(price)
                                 if mpm.buyBoxRank > bb.rank:
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
-                                        print("LOG2")
                                         bb.uncomp=True
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG2 "+str(bb) + " " + bb.merchantName + " uncomp")
                                     
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
-                                        print("LOG3")
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
 
                                     elif bb.price - bbtm.priceStep >= mpm.salePrice:
-                                        print("LOG4")
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))  
                                     
                                 elif mpm.buyBoxRank == 1:
-                                    print("LOG-SAME")
                                     return {"status": "same"}
                                         
                                 elif mpm.buyBoxRank < bb.rank and price - bbtm.priceStep > mpm.salePrice:
-                                    print("LOG5")
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
 
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
                 else:
-                    print("LOG7")
                     return "{} -- Başarılı".format(mpm.sellerSku)
             else:
-                print("LOG8")
                 return {"status": "same"} if notif else"{} -- BuyBox Takibi Tanımlı Değil!".format(mpm.sellerSku) 
         elif notif:
-            print("LOG9")
             return {
                 "status": "change",
                 "lastRank": "-",
@@ -224,7 +211,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 "url": "HATALI"
             }
         else:
-            print("LOG10")
             return "{} -- Hata var!".format(mpm.sellerSku)
 
 
@@ -232,7 +218,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
         messages = ""
         for mpm in mpms:
             message = self._getBuyBox(mpm, False)
-            print(message)
             if type(message) == dict:
                 messages += str(message.get("tpm")) + " " + str(message.get("detail"))
             else:
@@ -249,8 +234,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             mpm.lastControlDate = now
             mpm.save()
             m = self._getBuyBox(mpm, True)
-            print(mpm)
-            print(m)
             if m.get("status") == "change":
                 infos.append(m)
         if len(infos) > 0:
