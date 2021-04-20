@@ -57,6 +57,8 @@ class MarketProductModel(models.Model):
             "Ürün Linki",
         )
     
+  
+    
 class MarketMedProductModel(models.Model):
     product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
@@ -74,9 +76,25 @@ class MarketProductBuyBoxListModel(models.Model):
     merchantName = models.CharField(verbose_name="Satıcı Adı", max_length=255)
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
     dispatchTime = models.IntegerField("Kargoya Verme Süresi", blank=True, null=True) 
+    uncomp = models.BooleanField(verbose_name="Rekabet edilemez?", default=False)
 
     def __str__(self):
-        return str(self.rank)
+        return str(self.rank) + self.merchantName
+
+class MarketBuyBoxTraceModel(models.Model):
+    marketProduct = models.ForeignKey(MarketProductModel, on_delete=models.CASCADE)
+    minPrice = models.FloatField(verbose_name="Alt Fiyat")
+    maxPrice = models.FloatField(verbose_name="Üst Fiyat")
+    priceStep = models.FloatField(verbose_name="Değişim Miktarı")
+    isActive = models.BooleanField(verbose_name="Aktif mi?", default=True)
+
+
+    def __str__(self):
+        return str(self.marketProduct)
+    
+    def price(self):
+        return self.marketProduct.salePrice
+    
 
 
 class MarketOrderModel(models.Model):
@@ -99,13 +117,14 @@ class MarketOrderModel(models.Model):
         return self.marketorderdetailmodel_set.all().count()
 
     def setCustomer(self, customer, customerData):
-        customer.taxId = customerData.get("taxId")
-        customer.mail = customerData.get("mail")
-        customer.phone = customerData.get("phone")
-        customer.province = customerData.get("city")
-        customer.district = customerData.get("district")
-        customer.address = customerData.get("fullAddress")
-        customer.save()
+        if type(customerData) == dict:  
+            customer.taxId = customerData.get("taxId")
+            customer.mail = customerData.get("mail")
+            customer.phone = customerData.get("phone")
+            customer.province = customerData.get("city")
+            customer.district = customerData.get("district")
+            customer.address = customerData.get("fullAddress")
+            customer.save()
         
         self.customerModel = customer
         self.save()

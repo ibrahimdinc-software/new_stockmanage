@@ -8,6 +8,9 @@ from django.utils.translation import gettext as _
 
 translation.activate("tr")
 
+
+
+
 class MarketOrderModelManager(models.Manager):
     def getStatistics(self):
         orders = self.all()

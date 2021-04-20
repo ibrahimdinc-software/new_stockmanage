@@ -64,14 +64,15 @@ class HepsiProductModule(Listing):
 
     def _getHepsiBuyBox(self, mpm):
         bbList = []
-
-        for bb in self.getHepsiBuyboxList(mpm.marketplaceSku):
-            bbList.append({
-                "rank": bb.get("Rank"),
-                "merchantName": bb.get("MerchantName"),
-                "price": bb.get("Price"),
-                "dispatchTime": bb.get("DispatchTime")
-            })
+        data = self.getHepsiBuyboxList(mpm.marketplaceSku)
+        if data:
+            for bb in data:
+                bbList.append({
+                    "rank": bb.get("Rank"),
+                    "merchantName": bb.get("MerchantName"),
+                    "price": bb.get("Price"),
+                    "dispatchTime": bb.get("DispatchTime")
+                })
         return bbList
 
 

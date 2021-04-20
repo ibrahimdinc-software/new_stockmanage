@@ -7,7 +7,7 @@ from import_export.admin import ImportExportActionModelAdmin
 import requests
 
 from .resources import MarketOrderModelResource
-from .models import MarketMedProductModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel
+from .models import MarketBuyBoxTraceModel, MarketMedProductModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel
 from .module import ProductModule, OrderModule
 # Register your models here.
 
@@ -24,6 +24,11 @@ class MarketMedProductModelTabularInline(admin.TabularInline):
     autocomplete_fields = ["mpm"]
 
 
+class MarketBuyBoxTraceModelTabularInline(admin.TabularInline):
+    model = MarketBuyBoxTraceModel
+    extra = 0
+
+
 @admin.register(MarketProductModel)
 class MarketProductModelAdmin(admin.ModelAdmin):
     change_list_template = ["trendyol_api/admin/get_products.html"]
@@ -36,8 +41,11 @@ class MarketProductModelAdmin(admin.ModelAdmin):
     list_display = ['sellerSku', 'salePrice', 'availableStock',
                     'onSale', 'buyBoxRank', "lastControlDate"]
 
-    inlines = [MarketMedProductModelTabularInline,
-               MarketProductBuyBoxListModelTabularInline, ]
+    inlines = [
+        MarketBuyBoxTraceModelTabularInline,
+        MarketMedProductModelTabularInline,
+        MarketProductBuyBoxListModelTabularInline,
+    ]
 
     readonly_fields = ["productLinkF"]
 
@@ -124,6 +132,26 @@ class MarketMedProductModelAdmin(admin.ModelAdmin):
         self.message_user(request, "Stoklar sıfırlandı.")
 
     outOfStock.short_description = "Seçili ürünlerin satışını kapat."
+
+
+@admin.register(MarketBuyBoxTraceModel)
+class MarketBuyBoxTraceModelAdmin(admin.ModelAdmin):
+    list_display = ["marketProduct", "minPrice", "maxPrice", "priceStep"]
+
+    objId = None
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            self.objId = obj.marketProduct.id
+        return super().get_form(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        if db_field.name == 'marketProduct':
+            distinct = MarketBuyBoxTraceModel.objects.exclude(
+                marketProduct=self.objId).values_list('marketProduct_id').distinct()
+            kwargs["queryset"] = MarketProductModel.objects.filter(
+                onSale=True).exclude(id__in=distinct)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class MarketOrderDetailModelTabularInline(admin.TabularInline):
