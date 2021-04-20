@@ -169,11 +169,11 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 self.renewBbModel(bbList, mpm)
 
             bbtm = mpm.marketbuyboxtracemodel_set.first()
-            if bbtm:
+            if bbtm and lastRank != mpm.buyBoxRank:
                 time.sleep(.100)
                 if notif:
-                    rivals = mpm.marketproductbuyboxlistmodel_set.exclude(merchantName = "PetiFest")
-                    if len(rivals) < 1:
+                    rivals = mpm.marketproductbuyboxlistmodel_set.all()
+                    if len(rivals) < 1: #rakip yok
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                     else:
                         for bb in rivals:
