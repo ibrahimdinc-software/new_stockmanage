@@ -26,6 +26,7 @@ class ExtraMethods():
         for bb in bbList:
             if bbs.filter(merchantName=bb.get("merchantName")):
                 b = bbs.get(merchantName=bb.get("merchantName"))
+                b.uncomp = True if b.uncomp and b.price == bb.get("price") else False # rekabet edilemez ve fiyat değişmediyse True
                 b.rank = bb.get("rank")
                 b.price = bb.get("price")
                 b.dispatchTime = bb.get("dispatchTime") if bb.get("dispatchTime") else None
@@ -168,22 +169,28 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             if bbList:
                 self.renewBbModel(bbList, mpm)
 
-            bbtm = mpm.marketbuyboxtracemodel_set.first()
-            if bbtm and lastRank != mpm.buyBoxRank:
-                time.sleep(.100)
-                if notif:
+            time.sleep(.100)
+           
+                
+            if notif:
+                bbtm = mpm.marketbuyboxtracemodel_set.first()
+                if bbtm and lastRank != mpm.buyBoxRank:
                     rivals = mpm.marketproductbuyboxlistmodel_set.all()
                     if len(rivals) < 1: #rakip yok
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                     else:
                         for bb in rivals:
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
+                                # Rakibin fiyatı min fiyattan yüksekse ve rekabet edilebilirse
+                                
                                 price = mpm.salePrice if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
-                                if mpm.buyBoxRank > bb.rank:
+                                
+                                if mpm.buyBoxRank > bb.rank: 
+                                    # bizim sıralama rakipten büyükse
 
-                                    if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
+                                    if bb.price - bbtm.priceStep < bbtm.minPrice: # rakibin fiyatı min fiyattan düşükse rekabet edilemez
+                                        #mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
-                                        return self._buyBoxMessage(lastRank, mpm, detail="LOG2 "+str(bb) + " " + bb.merchantName + " uncomp")
                                     
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
@@ -199,9 +206,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
                 else:
-                    return "{} -- Başarılı".format(mpm.sellerSku)
+                    return {"status": "same"} if notif else"{} -- BuyBox Takibi Tanımlı Değil!".format(mpm.sellerSku) 
             else:
-                return {"status": "same"} if notif else"{} -- BuyBox Takibi Tanımlı Değil!".format(mpm.sellerSku) 
+                return "{} -- Başarılı".format(mpm.sellerSku)
+            
         elif notif:
             return {
                 "status": "change",
