@@ -33,13 +33,15 @@ class ExtraMethods():
                 b.save()
                 bbs = bbs.exclude(merchantName=bb.get("merchantName"))
             else:
-                MarketProductBuyBoxListModel(
+                mpbbl = MarketProductBuyBoxListModel(
                     mpm=mpm,
                     rank=bb.get("rank"),
                     merchantName=bb.get("merchantName"),
                     price=bb.get("price"),
                     dispatchTime=bb.get("dispatchTime") if bb.get("dispatchTime") else None
-                ).save()
+                )
+                mpbbl.save()
+                bbs = bbs.exclude(merchantName=bb.get("merchantName"))
 
             if bb.get("merchantName") == "PetiFest":
                 mpm.buyBoxRank = bb.get("rank")
