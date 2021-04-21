@@ -190,15 +190,14 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                 if mpm.buyBoxRank > bb.rank: 
                                     # bizim sıralama rakipten büyükse
 
-                                    if bb.price - bbtm.priceStep < bbtm.minPrice: # rakibin fiyatı min fiyattan düşükse rekabet edilemez
-                                        #mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
+                                    if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
                                     
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
 
-                                    elif bb.price - bbtm.priceStep >= mpm.salePrice:
-                                        return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))  
+                                    #elif bb.price - bbtm.priceStep >= mpm.salePrice:
+                                    #    return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))  
                                     
                                 elif mpm.buyBoxRank == 1:
                                     return {"status": "same"}
