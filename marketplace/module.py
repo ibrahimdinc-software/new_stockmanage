@@ -201,7 +201,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 # Rakibin fiyatı min fiyattan yüksekse ve rekabet edilebilirse
                                 
-                                price = mpm.salePrice if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
+                                price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
                                 
                                 if mpm.buyBoxRank > bb.rank: 
                                     # bizim sıralama rakipten büyükse
