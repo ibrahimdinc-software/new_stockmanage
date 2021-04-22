@@ -89,6 +89,13 @@ class MarketProductModelAdmin(admin.ModelAdmin):
             else:
                 self.message_user(request, "Geldi mi bak")
             return HttpResponseRedirect(".")
+        if "getBuyBoxTest" in request.POST:
+            message = ProductModule().cronBuyBoxTest(obj)
+            if message:
+                self.message_user(request, message)
+            else:
+                self.message_user(request, "Geldi mi bak")
+            return HttpResponseRedirect(".")
 
         return super().response_change(request, obj)
 
