@@ -23,15 +23,21 @@ class ExtraMethods():
 
     def renewBbModel(self, bbList, mpm):
         bbs = mpm.marketproductbuyboxlistmodel_set.all()
+        change = False
         for bb in bbList:
             if bbs.filter(merchantName=bb.get("merchantName")):
                 b = bbs.get(merchantName=bb.get("merchantName"))
+
+                change = True if b.price != bb.get("price") or b.rank != bb.get("rank") else False
+
                 b.uncomp = True if b.uncomp and b.price == bb.get("price") else False # rekabet edilemez ve fiyat değişmediyse True
+
                 b.rank = bb.get("rank")
                 b.price = bb.get("price")
                 b.dispatchTime = bb.get("dispatchTime") if bb.get("dispatchTime") else None
                 b.save()
                 bbs = bbs.exclude(merchantName=bb.get("merchantName"))
+
             else:
                 mpbbl = MarketProductBuyBoxListModel(
                     mpm=mpm,
@@ -40,6 +46,9 @@ class ExtraMethods():
                     price=bb.get("price"),
                     dispatchTime=bb.get("dispatchTime") if bb.get("dispatchTime") else None
                 )
+
+                change = True
+
                 mpbbl.save()
                 bbs = bbs.exclude(merchantName=bb.get("merchantName"))
 
@@ -47,6 +56,8 @@ class ExtraMethods():
                 mpm.buyBoxRank = bb.get("rank")
                 mpm.save()
         self.cleanBbModel(bbs)
+
+        return change
 
 class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
     def getProducts(self):
@@ -168,15 +179,17 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             elif self.marketType(mpm) == TrendProductModel:
                 bbList += self._getTrendBuyBox(mpm)
 
+            change = None
+
             if bbList:
-                self.renewBbModel(bbList, mpm)
+                change = self.renewBbModel(bbList, mpm)
 
             time.sleep(.100)
            
                 
             if notif:
                 bbtm = mpm.marketbuyboxtracemodel_set.first()
-                if bbtm and lastRank != mpm.buyBoxRank:
+                if bbtm and change:
                     rivals = mpm.marketproductbuyboxlistmodel_set.all()
                     if len(rivals) < 1: #rakip yok
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
@@ -206,8 +219,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
 
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
+                elif lastRank != mpm.buyBoxRank or change:
+                    return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada veya fiyatlarda değişiklik oldu.")
                 else:
-                    return self._buyBoxMessage(lastRank, mpm, detail="")
+                    return {"status": "same"}
             else:
                 return "{} -- Başarılı".format(mpm.sellerSku)
             
