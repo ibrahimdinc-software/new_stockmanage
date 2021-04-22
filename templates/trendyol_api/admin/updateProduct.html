@@ -1,9 +1,7 @@
-{% extends 'admin/change_form.html' %}
-
-{% block submit_buttons_bottom %}
-    {{ block.super }}
-    <div class="submit-row">
-            <input type="submit" value="Güncelle" name="update">
-            <input type="submit" value="BuyBox Getir" name="getBuyBox">
-    </div>
+{% extends 'admin/change_form.html' %} {% block submit_buttons_bottom %} {{ block.super }}
+<div class="submit-row">
+    <input type="submit" value="Güncelle" name="update">
+    <input type="submit" value="BuyBox Getir" name="getBuyBox">
+    <input type="submit" value="BuyBox Test" name="getBuyBoxTest">
+</div>
 {% endblock %}
