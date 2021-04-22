@@ -193,8 +193,11 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     rivals = mpm.marketproductbuyboxlistmodel_set.all()
                     if len(rivals) < 1: #rakip yok
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
+                    
                     else:
+                        
                         for bb in rivals:
+                            
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 # Rakibin fiyatı min fiyattan yüksekse ve rekabet edilebilirse
                                 
@@ -205,6 +208,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
+                                        bb.save()
                                     
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
@@ -215,14 +219,21 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                 elif mpm.buyBoxRank == 1:
                                     return {"status": "same"}
                                         
-                                elif mpm.buyBoxRank < bb.rank and price - bbtm.priceStep > mpm.salePrice:
-                                    return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
-
+                                elif mpm.buyBoxRank < bb.rank:
+                                    return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
+                            
+                            elif bb.price - bbtm.priceStep < bbtm.minPrice:
+                                bb.uncomp = True
+                                bb.save()
+                        
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
+                
                 elif lastRank != mpm.buyBoxRank or change:
                     return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada veya fiyatlarda değişiklik oldu.")
+                
                 else:
                     return {"status": "same"}
+            
             else:
                 return "{} -- Başarılı".format(mpm.sellerSku)
             
