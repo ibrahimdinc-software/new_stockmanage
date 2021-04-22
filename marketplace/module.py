@@ -188,9 +188,13 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
            
                 
             if notif:
+                
                 bbtm = mpm.marketbuyboxtracemodel_set.first()
+                
                 if bbtm and change:
+                   
                     rivals = mpm.marketproductbuyboxlistmodel_set.all()
+                    
                     if len(rivals) < 1: #rakip yok
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                     
@@ -203,7 +207,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
                                 
-                                if mpm.buyBoxRank > bb.rank: 
+                                if int(mpm.buyBoxRank) > int(bb.rank): 
                                     # bizim sıralama rakipten büyükse
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
@@ -216,10 +220,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                     #elif bb.price - bbtm.priceStep >= mpm.salePrice:
                                     #    return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))  
                                     
-                                elif mpm.buyBoxRank == 1:
+                                elif int(mpm.buyBoxRank) == 1:
                                     return {"status": "same"}
                                         
-                                elif mpm.buyBoxRank < bb.rank:
+                                elif int(mpm.buyBoxRank) < int(bb.rank):
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
                             
                             elif bb.price - bbtm.priceStep < bbtm.minPrice:
