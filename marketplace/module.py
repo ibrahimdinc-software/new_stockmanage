@@ -207,7 +207,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
                 else:
-                    return {"status": "same"} if notif else"{} -- BuyBox Takibi Tanımlı Değil!".format(mpm.sellerSku) 
+                    return self._buyBoxMessage(lastRank, mpm, detail="")
             else:
                 return "{} -- Başarılı".format(mpm.sellerSku)
             
