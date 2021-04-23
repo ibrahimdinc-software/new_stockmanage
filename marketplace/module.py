@@ -28,7 +28,7 @@ class ExtraMethods():
             if bbs.filter(merchantName=bb.get("merchantName")):
                 b = bbs.get(merchantName=bb.get("merchantName"))
 
-                change = True if b.price != bb.get("price") or b.rank != bb.get("rank") else False
+                change = True if b.price != bb.get("price") or b.rank != bb.get("rank") or change else False
 
                 b.uncomp = True if b.uncomp and b.price == bb.get("price") else False # rekabet edilemez ve fiyat değişmediyse True
 
@@ -230,7 +230,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 
                 elif lastRank != mpm.buyBoxRank:
                     return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada değişiklik oldu.")
-
                 
                 else:
                     return {"status": "same"}
