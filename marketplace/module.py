@@ -194,7 +194,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 if bbtm and change:
                    
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().exclude(merchantName="PetiFest").order_by("rank")
-                    print(rivals)
                     
                     if len(rivals) < 1:
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
@@ -202,7 +201,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     else:
                         
                         for bb in rivals:
-                            print(bb)
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
