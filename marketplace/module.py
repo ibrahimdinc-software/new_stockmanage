@@ -204,8 +204,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
-                                
-                                if mpm.buyBoxRank > bb.rank: 
+                                if int(mpm.buyBoxRank) > int(bb.rank): 
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
@@ -218,7 +217,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                 elif mpm.buyBoxRank == 1:
                                     return {"status": "same"}
                                         
-                                elif mpm.buyBoxRank < bb.rank:
+                                elif int(mpm.buyBoxRank) < int(bb.rank):
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
                             
                             elif bb.price - bbtm.priceStep < bbtm.minPrice:
