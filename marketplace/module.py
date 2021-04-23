@@ -226,7 +226,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                         
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
                 
-                elif lastRank != mpm.buyBoxRank:
+                elif int(lastRank) != int(mpm.buyBoxRank):
                     return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada değişiklik oldu.")
                 
                 else:
