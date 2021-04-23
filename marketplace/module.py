@@ -214,7 +214,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
 
                                     
-                                elif mpm.buyBoxRank == 1:
+                                elif int(mpm.buyBoxRank) == 1:
                                     return {"status": "same"}
                                         
                                 elif int(mpm.buyBoxRank) < int(bb.rank):
