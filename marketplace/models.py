@@ -40,11 +40,11 @@ class UserMarketPlaceModel(models.Model):
     apiSecret = models.CharField(verbose_name="Trendyol Satıcı ApiSecret", max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return str(self.user) + " / " + str(self.get_marketType_display())
+        return str(self.get_marketType_display())
     
 
 class UserMarketShipmentRuleModel(models.Model):
-    marketType = models.ForeignKey(UserMarketPlaceModel, on_delete=models.CASCADE)
+    userMarket = models.ForeignKey(UserMarketPlaceModel, on_delete=models.CASCADE)
     minPrice = models.FloatField(verbose_name="Min Fiyat")
     maxPrice = models.FloatField(verbose_name="Max Fiyat")
     cost = models.FloatField(verbose_name="Kargo Tutarı")
@@ -52,7 +52,6 @@ class UserMarketShipmentRuleModel(models.Model):
 
 
 class MarketProductModel(models.Model):
-    marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
     userMarket = models.ForeignKey(UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
     productName = models.CharField(verbose_name="Ürün Adı", max_length=200, blank=True, null=True)
     marketplaceSku = models.CharField(verbose_name="Pazaryeri SKU", max_length=100)
@@ -125,7 +124,6 @@ class MarketBuyBoxTraceModel(models.Model):
 
 
 class MarketOrderModel(models.Model):
-    marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
     userMarket = models.ForeignKey(UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
     customerModel = models.ForeignKey("billing.CustomerModel", blank=True, null=True, on_delete=models.CASCADE)
     orderNumber = models.CharField(verbose_name="Sipariş No", max_length=100)
@@ -155,6 +153,11 @@ class MarketOrderModel(models.Model):
             customer.save()
         
         self.customerModel = customer
+        self.save()
+
+    def setUserMarket(self, mType):
+        userMarket = UserMarketPlaceModel.objects.get(marketType=mType)
+        self.userMarket = userMarket
         self.save()
 
     def canceledOrder(self):

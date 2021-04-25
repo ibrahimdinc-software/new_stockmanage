@@ -119,13 +119,13 @@ class TrendOrderModule(TrendOrderAPI):
                     tom = self.createTrendOrder(trendProducts, order, dropStock=False)
                 else:
                     tom = trendOrders.filter(orderNumber=order.get("orderNumber")).first()
-                    tom.marketType = "trendyol"
                     tom.orderStatus = order.get("shipmentPackageStatus")
 
                     if order.get("shipmentPackageStatus") == "Delivered":
                         self.setDeliveryDate(tom, order.get("packageHistories"))
 
                 tom.save()
+                tom.setUserMarket("trendyol")
                 tom.setCustomer(customer, customerData)
 
             if endDate > currentDate:
@@ -151,7 +151,6 @@ class TrendOrderModule(TrendOrderAPI):
     def createTrendOrder(self, trendProducts, order, dropStock=True):
         date = datetime.fromtimestamp(order.get("orderDate")/1000)-timedelta(hours=3)
         tom = TrendOrderModel(
-            marketType="trendyol",
             packageNumber=order.get("id"),
             orderNumber=order.get("orderNumber"),
             orderDate=date,
@@ -160,6 +159,7 @@ class TrendOrderModule(TrendOrderAPI):
             orderStatus=order.get("shipmentPackageStatus")
         )
         tom.save()
+        tom.setUserMarket("trendyol")
 
         if order.get("status") == "Delivered":
             self.setDeliveryDate(tom, order.get("packageHistories"))

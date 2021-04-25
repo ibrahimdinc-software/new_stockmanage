@@ -106,13 +106,12 @@ class HepsiOrderModule(HepsiOrderAPI):
             if not hom:
                 date = self.__dateConverter__(order.get("orderDate"))
                 hom = HepsiOrderModel(
-                    marketType="hepsiburada",
                     orderNumber=order.get("orderNumber"),
                     orderDate=date,
                     orderStatus=order.get("status")
                 )
                 hom.save()
-                
+                hom.setUserMarket("hepsiburada")
                 hom.setCustomer(customer, customerData)
 
                 details = self.getDetails(hom.orderNumber)

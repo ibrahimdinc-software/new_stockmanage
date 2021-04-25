@@ -12,9 +12,9 @@ from .models import MarketOrderModel, MarketProductBuyBoxListModel, MarketProduc
 
 class ExtraMethods():
     def marketType(self, mpm):
-        if mpm.marketType == "trendyol":
+        if mpm.userMarket.marketType == "trendyol":
             return TrendProductModel
-        elif mpm.marketType == "hepsiburada":
+        elif mpm.userMarket.marketType == "hepsiburada":
             return HepsiProductModel        
 
     def cleanBbModel(self, bbList):
@@ -70,7 +70,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             marketProduct = mpms.filter(marketplaceSku=p.get("marketplaceSku")).first()
             if not marketProduct:
                 marketProduct = MarketProductModel(
-                    marketType=p.get("marketType"),
                     productName=p.get("productName"),
                     marketplaceSku=p.get("marketplaceSku"),
                     availableStock=p.get("availableStock"),
@@ -80,7 +79,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     productLink=p.get("productLink")
                 )
             else:
-                marketProduct.marketType = p.get("marketType")
                 marketProduct.productName = p.get("productName")
                 marketProduct.onSale = p.get("onSale")
                 marketProduct.sellerSku = p.get("sellerSku")
@@ -88,6 +86,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 marketProduct.productLink = p.get("productLink")
                 
             marketProduct.save()
+            marketProduct.setUserMarket(p.get("marketType"))
 
             if p.get("marketType") == "trendyol":
                 tpm = TrendProductModel(
@@ -114,9 +113,9 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             hpmList = []
             tpmList = []
             for muq in muqs:
-                if muq.mpm.marketType == "hepsiburada":
+                if self.marketType(muq.mpm) == HepsiProductModel:
                     hpmList.append(muq.mpm)
-                elif muq.mpm.marketType == "trendyol":
+                elif self.marketType(muq.mpm) == TrendProductModel:
                     tpmList.append(muq.mpm)
                 muq.isUpdated = True
                 muq.save()

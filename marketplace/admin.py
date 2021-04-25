@@ -49,7 +49,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
     search_fields = ["marketplaceSku", "sellerSku", ]
     actions = ['send_list', 'getBuyBoxes']
 
-    list_filter = ["onSale", "marketType"]
+    list_filter = ["onSale", "userMarket"]
     list_display = ['sellerSku', 'salePrice', 'availableStock',
                     'onSale', 'buyBoxRank', "lastControlDate"]
 
@@ -205,10 +205,10 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
     change_list_template = "market/admin/get_order.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
 
-    list_display = ["__str__", "marketType", "customerModel",
+    list_display = ["__str__", "userMarket", "customerModel",
                     "totalPrice", "orderDate", "getDetailCount", "orderStatus"]
     list_filter = [
-        "marketType",
+        "userMarket",
         ("orderDate", DateTimeRangeFilter),
         ("deliveryDate", DateTimeRangeFilter),
         "orderStatus"]
