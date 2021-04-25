@@ -19,14 +19,41 @@ ORDER_STATUS = (
     ('UnDeliveredAndReturned', 'Ulaştırılamadı ve Geri Döndü'),
 )
 
+COST_TYPES = (
+    ('Shipment', 'Kargo'),
+    ('Comission', 'Komisyon'),
+    ('PurchasePrice', 'Alım Fiyatı'),
+    ('Extra', 'Ekstra'),
+)
+
 MARKET_TYPE = (
     ('hepsiburada','Hepsiburada'),
     ('trendyol','Trendyol'),
 )
 
 
+class UserMarketPlaceModel(models.Model):
+    user = models.ForeignKey("auth.user", on_delete=models.CASCADE)
+    marketType = models.CharField(verbose_name="Market Tipi", max_length=255, choices=MARKET_TYPE)
+    supplierId = models.CharField(verbose_name="Trendyol Satıcı ID / Hepsiburada Merchant ID", max_length=255, unique=True)
+    apiKey = models.CharField(verbose_name="Trendyol Satıcı ApiKey", max_length=255, blank=True, null=True)
+    apiSecret = models.CharField(verbose_name="Trendyol Satıcı ApiSecret", max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.user) + " / " + str(self.get_marketType_display())
+    
+
+class UserMarketShipmentRuleModel(models.Model):
+    marketType = models.ForeignKey(UserMarketPlaceModel, on_delete=models.CASCADE)
+    minPrice = models.FloatField(verbose_name="Min Fiyat")
+    maxPrice = models.FloatField(verbose_name="Max Fiyat")
+    cost = models.FloatField(verbose_name="Kargo Tutarı")
+
+
+
 class MarketProductModel(models.Model):
     marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
+    userMarket = models.ForeignKey(UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
     productName = models.CharField(verbose_name="Ürün Adı", max_length=200, blank=True, null=True)
     marketplaceSku = models.CharField(verbose_name="Pazaryeri SKU", max_length=100)
     sellerSku = models.CharField(verbose_name="Satıcı SKU", max_length=100)
@@ -99,6 +126,7 @@ class MarketBuyBoxTraceModel(models.Model):
 
 class MarketOrderModel(models.Model):
     marketType = models.CharField(verbose_name="Pazar yeri", choices=MARKET_TYPE, max_length=255, blank=True, null=True)
+    userMarket = models.ForeignKey(UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
     customerModel = models.ForeignKey("billing.CustomerModel", blank=True, null=True, on_delete=models.CASCADE)
     orderNumber = models.CharField(verbose_name="Sipariş No", max_length=100)
     packageNumber = models.CharField(verbose_name="Paket Numarası",max_length=100, blank=True, null=True)
@@ -138,11 +166,15 @@ class MarketOrderModel(models.Model):
                 modm.increaseStock()
         
 
+
 class MarketOrderDetailModel(models.Model):
     mom = models.ForeignKey(MarketOrderModel, verbose_name="Sipariş Modeli", on_delete=models.CASCADE)
     mpm = models.ForeignKey(MarketProductModel, verbose_name="Market Ürünü", on_delete=models.CASCADE)
     totalPrice = models.FloatField(verbose_name="Tutar", blank=True, null=True)
     quantity = models.IntegerField(verbose_name="Adet")
+
+    def __str__(self):
+        return str(self.mom)+"/"+str(self.mpm)
 
     def dropStock(self):
         from .module import ProductModule
@@ -151,3 +183,10 @@ class MarketOrderDetailModel(models.Model):
     def increaseStock(self):
         from .module import ProductModule
         ProductModule().increaseStock(self.mpm, self.quantity)
+
+
+class MarketOrderPredCostModel(models.Model):
+    mom = models.ForeignKey(MarketOrderModel, verbose_name="Sipariş Modeli", on_delete=models.CASCADE)
+    modm = models.ForeignKey(MarketOrderDetailModel, verbose_name="Sipariş Detay Modeli", on_delete=models.CASCADE, blank=True, null=True)
+    costType = models.CharField(verbose_name="Gider Türü", max_length=255, choices=COST_TYPES)
+    costAmount = models.FloatField(verbose_name="Tutar")

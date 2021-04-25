@@ -1,3 +1,4 @@
+from django.contrib.admin.decorators import register
 from django.urls import path
 from django.contrib import admin
 from django.http import HttpResponseRedirect
@@ -7,9 +8,20 @@ from import_export.admin import ImportExportActionModelAdmin
 import requests
 
 from .resources import MarketOrderModelResource
-from .models import MarketBuyBoxTraceModel, MarketMedProductModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel
+from .models import MarketBuyBoxTraceModel, MarketMedProductModel, MarketOrderPredCostModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel, UserMarketPlaceModel, UserMarketShipmentRuleModel
 from .module import ProductModule, OrderModule
 # Register your models here.
+
+
+class UserMarketShipmentRuleModelTabularInline(admin.TabularInline):
+    model = UserMarketShipmentRuleModel
+    extra = 0
+
+
+@admin.register(UserMarketPlaceModel)
+class UserMarketPlaceModelAdmin(admin.ModelAdmin):
+    inlines = [UserMarketShipmentRuleModelTabularInline]
+
 
 
 class MarketProductBuyBoxListModelTabularInline (admin.TabularInline):
@@ -166,9 +178,29 @@ class MarketOrderDetailModelTabularInline(admin.TabularInline):
     extra = 0
 
 
+class MarketOrderPredCostModelTabularInline(admin.TabularInline):
+    model = MarketOrderPredCostModel
+    extra = 1
+
+    objId = None
+
+
+    def get_formset(self, request, obj=None, **kwargs):
+        print(request.GET)
+        if obj:
+            self.objId = obj.id
+        return super().get_formset(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        print(self.parent_model)
+        if db_field.name == 'modm':
+            kwargs["queryset"] = MarketOrderDetailModel.objects.filter(mom=self.objId)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(MarketOrderModel)
 class MarketOrderModelAdmin(ImportExportActionModelAdmin):
-    inlines = [MarketOrderDetailModelTabularInline]
+    inlines = [MarketOrderDetailModelTabularInline, MarketOrderPredCostModelTabularInline]
 
     change_list_template = "market/admin/get_order.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
