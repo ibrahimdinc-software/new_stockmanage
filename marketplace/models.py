@@ -66,6 +66,11 @@ class MarketProductModel(models.Model):
     def __str__(self):
         return self.sellerSku
 
+    def setUserMarket(self, mType):
+        userMarket = UserMarketPlaceModel.objects.get(marketType=mType)
+        self.userMarket = userMarket
+        self.save()
+
     def updateStock(self):
         from .module import ProductModule
         ProductModule().updateQueue(self)
