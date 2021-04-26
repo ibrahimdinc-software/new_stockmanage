@@ -192,8 +192,13 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 
                 if bbtm and change:
                    
-                    rivals = mpm.marketproductbuyboxlistmodel_set.all().exclude(merchantName="PetiFest").order_by("rank")
-                    
+                    rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
+
+                    if rivals.get(merchantName="PetiFest").price != mpm.salePrice:
+                        return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
+
+                    rivals.exclude(merchantName="PetiFest")
+
                     if len(rivals) < 1:
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                     
