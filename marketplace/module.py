@@ -190,7 +190,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 
                 bbtm = mpm.marketbuyboxtracemodel_set.first()
                 
-                if bbtm and change:
+                if bbtm.isActive and change:
                    
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
