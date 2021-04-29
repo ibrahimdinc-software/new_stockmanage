@@ -23,16 +23,14 @@ class ExtraMethods():
 
     def renewBbModel(self, bbList, mpm):
         bbs = mpm.marketproductbuyboxlistmodel_set.all()
-        change = False
         for bb in bbList:
             if bbs.filter(merchantName=bb.get("merchantName")):
                 b = bbs.get(merchantName=bb.get("merchantName"))
 
-                change = True if b.price != bb.get("price") or b.rank != bb.get("rank") or change else False
-
                 b.uncomp = True if b.uncomp and b.price == bb.get("price") else False # rekabet edilemez ve fiyat değişmediyse True
 
                 b.rank = bb.get("rank")
+                b.oldPrice = b.price
                 b.price = bb.get("price")
                 b.dispatchTime = bb.get("dispatchTime") if bb.get("dispatchTime") else None
                 b.save()
@@ -44,10 +42,10 @@ class ExtraMethods():
                     rank=bb.get("rank"),
                     merchantName=bb.get("merchantName"),
                     price=bb.get("price"),
+                    oldPrice=0,
                     dispatchTime=bb.get("dispatchTime") if bb.get("dispatchTime") else None
                 )
 
-                change = True
 
                 mpbbl.save()
                 bbs = bbs.exclude(merchantName=bb.get("merchantName"))
@@ -57,7 +55,6 @@ class ExtraMethods():
                 mpm.save()
         self.cleanBbModel(bbs)
 
-        return change
 
 class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
     def getProducts(self):
@@ -178,10 +175,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             elif self.marketType(mpm) == TrendProductModel:
                 bbList += self._getTrendBuyBox(mpm)
 
-            change = None
-
-            if bbList:
-                change = self.renewBbModel(bbList, mpm)
+            self.renewBbModel(bbList, mpm)
 
             time.sleep(.100)
            
@@ -190,25 +184,39 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 
                 bbtm = mpm.marketbuyboxtracemodel_set.first() 
                 
-                if bbtm and bbtm.isActive and change:
+                if bbtm and bbtm.isActive:
                    
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
                     seller = rivals.filter(merchantName="PetiFest").first()
+
+                    rivals = rivals.exclude(merchantName="PetiFest")
+
+
+                   
+
                     if seller and seller.price != mpm.salePrice:
                         return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
-                    rivals.exclude(merchantName="PetiFest")
-
-                    if len(rivals) < 1:
+                    elif len(rivals) < 1:
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
-                    
+                   
+                    elif int(mpm.buyBoxRank) == 1:
+
+                        if rivals[1].price != rivals[1].oldPrice:
+                            return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(rivals[1].price-bbtm.priceStep, 2)))
+                        
+                        else:
+                            return {"status": "same"}
+
                     else:
                         
                         for bb in rivals:
+
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
                                 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
+
                                 if int(mpm.buyBoxRank) > int(bb.rank): 
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
@@ -217,19 +225,15 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                     
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
-
-                                    
-                                elif int(mpm.buyBoxRank) == 1:
-                                    return {"status": "same"}
-                                        
+    
                                 elif int(mpm.buyBoxRank) < int(bb.rank):
-                                    return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
+                                    return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
                             
                             elif bb.price - bbtm.priceStep < bbtm.minPrice:
                                 bb.uncomp = True
                                 bb.save()
                         
-                        return self._buyBoxMessage(lastRank, mpm, detail="LOG6 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
+                        return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Durumlar harici bir olay Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))
                 
                 elif int(lastRank) != int(mpm.buyBoxRank):
                     return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada değişiklik oldu.")
@@ -264,18 +268,25 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
         return messages
 
     def cronBuyBox(self):
+
         now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=10)
+
         mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__lte=tenMinAgo)[:20]
+
         infos = []
+
         for mpm in mpms:
-            mpm.lastControlDate = now
-            mpm.save()
             m = self._getBuyBox(mpm, True)
             if m.get("status") == "change":
                 infos.append(m)
+            
+            mpm.lastControlDate = now
+            mpm.save()
+
         if len(infos) > 0:
             return infos
+            
         return []
     
     def cronBuyBoxTest(self, mpm):

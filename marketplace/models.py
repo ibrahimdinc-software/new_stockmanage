@@ -107,6 +107,7 @@ class MarketProductBuyBoxListModel(models.Model):
     rank = models.IntegerField(verbose_name="Sıralama")
     merchantName = models.CharField(verbose_name="Satıcı Adı", max_length=255)
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
+    oldPrice = models.FloatField(verbose_name="Satıcının Önceki Fiyatı")
     dispatchTime = models.IntegerField("Kargoya Verme Süresi", blank=True, null=True) 
     uncomp = models.BooleanField(verbose_name="Rekabet edilemez?", default=False)
 
