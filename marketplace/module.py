@@ -194,7 +194,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                    
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
-                    if rivals.get(merchantName="PetiFest").price != mpm.salePrice:
+                    seller = rivals.filter(merchantName="PetiFest").first()
+                    if seller and seller.price != mpm.salePrice:
                         return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
                     rivals.exclude(merchantName="PetiFest")
