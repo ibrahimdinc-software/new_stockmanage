@@ -188,9 +188,9 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                 
             if notif:
                 
-                bbtm = mpm.marketbuyboxtracemodel_set.first()
+                bbtm = mpm.marketbuyboxtracemodel_set.first() 
                 
-                if bbtm.isActive and change:
+                if bbtm and bbtm.isActive and change:
                    
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 

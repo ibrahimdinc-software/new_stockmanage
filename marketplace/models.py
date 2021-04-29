@@ -29,15 +29,16 @@ COST_TYPES = (
 MARKET_TYPE = (
     ('hepsiburada','Hepsiburada'),
     ('trendyol','Trendyol'),
+    ('nonbir','N11'),
 )
 
 
 class UserMarketPlaceModel(models.Model):
     user = models.ForeignKey("auth.user", on_delete=models.CASCADE)
     marketType = models.CharField(verbose_name="Market Tipi", max_length=255, choices=MARKET_TYPE)
-    supplierId = models.CharField(verbose_name="Trendyol Satıcı ID / Hepsiburada Merchant ID", max_length=255, unique=True)
-    apiKey = models.CharField(verbose_name="Trendyol Satıcı ApiKey", max_length=255, blank=True, null=True)
-    apiSecret = models.CharField(verbose_name="Trendyol Satıcı ApiSecret", max_length=255, blank=True, null=True)
+    supplierId = models.CharField(verbose_name="Trendyol Satıcı ID / Hepsiburada Merchant ID", max_length=255, unique=True, blank=True, null=True)
+    apiKey = models.CharField(verbose_name="Trendyol / N11 Satıcı ApiKey", max_length=255, blank=True, null=True)
+    apiSecret = models.CharField(verbose_name="Trendyol / N11 Satıcı ApiSecret", max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.get_marketType_display())
