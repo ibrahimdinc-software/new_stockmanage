@@ -196,7 +196,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                    
                     if int(mpm.buyBoxRank) == 1:
 
-                        if rivals[1].price != rivals[1].oldPrice:
+                        if rivals[0].price != rivals[0].oldPrice:
                             return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(rivals[1].price-bbtm.priceStep, 2)))
                         
                         else:
