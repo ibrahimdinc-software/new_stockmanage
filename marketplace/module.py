@@ -212,7 +212,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                         for bb in rivals:
 
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp and bb.price != bb.oldPrice:
-                                
+
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
 
                                 if int(mpm.buyBoxRank) > int(bb.rank): 
@@ -231,7 +231,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                 bb.uncomp = True
                                 bb.save()
                         
-                        return self._buyBoxMessage(lastRank, mpm, detail="LOG5 Durumlar harici bir olay")
+                        return {"status": "same"}
                 
                 elif int(lastRank) != int(mpm.buyBoxRank):
                     return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada değişiklik oldu.")
