@@ -194,20 +194,19 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
 
                    
-
-                    if seller and seller.price != mpm.salePrice:
-                        return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
-
-                    elif len(rivals) < 1:
-                        return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
-                   
-                    elif int(mpm.buyBoxRank) == 1:
+                    if int(mpm.buyBoxRank) == 1:
 
                         if rivals[1].price != rivals[1].oldPrice:
                             return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(rivals[1].price-bbtm.priceStep, 2)))
                         
                         else:
                             return {"status": "same"}
+
+                    elif len(rivals) < 1:
+                        return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
+                   
+                    elif seller and seller.price != mpm.salePrice:
+                        return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
                     else:
                         for bb in rivals:
