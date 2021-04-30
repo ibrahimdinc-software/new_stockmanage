@@ -211,7 +211,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     else:
                         for bb in rivals:
 
-                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
+                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp and bb.price != bb.oldPrice:
                                 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
 
