@@ -43,6 +43,8 @@ class MarketBuyBoxTraceModelTabularInline(admin.TabularInline):
 
 @admin.register(MarketProductModel)
 class MarketProductModelAdmin(admin.ModelAdmin):
+    ordering = ("-buyBoxRank",)
+
     change_list_template = ["trendyol_api/admin/get_products.html"]
     change_form_template = "trendyol_api/admin/updateProduct.html"
 
