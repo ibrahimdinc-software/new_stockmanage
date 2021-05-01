@@ -221,11 +221,12 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
                                         bb.save()
-                                    elif int(mpm.buyBoxRank) == 1:
-                                        return {"status": "same"}
                                     elif price - bbtm.priceStep >= bbtm.minPrice:
                                         return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
-    
+
+                                elif int(mpm.buyBoxRank) == 1:
+                                    return {"status": "same"}
+                                    
                                 elif int(mpm.buyBoxRank) < int(bb.rank):
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
                             
