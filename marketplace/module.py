@@ -207,16 +207,16 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                     elif len(rivals) < 1:
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
-                   
-
+                    
                     else:
                         for bb in rivals:
+                            change = True if bb.price != bb.oldPrice else False
 
-                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
+                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp :
 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
 
-                                if int(mpm.buyBoxRank) > int(bb.rank) and bb.price != bb.oldPrice: 
+                                if int(mpm.buyBoxRank) > int(bb.rank) and change:  
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
@@ -226,8 +226,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                                 elif int(mpm.buyBoxRank) == 1:
                                     return {"status": "same"}
-                                    
-                                elif int(mpm.buyBoxRank) < int(bb.rank):
+
+                                elif int(mpm.buyBoxRank) < int(bb.rank) and change:
                                     return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
                             
                             elif bb.price - bbtm.priceStep < bbtm.minPrice:
