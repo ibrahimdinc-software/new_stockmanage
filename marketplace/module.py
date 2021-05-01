@@ -192,10 +192,14 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
 
                     rivals = rivals.exclude(merchantName="PetiFest")
 
+                    campaign = True if seller and seller.price != mpm.salePrice else False
 
-                    if int(mpm.buyBoxRank) == 1 and seller and seller.price == mpm.salePrice:
+                    if int(mpm.buyBoxRank) == 1:
+                        change = True if rivals[0].price != rivals[0].oldPrice else False
+                        if campaign and change:
+                            return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
-                        if rivals[0].price != rivals[0].oldPrice:
+                        elif change:
                             return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \Buybox kazanılıyor. \nDaha kârlı fiyat {}₺ olabilir.".format(round(rivals[0].price-bbtm.priceStep, 2)))
                         
                         else:
@@ -204,8 +208,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     elif len(rivals) < 1:
                         return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
                    
-                    elif seller and seller.price != mpm.salePrice and int(mpm.buyBoxRank) != 1:
-                        return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
                     else:
                         for bb in rivals:
