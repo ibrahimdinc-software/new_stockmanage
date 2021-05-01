@@ -193,7 +193,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     rivals = rivals.exclude(merchantName="PetiFest")
 
 
-                    if int(mpm.buyBoxRank) == 1:
+                    if int(mpm.buyBoxRank) == 1 and seller and seller.price == mpm.salePrice:
 
                         if rivals[0].price != rivals[0].oldPrice:
                             return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \Buybox kazanılıyor. \nDaha kârlı fiyat {}₺ olabilir.".format(round(rivals[0].price-bbtm.priceStep, 2)))
