@@ -197,7 +197,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     if int(mpm.buyBoxRank) == 1:
 
                         if rivals[0].price != rivals[0].oldPrice:
-                            return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \Buybox kazanılıyor. \nDaha kârlı fiyat {}₺ olabilir.".format(round(rivals[1].price-bbtm.priceStep, 2)))
+                            return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \Buybox kazanılıyor. \nDaha kârlı fiyat {}₺ olabilir.".format(round(rivals[0].price-bbtm.priceStep, 2)))
                         
                         else:
                             return {"status": "same"}
@@ -211,11 +211,11 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     else:
                         for bb in rivals:
 
-                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp and bb.price != bb.oldPrice:
+                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp:
 
                                 price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
 
-                                if int(mpm.buyBoxRank) > int(bb.rank): 
+                                if int(mpm.buyBoxRank) > int(bb.rank) and bb.price != bb.oldPrice: 
 
                                     if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
                                         bb.uncomp=True
