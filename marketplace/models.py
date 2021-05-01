@@ -67,6 +67,13 @@ class MarketProductModel(models.Model):
     def __str__(self):
         return self.sellerSku
 
+    def save(self, *args, **kwargs):
+        if self.availableStock > 0:
+           self.onSale = True
+        else:
+            self.onSale=False
+        super(MarketProductModel, self).save(*args, **kwargs) # Call the real save() method
+
     def setUserMarket(self, mType):
         userMarket = UserMarketPlaceModel.objects.get(marketType=mType)
         self.userMarket = userMarket

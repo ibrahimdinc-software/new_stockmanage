@@ -193,7 +193,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     rivals = rivals.exclude(merchantName="PetiFest")
 
 
-                   
                     if int(mpm.buyBoxRank) == 1:
 
                         if rivals[0].price != rivals[0].oldPrice:
