@@ -236,7 +236,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                             elif bb.price - bbtm.priceStep < bbtm.minPrice:
                                 bb.uncomp = True
                                 bb.save()
-                                change = True
+                                change = True if change else False
                         
                         return {"status": "same"}
                 
