@@ -211,7 +211,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
                     else:
                         change = False
                         for bb in rivals:
-                            change = True if bb.price != bb.oldPrice and change else False
+                            change = True if bb.price != bb.oldPrice or change else False
 
                             if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp :
 
