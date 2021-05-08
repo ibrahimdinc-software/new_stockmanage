@@ -29,7 +29,7 @@ COST_TYPES = (
 MARKET_TYPE = (
     ('hepsiburada','Hepsiburada'),
     ('trendyol','Trendyol'),
-    ('nonbir','N11'),
+    ('n11','N11'),
 )
 
 
@@ -68,7 +68,7 @@ class MarketProductModel(models.Model):
         return self.sellerSku
 
     def save(self, *args, **kwargs):
-        if self.availableStock > 0:
+        if int(self.availableStock) > 0:
            self.onSale = True
         else:
             self.onSale=False
