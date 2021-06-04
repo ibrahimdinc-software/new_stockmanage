@@ -188,13 +188,11 @@ class MarketOrderPredCostModelTabularInline(admin.TabularInline):
 
 
     def get_formset(self, request, obj=None, **kwargs):
-        print(request.GET)
         if obj:
             self.objId = obj.id
         return super().get_formset(request, obj, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        print(self.parent_model)
         if db_field.name == 'modm':
             kwargs["queryset"] = MarketOrderDetailModel.objects.filter(mom=self.objId)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)

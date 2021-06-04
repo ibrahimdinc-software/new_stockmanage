@@ -30,8 +30,8 @@ class TrendProductModule(TrendProductAPI):
 
     def updateTrendProducts(self, tpms):
         l = []
-        trendProductModels = TrendProductModel.objects.all()
         if tpms:
+            trendProductModels = TrendProductModel.objects.all()
             for tpm in tpms:
                 tpm = trendProductModels.get(id=tpm.id)
                 item={
@@ -61,6 +61,10 @@ class TrendProductModule(TrendProductAPI):
 
 
 class TrendOrderModule(TrendOrderAPI):
+    def getTrendOrders_NEW(self):
+        orders = self.get("Awaiting,Created,Picking,Invoiced,Cancelled,Shipped")
+
+        
     def getTrendOrders(self):
         orders = self.get("Awaiting,Created,Picking,Invoiced,Cancelled,Shipped")
 
@@ -91,6 +95,7 @@ class TrendOrderModule(TrendOrderAPI):
                     to = to.first()
                     if to.orderStatus != "Cancelled":
                         to.canceledOrder()
+
 
     def getOldTrendOrders(self, date):
         currentDate = int(datetime.timestamp(datetime.now())*1000)
@@ -189,6 +194,5 @@ class TrendOrderModule(TrendOrderAPI):
                 break
         
         order.deliveryDate = datetime.fromtimestamp(deliveryDate/1000)
-        print(order)
         order.save()
 

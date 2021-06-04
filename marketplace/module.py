@@ -1,4 +1,6 @@
 from datetime import date, datetime, timedelta
+from nonbir_api.n_module import NOrderModule, NProductModule
+from nonbir_api.models import NProductModel
 import time
 
 from trendyol_api.models import TrendProductModel, TrendOrderModel
@@ -15,7 +17,9 @@ class ExtraMethods():
         if mpm.userMarket.marketType == "trendyol":
             return TrendProductModel
         elif mpm.userMarket.marketType == "hepsiburada":
-            return HepsiProductModel        
+            return HepsiProductModel
+        elif mpm.userMarket.marketType == "n11":
+            return NProductModel
 
     def cleanBbModel(self, bbList):
         for bb in bbList:
@@ -56,11 +60,12 @@ class ExtraMethods():
         self.cleanBbModel(bbs)
 
 
-class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
+class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, ExtraMethods):
     def getProducts(self):
         productList = []
         productList += self.getHepsiProducts()
         productList += self.getTrendProducts()
+        productList += self.getNProducts()
 
         mpms = MarketProductModel.objects.all()
         for p in productList:
@@ -85,40 +90,49 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
             marketProduct.save()
             marketProduct.setUserMarket(p.get("marketType"))
 
-            if p.get("marketType") == "trendyol":
-                tpm = TrendProductModel(
-                    marketproductmodel_ptr_id=marketProduct.id)
-                tpm.__dict__.update(marketProduct.__dict__)
+            self.addProductDetails(marketProduct, p)
 
-                tpm.listPrice = p.get("listPrice")
+    def addProductDetails(self, mpm, details):
+        if details.get("marketType") == "trendyol":
+            tpm = TrendProductModel(
+                marketproductmodel_ptr_id=mpm.id)
+            tpm.__dict__.update(mpm.__dict__)
 
-                tpm.save()
-            elif p.get("marketType") == "hepsiburada":
-                hpm = HepsiProductModel(
-                    marketproductmodel_ptr_id=marketProduct.id)
-                hpm.__dict__.update(marketProduct.__dict__)
-                hpm.DispatchTime = p.get("DispatchTime")
-                hpm.CargoCompany1 = p.get("CargoCompany1")
-                hpm.CargoCompany2 = p.get("CargoCompany2")
-                hpm.CargoCompany3 = p.get("CargoCompany3")
+            tpm.listPrice = details.get("listPrice")
 
-                hpm.save()
+            tpm.save()
+        elif details.get("marketType") == "hepsiburada":
+            hpm = HepsiProductModel(
+                marketproductmodel_ptr_id=mpm.id)
+            hpm.__dict__.update(mpm.__dict__)
+            hpm.DispatchTime = details.get("DispatchTime")
+            hpm.CargoCompany1 = details.get("CargoCompany1")
+            hpm.CargoCompany2 = details.get("CargoCompany2")
+            hpm.CargoCompany3 = details.get("CargoCompany3")
+
+            hpm.save()
+        elif details.get("marketType") == "n11":
+            self.addNProductDetails(mpm, details)
 
     def updateProducts(self):
         muqs = MarketUpdateQueueModel.objects.filter(isUpdated=False)
         if muqs:
             hpmList = []
             tpmList = []
+            npmList = []
             for muq in muqs:
                 if self.marketType(muq.mpm) == HepsiProductModel:
                     hpmList.append(muq.mpm)
                 elif self.marketType(muq.mpm) == TrendProductModel:
                     tpmList.append(muq.mpm)
+                elif self.marketType(muq.mpm) == NProductModel:
+                    npmList.append(muq.mpm)
                 muq.isUpdated = True
                 muq.save()
 
             self.updateHepsiProducts(hpmList)
             self.updateTrendProducts(tpmList)
+            self.updateNProducts(npmList)
 
     def updateQueue(self, qs):
         marketUpdateQueueModels = MarketUpdateQueueModel.objects.all()
@@ -308,10 +322,11 @@ class ProductModule(HepsiProductModule, TrendProductModule, ExtraMethods):
         return []
 
 
-class OrderModule(HepsiOrderModule, TrendOrderModule):
+class OrderModule(HepsiOrderModule, TrendOrderModule, NOrderModule):
     def getOrders(self):
         self.getTrendOrders()
         self.getHepsiOrders()
+        self.getNOrders()
 
     def getOldOrders(self, date):
         self.getOldTrendOrders(date)

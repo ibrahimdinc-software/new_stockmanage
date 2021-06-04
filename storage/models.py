@@ -56,11 +56,11 @@ class BaseProductModel(models.Model):
             return "Hiç alım girilmemiş veya aktif alım yok."
 
     def getActiveStock(self):
-        cdms = self.costdetailmodel_set.all().filter(active=True)
+        cdms = self.costdetailmodel_set.all()
         if cdms:
-            return cdms.first()
+            return cdms.filter(active=True).first()
         else:
-            return None
+            return cdms.reverse()[0]
 
     def setMedProductStock(self):
         meds = self.medproductmodel_set.all()
