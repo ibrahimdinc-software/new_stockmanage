@@ -2,7 +2,7 @@ from datetime import datetime
 from marketplace.models import MarketOrderDetailModel
 from billing.models import CustomerModel
 from .n_api import NOrderAPI, NProductAPI, ShipmentApi
-from .models import NORDER_STATUS, NOrderModel, NProductModel, NProductImageModel
+from .models import NORDER_STATUS, NOrderModel, NProductDiscountModel, NProductModel, NProductImageModel
 
 
 class ShipmentModule(ShipmentApi):
@@ -14,6 +14,7 @@ class NProductModule(NProductAPI):
     def addNProductDetails(self, mpm, details):
         npm = NProductModel(marketproductmodel_ptr_id=mpm.id)
         npm.__dict__.update(mpm.__dict__)
+        npm.displayPrice = details.get("displayPrice")
         npm.subtitle = details.get("subtitle")
         npm.description = details.get("description")
         npm.category = int(details.get("category"))
@@ -30,14 +31,23 @@ class NProductModule(NProductAPI):
         if npim:
             for np in npim:
                 np.delete()
-        else:
-            for pi in details.get("images"):
-                pim = NProductImageModel(
-                    nProductModel=npm,
-                    imageUrl=pi["url"],
-                    order=pi["order"]
-                )
-                pim.save()
+        for pi in details.get("images"):
+            pim = NProductImageModel(
+                nProductModel=npm,
+                imageUrl=pi["url"],
+                order=pi["order"]
+            )
+            pim.save()
+        
+        if details.get("discount"):
+            for npd in npm.nproductdiscountmodel_set.all():
+                npd.delete()
+            npdm = NProductDiscountModel(
+                npm = npm,
+                type=details.get("discount")["type"],
+                value=details.get("discount")["value"]
+            )
+            npdm.save()
 
 
     def getNProducts(self):
@@ -51,11 +61,12 @@ class NProductModule(NProductAPI):
                 "productName": p.get("title"),
                 "marketplaceSku": p.get("id"),
                 "sellerSku": p.get("productSellerCode"),
-                "salePrice": float(p.get("displayPrice")),
+                "salePrice": float(p.get("price")),
                 "onSale": True if p.get("saleStatus") == "2" else False,
                 "availableStock": int(p["stockItems"]["stockItem"]["quantity"]),
                 "productLink": "https://urun.n11.com/--P"+p.get("id"),
 
+                "displayPrice": float(p.get("displayPrice")),
                 "subtitle": p.get("subtitle"),
                 "description": pDetail.get("description"),
                 "category": pDetail["category"]["id"],
@@ -64,6 +75,7 @@ class NProductModule(NProductAPI):
                 "preparingDay": pDetail.get("preparingDay"),
                 "shipmentTemplate": pDetail.get("shipmentTemplate"),
                 "images": [],
+                "discount": pDetail["discount"] if pDetail.get("discount") else None,
                 "n11CatalogId": None
             }
             pAttr = pDetail["attributes"]["attribute"]
@@ -128,6 +140,14 @@ class NProductModule(NProductAPI):
                         "url": pim.imageUrl,
                         "order": pim.order
                     })
+
+                npdm = npm.nproductdiscountmodel_set.all()
+                
+                if npdm:
+                    item["discount"] = {
+                        "type": npdm.first().type,
+                        "value": npdm.first().value 
+                    }
 
                 return self.updateNProductAPI(item)
 

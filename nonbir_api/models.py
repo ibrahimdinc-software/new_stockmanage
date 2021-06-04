@@ -37,7 +37,8 @@ class NProductModel(MarketProductModel):
             return ((i,i,) for i in shipmentTemplates)
         else:
             return(('ERROR', 'ERROR',),)
-
+    
+    displayPrice = models.FloatField(verbose_name="Fatura Fiyatı")
     subtitle = models.CharField(verbose_name="Alt Başlık", max_length=65)
     description = RichTextField(verbose_name="Açıklama", max_length=2500)
     category = models.BigIntegerField(verbose_name="Kategori ID")
@@ -62,6 +63,13 @@ class NProductImageModel(models.Model):
            self.imageUrl = "dev.petifest.com" + self.image.url
        super(NProductImageModel, self).save(*args, **kwargs) # Call the real save() method
 
+
+class NProductDiscountModel(models.Model):
+    npm = models.ForeignKey(NProductModel, verbose_name="N11 Ürünü", on_delete=models.CASCADE)
+    type = models.CharField(verbose_name="İndirim Türü", max_length=25)
+    value = models.FloatField(verbose_name="İndirim Miktarı")
+
+
 class NUpdateQueueModel(models.Model):
     npm = models.ForeignKey(NProductModel, verbose_name="N11 Ürünü", on_delete=models.CASCADE)
     date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
@@ -69,5 +77,4 @@ class NUpdateQueueModel(models.Model):
 
 class NOrderModel(MarketOrderModel):
     pass
-
 

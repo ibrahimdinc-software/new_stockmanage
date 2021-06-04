@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
 
-from .models import NProductImageModel, NProductModel, NUpdateQueueModel
+from .models import NProductDiscountModel, NProductImageModel, NProductModel, NUpdateQueueModel
 from .adminFilter import OnSaleFilter
 from .n_module import NProductModule
 
@@ -17,6 +17,10 @@ class NProductImageModelTabularInline (admin.TabularInline):
     extra = 1
     ordering = ('order',)
 
+class NProductDiscountModelTabularInline (admin.TabularInline):
+    model = NProductDiscountModel
+    extra = 0
+
 
 
 
@@ -29,7 +33,7 @@ class NProductModelAdmin(admin.ModelAdmin):
     search_fields = ["sku", "productName"]
     list_display = ["productName", "salePrice", "availableStock"]
 
-    inlines = [NProductImageModelTabularInline]
+    inlines = [NProductImageModelTabularInline, NProductDiscountModelTabularInline]
 
     list_filter = [OnSaleFilter]
     
