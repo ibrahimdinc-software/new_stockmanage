@@ -150,7 +150,6 @@ class NProductAPI:
         res = xmltodict.parse(
             response
         )["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:SaveProductResponse"]
-        print(res)
         if res["result"]["status"] == "success":
             return res
         else:
