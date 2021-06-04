@@ -149,8 +149,8 @@ class NProductModule(NProductAPI):
                         "value": npdm.first().value 
                     }
 
-                messages += self.updateNProductAPI(item)
-                
+                self.updateNProductAPI(item)
+
             return messages
 
 
