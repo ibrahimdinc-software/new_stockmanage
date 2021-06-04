@@ -1,8 +1,6 @@
 from datetime import datetime
 from marketplace.models import MarketOrderDetailModel
 from billing.models import CustomerModel
-from typing import OrderedDict
-from requests import models
 from .n_api import NOrderAPI, NProductAPI, ShipmentApi
 from .models import NORDER_STATUS, NOrderModel, NProductModel, NProductImageModel
 
