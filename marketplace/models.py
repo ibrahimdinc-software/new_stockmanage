@@ -65,7 +65,7 @@ class MarketProductModel(models.Model):
     productLink = models.CharField(verbose_name="Link", max_length=255, blank=True, null=True)
     
     def __str__(self):
-        return self.sellerSku
+        return str(self.userMarket) + " / " + self.sellerSku
 
     def save(self, *args, **kwargs):
         if int(self.availableStock) > 0:
