@@ -1,6 +1,7 @@
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
-
+from .w_api import requestAccessToken
+from .models import WixAuthTokensModel
 # Create your views here.
 
 
@@ -13,15 +14,16 @@ def installWix(request):
 
 
 def authWix(request):
-    content = """
-        code: {} <br>
-        state: {} <br>
-        instanceId: {}
-    """.format(
-        request.GET.get("code"),
-        request.GET.get("state"),
-        request.GET.get("instanceId")
-    )
-    return HttpResponse(content)
+    tokens = requestAccessToken("authorization_code", request.GET.get("code"))
+
+    if tokens.get("success") == False:
+        redirect(installWix)
+
+    o, c = WixAuthTokensModel.objects.get_or_create(refreshToken=tokens.get("refreshToken"))
+    if not c:
+        o.authToken = tokens.get("access_token")
+        o.save()
+
+    return HttpResponseRedirect("https://www.wix.com/installer/token-received?access_token={}".format(tokens.get("access_token")))
 
     
