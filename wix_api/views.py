@@ -20,9 +20,8 @@ def authWix(request):
         redirect(installWix)
 
     o, c = WixAuthTokensModel.objects.get_or_create(refreshToken=tokens.get("refresh_token"))
-    if not c:
-        o.authToken = tokens.get("access_token")
-        o.save()
+    o.authToken = tokens.get("access_token")
+    o.save()
 
     return HttpResponseRedirect("https://www.wix.com/installer/token-received?access_token={}".format(tokens.get("access_token")))
 
