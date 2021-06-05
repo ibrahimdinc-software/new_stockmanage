@@ -291,7 +291,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
         now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=10)
 
-        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__lte=tenMinAgo)[:20]
+        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType="n11")[:20]
 
         infos = []
 
