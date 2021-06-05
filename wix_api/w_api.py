@@ -6,12 +6,22 @@ client_secret = "c650239b-38fc-4460-8bb7-ffa97562280f"
 
 
 def requestAccessToken(grantType, code):
-    data = {
-        "grant_type": grantType,
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "code": code
-    }
+    data = None
+    if grantType == "authorization_code":
+        data = {
+            "grant_type": grantType,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": code
+        }
+    elif grantType == "refresh_token":
+        data = {
+            "grant_type": grantType,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "refresh_token": code
+        }
+
 
     response = requests.post(
         "https://www.wix.com/oauth/access",
