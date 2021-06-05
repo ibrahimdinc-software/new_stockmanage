@@ -5,7 +5,9 @@ from django.shortcuts import render
 
 
 def installWix(request):
-    installUrl = "https://www.wix.com/installer/install?token="+request.GET.get("token")+"&appId=54954e33-345e-4eef-af36-1fe998a7a9e3"
+    installUrl = "https://www.wix.com/installer/install?appId=54954e33-345e-4eef-af36-1fe998a7a9e3&token={}".format(
+        request.GET.get("token") if request.GET.get("token") else ""
+    )
     return HttpResponseRedirect(installUrl)
 
 def authWix(request):
@@ -19,3 +21,5 @@ def authWix(request):
         request.GET.get("instanceId")
     )
     return HttpResponse(content)
+
+    
