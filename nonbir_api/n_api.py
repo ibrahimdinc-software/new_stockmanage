@@ -1,9 +1,9 @@
 import requests
 
 import xmltodict
-
-
 from xml.etree import ElementTree as et
+
+from errorLogger.module import createErrorLoggingModel
 
 
 baseUrl = "https://api.n11.com/ws/"
@@ -59,6 +59,11 @@ class ShipmentApi:
 
             return shipmentTemplateList
         else:
+            createErrorLoggingModel(
+                errorType="N11 Entegrasyonu",
+                errorLocation="nonbir_api/n_api.py:64",
+                errorMessage=res["result"]["errorMessage"]
+            )
             return "ERROR"
 
 
@@ -73,23 +78,24 @@ class NProductAPI:
                 }
             }
         }
-        try:
-            response = requests.post(
-                baseUrl+"ProductService.wsdl",
-                data=xmltodict.unparse(baseContent),
-                headers=headers
-            ).content
+        response = requests.post(
+            baseUrl+"ProductService.wsdl",
+            data=xmltodict.unparse(baseContent),
+            headers=headers
+        ).content
 
-            res = xmltodict.parse(
-                response
-            )["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:GetProductListResponse"]
+        res = xmltodict.parse(
+            response
+        )["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:GetProductListResponse"]
 
-            if res["result"]["status"] == "success":
-                return res
-            else:
-                return Exception('N11 server error.')
-        except:
-            return Exception('N11 server is not responding.')
+        if res["result"]["status"] == "success":
+            return res
+            
+        createErrorLoggingModel(
+            errorType="N11 Entegrasyonu",
+            errorLocation="nonbir_api/n_api.py:92",
+            errorMessage=res["result"]["errorMessage"]
+        )
 
         
 
@@ -131,6 +137,11 @@ class NProductAPI:
         if res["result"]["status"] == "success":
             return res
         else:
+            createErrorLoggingModel(
+                errorType="N11 Entegrasyonu",
+                errorLocation="nonbir_api/n_api.py:136",
+                errorMessage=res["result"]["errorMessage"]
+            )
             return "ERROR"
 
     def updateNProductAPI(self, product):
@@ -150,10 +161,15 @@ class NProductAPI:
         res = xmltodict.parse(
             response
         )["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:SaveProductResponse"]
+
         if res["result"]["status"] == "success":
             return res
         else:
-            return Exception("ERROR " + product["productSellerCode"] + " " + res["result"]["errorMessage"])
+            createErrorLoggingModel(
+                errorType="N11 Entegrasyonu",
+                errorLocation="nonbir_api/n_api.py:159",
+                errorMessage=res["result"]["errorMessage"]
+            )
 
 
 
@@ -194,7 +210,13 @@ class NOrderAPI:
         if res["result"]["status"] == "success":
             return res
         
+        createErrorLoggingModel(
+            errorType="N11 Entegrasyonu",
+            errorLocation="nonbir_api/n_api.py:204",
+            errorMessage=res["result"]["errorMessage"]
+        )
         return None
+
 
     def getNOrderAPI(self, status=None, startDate=None, endDate=None):
         n_res = []
@@ -244,4 +266,12 @@ class NOrderAPI:
 
         if res["result"]["status"] == "success":
             return res
+
+        
+        createErrorLoggingModel(
+            errorType="N11 Entegrasyonu",
+            errorLocation="nonbir_api/n_api.py:262",
+            errorMessage=res["result"]["errorMessage"]
+        )
+
         return [] #!
