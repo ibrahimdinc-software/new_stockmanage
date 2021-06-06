@@ -11,6 +11,9 @@ class ErrorLoggingModel(models.Model):
     errorMessage = models.TextField(verbose_name="Hata Mesajı", max_length=1000)
     date = models.DateTimeField(verbose_name="Tarih", auto_now_add=True)
 
+    def __str__(self):
+        return self.errorType + " || " + self.errorLocation
+
     def get_admin_url(self):
         return "https://dev.petifest.com/admin/errorLogger/errorloggingmodel/1/change/"
 

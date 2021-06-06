@@ -6,4 +6,4 @@ from django.contrib import admin
 
 @admin.register(ErrorLoggingModel)
 class ErrorLoggingModelAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("errorType", "errorLocation", "date")
