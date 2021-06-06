@@ -62,7 +62,7 @@ class ShipmentApi:
             createErrorLoggingModel(
                 errorType="N11 Entegrasyonu",
                 errorLocation="nonbir_api/n_api.py:64",
-                errorMessage=res["result"]["errorMessage"]
+                errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
             )
             return "ERROR"
 
@@ -94,7 +94,7 @@ class NProductAPI:
         createErrorLoggingModel(
             errorType="N11 Entegrasyonu",
             errorLocation="nonbir_api/n_api.py:92",
-            errorMessage=res["result"]["errorMessage"]
+            errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
         )
 
         
@@ -140,7 +140,7 @@ class NProductAPI:
             createErrorLoggingModel(
                 errorType="N11 Entegrasyonu",
                 errorLocation="nonbir_api/n_api.py:136",
-                errorMessage=res["result"]["errorMessage"]
+                errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
             )
             return "ERROR"
 
@@ -168,7 +168,7 @@ class NProductAPI:
             createErrorLoggingModel(
                 errorType="N11 Entegrasyonu",
                 errorLocation="nonbir_api/n_api.py:159",
-                errorMessage=res["result"]["errorMessage"]
+                errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
             )
 
 
@@ -213,7 +213,7 @@ class NOrderAPI:
         createErrorLoggingModel(
             errorType="N11 Entegrasyonu",
             errorLocation="nonbir_api/n_api.py:204",
-            errorMessage=res["result"]["errorMessage"]
+            errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
         )
         return None
 
@@ -271,7 +271,7 @@ class NOrderAPI:
         createErrorLoggingModel(
             errorType="N11 Entegrasyonu",
             errorLocation="nonbir_api/n_api.py:262",
-            errorMessage=res["result"]["errorMessage"]
+            errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
         )
 
         return [] #!

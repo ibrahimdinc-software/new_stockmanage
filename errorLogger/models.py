@@ -10,9 +10,7 @@ class ErrorLoggingModel(models.Model):
     errorLocation = models.CharField(verbose_name="Hata Konumu", max_length=100)
     errorMessage = models.TextField(verbose_name="Hata Mesajı", max_length=1000)
     date = models.DateTimeField(verbose_name="Tarih", auto_now_add=True)
-    isReported = models.BooleanField(verbose_name="Bildirildi mi", default=False)
 
     def get_admin_url(self):
-        content_type = ContentType.objects.get_for_model(self.__class__)
-        return reverse("admin:%s_%s_change" % (content_type.app_label, content_type.model), args=(self.id,))
+        return "https://dev.petifest.com/admin/errorLogger/errorloggingmodel/1/change/"
 

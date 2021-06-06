@@ -10,7 +10,7 @@ def createErrorLoggingModel(errorType, errorLocation, errorMessage):
     )
     elm.save()
 
-    sendMail("Yeni Hata Var!", "Hatanın detayları: {}".format(elm.get_admin_url()))
+    sendMail("Yeni Hata Var!", 'Hatanın detayları:{url}'.format(url=elm.get_admin_url()))
 
 
 
