@@ -15,5 +15,5 @@ class ErrorLoggingModel(models.Model):
         return self.errorType + " || " + self.errorLocation
 
     def get_admin_url(self):
-        return "https://dev.petifest.com/admin/errorLogger/errorloggingmodel/1/change/"
+        return "https://dev.petifest.com/admin/errorLogger/errorloggingmodel/{}/change/".format(self.pk)
 
