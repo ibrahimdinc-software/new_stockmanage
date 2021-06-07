@@ -61,6 +61,7 @@ class ExtraMethods():
 
 
 class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, ExtraMethods):
+
     def getProducts(self):
         productList = []
         productList += self.getHepsiProducts()
@@ -119,20 +120,19 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
         if muqs:
             hpmList = []
             tpmList = []
-            npmList = []
+            status = True
             for muq in muqs:
                 if self.marketType(muq.mpm) == HepsiProductModel:
                     hpmList.append(muq.mpm)
                 elif self.marketType(muq.mpm) == TrendProductModel:
                     tpmList.append(muq.mpm)
                 elif self.marketType(muq.mpm) == NProductModel:
-                    npmList.append(muq.mpm)
-                muq.isUpdated = True
+                    status = self.updateNProduct(muq.mpm)
+                muq.isUpdated = status
                 muq.save()
 
             self.updateHepsiProducts(hpmList)
             self.updateTrendProducts(tpmList)
-            self.updateNProducts(npmList)
 
     def updateQueue(self, qs):
         marketUpdateQueueModels = MarketUpdateQueueModel.objects.all()
@@ -150,6 +150,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
                 muq = MarketUpdateQueueModel(mpm=qs[0])
                 muq.save()
 
+
     def dropStock(self, product, quantity):
         marketMedProductModels = product.marketmedproductmodel_set.all()
         for marketMedProductModel in marketMedProductModels:
@@ -166,7 +167,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
                 medProductModel.base_product.increaseStock(
                     quantity*medProductModel.piece)
 
-   
+
     def _buyBoxMessage(self, lastRank, mpm, detail):
         d = {
             "status": "change",
@@ -273,7 +274,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
             }
         else:
             return "{} -- Hata var!".format(mpm.sellerSku)
-
 
     def buyboxList(self, mpms):
         messages = ""
