@@ -152,7 +152,7 @@ class NProductModule(NProductAPI):
         if result["result"]["status"] == "success":
             return True
         
-        if result["result"]["errorCode"]["IMPORT_PRODUCT.imageDownloadInvalidHttpStatusCode"]:
+        if result["result"]["errorCode"] == "IMPORT_PRODUCT.imageDownloadInvalidHttpStatusCode":
             pDetail = self.getPdetail(npm.sellerSku)
             self._addProductImages(npm, pDetail.get("images"))
             return self.updateNProduct(npm)
