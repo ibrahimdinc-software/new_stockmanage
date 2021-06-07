@@ -18,7 +18,7 @@ class NProductModule(NProductAPI):
         if npim:
             for np in npim:
                 np.delete()
-        for pi in images:
+        for pi in images if type(images) == list else [images]:
             pim = NProductImageModel(
                 nProductModel=npm,
                 imageUrl=pi["url"],
@@ -154,7 +154,7 @@ class NProductModule(NProductAPI):
         
         if result["result"]["errorCode"] == "IMPORT_PRODUCT.imageDownloadInvalidHttpStatusCode":
             pDetail = self.getPdetail(npm.sellerSku)
-            self._addProductImages(npm, pDetail.get("images"))
+            self._addProductImages(npm, pDetail["images"]["image"])
             return self.updateNProduct(npm)
 
         return False
