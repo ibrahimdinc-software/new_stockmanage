@@ -97,8 +97,6 @@ class NProductAPI:
             errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
         )
 
-        
-
     def getNProductAPI(self):
         n_res = []
 
@@ -162,14 +160,13 @@ class NProductAPI:
             response
         )["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:SaveProductResponse"]
 
-        if res["result"]["status"] == "success":
-            return res
-        else:
+        if res["result"]["status"] == "failure":
             createErrorLoggingModel(
                 errorType="N11 Entegrasyonu",
-                errorLocation="nonbir_api/n_api.py:159",
+                errorLocation="nonbir_api/n_api.py:166",
                 errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
             )
+        return res
 
 
 
@@ -216,7 +213,6 @@ class NOrderAPI:
             errorMessage=res["result"]["errorCode"] + "\n" + res["result"]["errorMessage"]
         )
         return None
-
 
     def getNOrderAPI(self, status=None, startDate=None, endDate=None):
         n_res = []

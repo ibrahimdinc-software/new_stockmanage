@@ -11,6 +11,21 @@ class ShipmentModule(ShipmentApi):
 
 
 class NProductModule(NProductAPI):
+
+    def _addProductImages(self, npm, images):
+        npim = npm.nproductimagemodel_set.all()
+
+        if npim:
+            for np in npim:
+                np.delete()
+        for pi in images:
+            pim = NProductImageModel(
+                nProductModel=npm,
+                imageUrl=pi["url"],
+                order=pi["order"]
+            )
+            pim.save()
+
     def addNProductDetails(self, mpm, details):
         npm = NProductModel(marketproductmodel_ptr_id=mpm.id)
         npm.__dict__.update(mpm.__dict__)
@@ -26,19 +41,8 @@ class NProductModule(NProductAPI):
         npm.n11CatalogId = details.get("n11CatalogId")
         npm.save()
 
-        npim = npm.nproductimagemodel_set.all()
+        self._addProductImages(npm, details.get("images"))
 
-        if npim:
-            for np in npim:
-                np.delete()
-        for pi in details.get("images"):
-            pim = NProductImageModel(
-                nProductModel=npm,
-                imageUrl=pi["url"],
-                order=pi["order"]
-            )
-            pim.save()
-        
         if details.get("discount"):
             for npd in npm.nproductdiscountmodel_set.all():
                 npd.delete()
@@ -48,7 +52,6 @@ class NProductModule(NProductAPI):
                 value=details.get("discount")["value"]
             )
             npdm.save()
-
 
     def getNProducts(self):
         products = self.getNProductAPI()
@@ -98,61 +101,63 @@ class NProductModule(NProductAPI):
 
         return productList
 
-    def updateNProducts(self, npms):
-        l = []
-        if npms:
-            nProductModels = NProductModel.objects.all()
-            messages = ""
-            for npm in npms:
-                npm = nProductModels.get(id=npm.id)
-                item = {
-                    "productSellerCode": npm.sellerSku,
-                    "title": npm.productName,
-                    "subtitle": npm.subtitle,
-                    "description": npm.description,
-                    "category": {
-                        "id": str(npm.category),
-                    },
-                    "price": npm.salePrice,
-                    "currencyType": npm.currencyType,
-                    "productCondition": npm.productCondition,
-                    "preparingDay": npm.preparingDay,
-                    "shipmentTemplate": npm.shipmentTemplate,
-                    "stockItems": {
-                        "stockItem":{
-                            "quantity": npm.availableStock,
-                            "n11CatalogId": npm.n11CatalogId if npm.n11CatalogId else None,
-                        }
-                    },
-                    "attributes":{
-                        "attribute":{
-                            "name": "Marka",
-                            "value": npm.brand
-                        }
-                    },
-                    "images":{
-                        "image": []
-                    }
+    def updateNProduct(self, npm):
+        npm = NProductModel.objects.get(id=npm.id)
+        item = {
+            "productSellerCode": npm.sellerSku,
+            "title": npm.productName,
+            "subtitle": npm.subtitle,
+            "description": npm.description,
+            "category": {
+                "id": str(npm.category),
+            },
+            "price": npm.salePrice,
+            "currencyType": npm.currencyType,
+            "productCondition": npm.productCondition,
+            "preparingDay": npm.preparingDay,
+            "shipmentTemplate": npm.shipmentTemplate,
+            "stockItems": {
+                "stockItem":{
+                    "quantity": npm.availableStock,
+                    "n11CatalogId": npm.n11CatalogId if npm.n11CatalogId else None,
                 }
+            },
+            "attributes":{
+                "attribute":{
+                    "name": "Marka",
+                    "value": npm.brand
+                }
+            },
+            "images":{
+                "image": []
+            }
+        }
 
-                for pim in npm.nproductimagemodel_set.all():
-                    item["images"]["image"].append({
-                        "url": pim.imageUrl,
-                        "order": pim.order
-                    })
+        for pim in npm.nproductimagemodel_set.all():
+            item["images"]["image"].append({
+                "url": pim.imageUrl,
+                "order": pim.order
+            })
 
-                npdm = npm.nproductdiscountmodel_set.all()
-                
-                if npdm:
-                    item["discount"] = {
-                        "type": npdm.first().type,
-                        "value": npdm.first().value 
-                    }
+        npdm = npm.nproductdiscountmodel_set.all()
+        
+        if npdm:
+            item["discount"] = {
+                "type": npdm.first().type,
+                "value": npdm.first().value 
+            }
 
-                self.updateNProductAPI(item)
+        result = self.updateNProductAPI(item)
 
-            return messages
+        if result["result"]["status"] == "success":
+            return True
+        
+        if result["result"]["errorCode"]["IMPORT_PRODUCT.imageDownloadInvalidHttpStatusCode"]:
+            pDetail = self.getPdetail(npm.sellerSku)
+            self._addProductImages(npm, pDetail.get("images"))
+            return self.updateNProduct(npm)
 
+        return False
 
 
 
