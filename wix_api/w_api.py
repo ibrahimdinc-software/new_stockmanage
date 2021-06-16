@@ -86,7 +86,9 @@ class WixProductAPI:
             }
             res = requests.post(url, headers=_getHeaders(token), json=body)
             response = json.loads(res.content)
-            if res.status_code != 200:
+            if res.status_code == 401:
+                return self.getProductsAPI(token)
+            elif res.status_code != 200:
                 createErrorLoggingModel(
                     "Wix",
                     "wix_api/w_api.py:65",
@@ -107,7 +109,9 @@ class WixProductAPI:
         res = requests.get(url, headers=_getHeaders(token))
         response = json.loads(res.content)
         
-        if res.status_code != 200:
+        if res.status_code == 401:
+            return self.getWixProductDetailAPI(productId, token)
+        elif res.status_code != 200:
             createErrorLoggingModel(
                 "Wix",
                 "wix_api/w_api.py:86",
@@ -124,7 +128,9 @@ class WixProductAPI:
         res = requests.post(url, headers=_getHeaders(token), json=body)
         response = json.loads(res.content)
 
-        if res.status_code != 200:
+        if res.status_code == 401:
+            return self.getWixProuctVariantAPI(productId, token)
+        elif res.status_code != 200:
             createErrorLoggingModel(
                 "Wix",
                 "wix_api/w_api.py:89",
@@ -139,8 +145,10 @@ class WixProductAPI:
         
         res = requests.patch(url, headers=_getHeaders(token), json=data)
         response = json.loads(res.content)
-        print(response)
-        if res.status_code != 200:
+        
+        if res.status_code == 401:
+            return self.updateWixProductAPI(token, data)
+        elif res.status_code != 200:
             createErrorLoggingModel(
                 "Wix",
                 "wix_api/w_api.py:81",

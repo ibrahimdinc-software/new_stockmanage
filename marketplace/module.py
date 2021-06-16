@@ -139,7 +139,6 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixP
                     status = self.updateNProduct(muq.mpm)
                 elif self.marketType(muq.mpm) == WixProductModel:
                     status = self.updateWixProduct(muq.mpm)
-                    print("test")
                 muq.isUpdated = status
                 muq.save()
 
