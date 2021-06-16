@@ -1,18 +1,21 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
+from wix_api.w_module import WixProductModule
+from wix_api.models import WixProductModel
 from nonbir_api.n_module import NOrderModule, NProductModule
 from nonbir_api.models import NProductModel
 import time
 
-from trendyol_api.models import TrendProductModel, TrendOrderModel
+from trendyol_api.models import TrendProductModel
 from trendyol_api.tr_module import TrendProductModule, TrendOrderModule
 
-from hepsiburada_api.models import HepsiProductModel, HepsiOrderModel
+from hepsiburada_api.models import HepsiProductModel
 from hepsiburada_api.hb_module import HepsiProductModule, HepsiOrderModule
 
-from .models import MarketOrderModel, MarketProductBuyBoxListModel, MarketProductModel, MarketUpdateQueueModel
+from .models import MarketProductBuyBoxListModel, MarketProductModel, MarketUpdateQueueModel
 
 
 class ExtraMethods():
+
     def marketType(self, mpm):
         if mpm.userMarket.marketType == "trendyol":
             return TrendProductModel
@@ -20,6 +23,8 @@ class ExtraMethods():
             return HepsiProductModel
         elif mpm.userMarket.marketType == "n11":
             return NProductModel
+        elif mpm.userMarket.marketType == "wix":
+            return WixProductModel
 
     def cleanBbModel(self, bbList):
         for bb in bbList:
@@ -60,13 +65,14 @@ class ExtraMethods():
         self.cleanBbModel(bbs)
 
 
-class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, ExtraMethods):
+class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixProductModule, ExtraMethods):
 
     def getProducts(self):
         productList = []
-        productList += self.getHepsiProducts()
         productList += self.getTrendProducts()
+        productList += self.getHepsiProducts()
         productList += self.getNProducts()
+        productList += self.getWixProducts()
 
         mpms = MarketProductModel.objects.all()
         for p in productList:
@@ -87,7 +93,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
                 marketProduct.sellerSku = p.get("sellerSku")
                 marketProduct.salePrice = p.get("salePrice")
                 marketProduct.productLink = p.get("productLink")
-                
+            
             marketProduct.save()
             marketProduct.setUserMarket(p.get("marketType"))
 
@@ -114,6 +120,9 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
             hpm.save()
         elif details.get("marketType") == "n11":
             self.addNProductDetails(mpm, details)
+        elif details.get("marketType") == "wix":
+            self.addWixProductDetail(mpm, details)
+            
 
     def updateProducts(self):
         muqs = MarketUpdateQueueModel.objects.filter(isUpdated=False)
@@ -128,6 +137,9 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
                     tpmList.append(muq.mpm)
                 elif self.marketType(muq.mpm) == NProductModel:
                     status = self.updateNProduct(muq.mpm)
+                elif self.marketType(muq.mpm) == WixProductModel:
+                    status = self.updateWixProduct(muq.mpm)
+                    print("test")
                 muq.isUpdated = status
                 muq.save()
 
@@ -158,6 +170,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
             for medProductModel in medProductModels:
                 medProductModel.base_product.dropStock(
                     quantity*medProductModel.piece)
+                return -1 * quantity * medProductModel.piece
+        return 0
 
     def increaseStock(self, product, quantity):
         marketMedProductModels = product.marketmedproductmodel_set.all()
@@ -166,6 +180,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, Extr
             for medProductModel in medProductModels:
                 medProductModel.base_product.increaseStock(
                     quantity*medProductModel.piece)
+                return quantity*medProductModel.piece
+        return 0
 
 
     def _buyBoxMessage(self, lastRank, mpm, detail):

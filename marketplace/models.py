@@ -30,6 +30,7 @@ MARKET_TYPE = (
     ('hepsiburada','Hepsiburada'),
     ('trendyol','Trendyol'),
     ('n11','N11'),
+    ('wix','Wix'),
 )
 
 
@@ -195,11 +196,11 @@ class MarketOrderDetailModel(models.Model):
 
     def dropStock(self):
         from .module import ProductModule
-        ProductModule().dropStock(self.mpm, self.quantity)
+        return ProductModule().dropStock(self.mpm, self.quantity)
 
     def increaseStock(self):
         from .module import ProductModule
-        ProductModule().increaseStock(self.mpm, self.quantity)
+        return ProductModule().increaseStock(self.mpm, self.quantity)
 
 
 class MarketOrderPredCostModel(models.Model):
