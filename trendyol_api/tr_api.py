@@ -1,6 +1,7 @@
 import requests
 import base64
 import json
+import re
 from bs4 import BeautifulSoup
 
 
@@ -61,23 +62,26 @@ class TrendProductAPI:
         return result.get("batchRequestId")
 
     def getTrendBuyboxList(self, link):
-        page = requests.get(link)
-        soup = BeautifulSoup(page.content, 'html.parser')
+        page = requests.get(link, headers={'Cache-Control': 'no-cache'})
+
+        data = re.search(r'"product":.*}},', page.text).group()
+        data = data.replace('"product":', '')[:-1]  
+        data = json.loads(data)
 
         lastData = [
             {
                 "rank": 1,
-                "merchantName": soup.find("div", attrs={"class": "sl-nm"}).find("a").text,
-                "price": float(soup.find("span", attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
+                "merchantName": data["merchant"]["name"],
+                "price": data["price"]["discountedPrice"]["value"]
             }
         ]
 
         r = 2
-        for i in soup.find_all("div", attrs={"class": "pr-mc-w gnr-cnt-br"}):
+        for i in data["otherMerchants"]:
             lastData.append({
                 "rank": r,
-                "merchantName": i.find("div", attrs={"class": "pr-mb-mn"}).find("a").text,
-                "price": float(i.find("span", attrs={"class": "prc-slg"}).text.replace(" TL", "").replace(",", "."))
+                "merchantName": i["merchant"]["name"],
+                "price": i["price"]["discountedPrice"]["value"]
             })
             r += 1
 
