@@ -326,9 +326,7 @@ class ProductModule(
         tenMinAgo = datetime.now()-timedelta(minutes=10)
 
         mpms = MarketProductModel.objects.filter(onSale=True, 
-                                                lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType="n11",
-                                                                                        userMarket__marketType="wix",
-                                                                                        userMarket__marketType="cicek")[:20]
+                                                lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:20]
 
         infos = []
 
