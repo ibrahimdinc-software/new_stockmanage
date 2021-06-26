@@ -14,7 +14,6 @@ class CicekProductModule(CicekProductAPI):
         pList = []
 
         for p in products:
-            print(p)
             pList.append({
                 "marketType": "cicek",
                 "productName": p.get("productName"),
