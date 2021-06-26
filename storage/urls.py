@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path('baseProducts/', views.BaseProductListView.as_view(), name="baseProductsListView"),
-    path('baseProducts/detail/<int:pk>', views.BaseProductDetailView.as_view(), name="baseProductsDetailView"),
+    path('baseProducts/edit/<int:pk>', views.BaseProductUpdateView.as_view(), name="baseProductsUpdateView"),
+    path('baseProducts/add/', views.BaseProductCreateView.as_view(), name="baseProductsCreateView"),
     #path('api/baseProducts/', views.BaseProductList.as_view()),
     #path('api/baseProducts/<int:pk>/', views.BaseProductDetail.as_view()),
 ]

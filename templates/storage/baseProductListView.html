@@ -1,25 +1,17 @@
-{% extends 'layout/layout.html' %}
-
-
-{% block header %}
-Temel Ürünler
-{% endblock header %}
-
-
-{% block body %}
+{% extends 'layout/layout.html' %} {% block header %} Temel Ürünler {% endblock header %} {% block customRightButton %}
+<a href="{% url 'baseProductsCreateView' %}" class="btn btn-accent-red">
+    <i class="material-icons icon--left">add</i> ekle
+</a> {% endblock customRightButton %} {% block body %}
 <div class="card mb-lg-32pt">
 
-    <div class="table-responsive" data-toggle="lists" data-lists-sort-by="js-lists-values-date"
-        data-lists-sort-desc="true"
-        data-lists-values='["js-lists-values-name", "js-lists-values-department", "js-lists-values-status", "js-lists-values-type", "js-lists-values-phone", "js-lists-values-date"]'>
+    <div class="table-responsive" data-toggle="lists" data-lists-sort-by="js-lists-values-date" data-lists-sort-desc="true" data-lists-values='["js-lists-values-name", "js-lists-values-department", "js-lists-values-status", "js-lists-values-type", "js-lists-values-phone", "js-lists-values-date"]'>
 
         <table class="table mb-0 thead-border-top-0 table-nowrap">
             <thead>
                 <tr>
                     <th style="width: 18px;" class="pr-0">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input js-toggle-check-all"
-                                data-target="#employees" id="customCheckAllemployees">
+                            <input type="checkbox" class="custom-control-input js-toggle-check-all" data-target="#employees" id="customCheckAllemployees">
                             <label class="custom-control-label" for="customCheckAllemployees"><span
                                     class="text-hide">Toggle all</span></label>
                         </div>
@@ -41,14 +33,13 @@ Temel Ürünler
                 </tr>
             </thead>
             <tbody class="list" id="employees">
-                
+
                 {% for obj in object_list %}
                 <tr>
 
                     <td class="pr-0">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input js-check-selected-row"
-                                id="customCheck1_{{obj.id}}">
+                            <input type="checkbox" class="custom-control-input js-check-selected-row" id="customCheck1_{{obj.id}}">
                             <label class="custom-control-label" for="customCheck1_{{obj.id}}"><span
                                     class="text-hide">Check</span></label>
                         </div>
@@ -66,7 +57,7 @@ Temel Ürünler
 
                                 <div class="d-flex align-items-center">
                                     <div class="flex d-flex flex-column">
-                                        <a href="detail/{{obj.id}}" class="mb-0"><strong class="js-lists-values-name">{{obj.name}}</strong></a>
+                                        <a href="edit/{{obj.id}}" class="mb-0"><strong class="js-lists-values-name">{{obj.name}}</strong></a>
                                     </div>
                                 </div>
 
@@ -100,14 +91,14 @@ Temel Ürünler
                     </td>
                 </tr>
                 {% endfor %}
-                    
-                
+
+
 
             </tbody>
         </table>
     </div>
 
-    
+
 
 </div>
 {% endblock body %}

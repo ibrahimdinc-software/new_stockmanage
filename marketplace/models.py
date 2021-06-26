@@ -31,6 +31,7 @@ MARKET_TYPE = (
     ('trendyol','Trendyol'),
     ('n11','N11'),
     ('wix','Wix'),
+    ('cicek','Çiçek Sepeti'),
 )
 
 

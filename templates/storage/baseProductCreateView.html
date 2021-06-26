@@ -1,0 +1,38 @@
+{% extends 'layout/layout.html' %} {% block header %} Yeni Ürün {% endblock header %}{% load widget_tweaks %}
+{% block body %}
+
+<form>
+<div class="list-group list-group-form">
+    <div class="list-group-item">
+        <div class="form-group row align-items-center mb-0">
+            <label class="form-label col-form-label col-sm-3">{{form.name.label}}</label>
+            <div class="col-sm-9">
+                {% render_field form.name type="text" class="form-control" placeholder="Temel ürün adı girin" %}
+            </div>
+        </div>
+    </div>
+    <div class="list-group-item">
+        <div class="form-group row align-items-center mb-0">
+            <label class="form-label col-form-label col-sm-3">{{form.barcode.label}}</label>
+            <div class="col-sm-9">
+                {% render_field form.barcode type="number" class="form-control" placeholder="Barkod bilgisi girin" %}
+            </div>
+        </div>
+    </div>
+    <div class="list-group-item">
+        <div class="form-group row align-items-center mb-0">
+            <label class="form-label col-form-label col-sm-3">{{form.piece.label}}</label>
+            <div class="col-sm-9">
+                {% render_field form.piece type="number" class="form-control" placeholder="Adet" %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-section">
+    <div class="page-nav__content float-right">
+        <button type="submit" class="btn btn-accent-red">Ekle</button>
+    </div>
+</div>
+</form>
+{% endblock body %}

@@ -23,13 +23,4 @@ class WixProductUpdateModel(models.Model):
 
 
 class WixOrderDetailModel(MarketOrderDetailModel):
-
-    def dropStock(self):
-        from .w_module import WixProductModule
-        quantity = super().dropStock()
-        WixProductModule.createUpdateModel(self.mpm, quantity)
-
-    def increaseStock(self):
-        from .w_module import WixProductModule
-        quantity = super().increaseStock()
-        WixProductModule.createUpdateModel(self.mpm, quantity)
+    pass

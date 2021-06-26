@@ -1,3 +1,5 @@
+from cs_api.cs_module import CicekProductModule
+from cs_api.models import CicekProductModel
 from datetime import datetime, timedelta
 from wix_api.w_module import WixProductModule
 from wix_api.models import WixProductModel
@@ -25,6 +27,8 @@ class ExtraMethods():
             return NProductModel
         elif mpm.userMarket.marketType == "wix":
             return WixProductModel
+        elif mpm.userMarket.marketType == "cicek":
+            return CicekProductModel
 
     def cleanBbModel(self, bbList):
         for bb in bbList:
@@ -65,16 +69,26 @@ class ExtraMethods():
         self.cleanBbModel(bbs)
 
 
-class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixProductModule, ExtraMethods):
+class ProductModule(
+    HepsiProductModule, 
+    TrendProductModule, 
+    NProductModule, 
+    WixProductModule,
+    CicekProductModule,
+    ExtraMethods):
 
     def getProducts(self):
-        productList = []
-        productList += self.getTrendProducts()
-        productList += self.getHepsiProducts()
-        productList += self.getNProducts()
-        productList += self.getWixProducts()
-
         mpms = MarketProductModel.objects.all()
+        
+        self._addProducts(mpms, self.getTrendProducts())
+        self._addProducts(mpms, self.getHepsiProducts())
+        self._addProducts(mpms, self.getNProducts())
+        self._addProducts(mpms, self.getWixProducts())
+        self._addProducts(mpms, self.getCicekProducts())
+
+
+    def _addProducts(self, mpms, productList):
+
         for p in productList:
             marketProduct = mpms.filter(marketplaceSku=p.get("marketplaceSku")).first()
             if not marketProduct:
@@ -99,6 +113,7 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixP
 
             self.addProductDetails(marketProduct, p)
 
+
     def addProductDetails(self, mpm, details):
         if details.get("marketType") == "trendyol":
             tpm = TrendProductModel(
@@ -122,6 +137,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixP
             self.addNProductDetails(mpm, details)
         elif details.get("marketType") == "wix":
             self.addWixProductDetail(mpm, details)
+        elif details.get("marketType") == "cicek":
+            self.addCicekProductDetail(mpm, details)
             
 
     def updateProducts(self):
@@ -139,6 +156,8 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixP
                     status = self.updateNProduct(muq.mpm)
                 elif self.marketType(muq.mpm) == WixProductModel:
                     status = self.updateWixProduct(muq.mpm)
+                elif self.marketType(muq.mpm) == CicekProductModel:
+                    status = self.updateCicekProduct(muq.mpm)
                 muq.isUpdated = status
                 muq.save()
 
@@ -306,7 +325,10 @@ class ProductModule(HepsiProductModule, TrendProductModule, NProductModule, WixP
         now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=10)
 
-        mpms = MarketProductModel.objects.filter(onSale=True, lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType="n11")[:20]
+        mpms = MarketProductModel.objects.filter(onSale=True, 
+                                                lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType="n11",
+                                                                                        userMarket__marketType="wix",
+                                                                                        userMarket__marketType="cicek")[:20]
 
         infos = []
 

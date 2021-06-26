@@ -1,10 +1,12 @@
-from typing import List
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
 
+from django.views.generic import ListView, UpdateView, CreateView
+from django.contrib.messages.views import SuccessMessageMixin
+
+from rest_framework import generics
+
+from .forms import BaseProductModelForm
 from .models import BaseProductModel
 from .serializers import BaseProductModelSerializer
-from rest_framework import generics
 
 # Create your views here.
 
@@ -13,9 +15,19 @@ class BaseProductListView(ListView):
     template_name = "storage/baseProductListView.html"
     model = BaseProductModel
 
-class BaseProductDetailView(DetailView):
-    template_name = "storage/baseProductDetailView.html"
+
+class BaseProductCreateView(CreateView, SuccessMessageMixin):
+    template_name = "storage/baseProductCreateView.html"
     model = BaseProductModel
+    form_class = BaseProductModelForm
+
+    success_message = 'Temel ürün başarıyla eklendi!'
+
+
+class BaseProductUpdateView(UpdateView):
+    template_name = "storage/baseProductUpdateView.html"
+    
+
 
 
 
