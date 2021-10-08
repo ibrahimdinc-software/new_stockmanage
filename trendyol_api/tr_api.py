@@ -64,8 +64,9 @@ class TrendProductAPI:
     def getTrendBuyboxList(self, link):
         page = requests.get(link, headers={'Cache-Control': 'no-cache'})
 
-        data = re.search(r'"product":.*}},', page.text).group()
-        data = data.replace('"product":', '')[:-1]  
+        data = re.search(r'"product":.*},"htmlContent"', page.text).group()
+        data = data.replace('"product":', '')
+        data = data.replace(',"htmlContent"', '')
         data = json.loads(data)
 
         lastData = [
