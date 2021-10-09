@@ -267,7 +267,7 @@ class ProductModule(
                                 mpm.salePrice = lPrice
                                 mpm.save()
                                 mpm.updateStock()
-                                
+
                                 time.sleep(3)
                                 
                                 mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
@@ -284,6 +284,8 @@ class ProductModule(
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor max fiyat {}₺ olabilir.".format(bbtm.maxPrice))
                         elif not bbtm.giveMax and seller.price != bbtm.minPrice:
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor min fiyat {}₺ olabilir.".format(bbtm.minPrice))
+                
+                return self._buyBoxMessage(lastRank, mpm, detail="???")
 
             else:
                 return "{} -- Başarılı".format(mpm.sellerSku)
