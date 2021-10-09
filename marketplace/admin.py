@@ -8,8 +8,8 @@ from import_export.admin import ImportExportActionModelAdmin
 import requests
 
 from .resources import MarketOrderModelResource
-from .models import MarketBuyBoxTraceModel, MarketMedProductModel, MarketOrderPredCostModel, MarketProductBuyBoxListModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel, UserMarketPlaceModel, UserMarketShipmentRuleModel
-from .module import ProductModule, OrderModule
+from .models import MarketBuyBoxTraceModel, MarketMedProductModel, MarketOrderPredCostModel, MarketProductBuyBoxListModel, MarketProductCommissionModel, MarketUpdateQueueModel, MarketProductModel, MarketOrderModel, MarketOrderDetailModel, UserMarketPlaceModel, UserMarketShipmentRuleModel
+from .module import ProductModule, OrderModule, ProfitModule
 # Register your models here.
 
 
@@ -41,6 +41,11 @@ class MarketBuyBoxTraceModelTabularInline(admin.TabularInline):
     extra = 0
 
 
+class MarketProductCommissionModelTabularInline(admin.TabularInline):
+    model = MarketProductCommissionModel
+    extra = 0
+
+
 @admin.register(MarketProductModel)
 class MarketProductModelAdmin(admin.ModelAdmin):
     ordering = ("-buyBoxRank",)
@@ -59,6 +64,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
         MarketBuyBoxTraceModelTabularInline,
         MarketMedProductModelTabularInline,
         MarketProductBuyBoxListModelTabularInline,
+        MarketProductCommissionModelTabularInline
     ]
 
     readonly_fields = ["productLinkF"]
@@ -204,7 +210,7 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
 
     change_list_template = "market/admin/get_order.html"
     change_form_template = "trendyol_api/admin/cancelOrder.html"
-
+    
     list_display = ["__str__", "userMarket", "customerModel",
                     "totalPrice", "orderDate", "getDetailCount", "orderStatus"]
     list_filter = [
@@ -212,6 +218,8 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
         ("orderDate", DateTimeRangeFilter),
         ("deliveryDate", DateTimeRangeFilter),
         "orderStatus"]
+
+    readonly_fields = ["getProfit"]
 
     resource_class = MarketOrderModelResource
 
@@ -246,4 +254,10 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
             self.message_user(request, "İptal Edildi")
 
             return HttpResponseRedirect(".")
+
+        if "calcProfit" in request.POST:
+            ProfitModule().calcProfit(obj)
+            self.message_user(request, "Kâr Hesaplandı")
+            return HttpResponseRedirect(".")
+
         return super().response_change(request, obj)

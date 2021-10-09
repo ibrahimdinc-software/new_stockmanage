@@ -1,3 +1,4 @@
+from nonbir_api.n_api import ShipmentApi
 from cs_api.cs_module import CicekProductModule
 from cs_api.models import CicekProductModel
 from datetime import datetime, timedelta
@@ -13,7 +14,7 @@ from trendyol_api.tr_module import TrendProductModule, TrendOrderModule
 from hepsiburada_api.models import HepsiProductModel
 from hepsiburada_api.hb_module import HepsiProductModule, HepsiOrderModule
 
-from .models import MarketProductBuyBoxListModel, MarketProductModel, MarketUpdateQueueModel
+from .models import COST_TYPES, MarketOrderPredCostModel, MarketProductBuyBoxListModel, MarketProductCommissionModel, MarketProductModel, MarketUpdateQueueModel, UserMarketShipmentRuleModel
 
 
 class ExtraMethods():
@@ -37,31 +38,32 @@ class ExtraMethods():
     def renewBbModel(self, bbList, mpm):
         bbs = mpm.marketproductbuyboxlistmodel_set.all()
         for bb in bbList:
-            if bbs.filter(merchantName=bb.get("merchantName")):
-                b = bbs.get(merchantName=bb.get("merchantName"))
-
-                b.uncomp = True if b.uncomp and b.price == bb.get("price") else False # rekabet edilemez ve fiyat değişmediyse True
+            mName = bb.get("merchantName")[:-1] if bb.get("merchantName")[-1] == ' ' else bb.get("merchantName")
+            b = bbs.filter(merchantName=mName).first()
+            if b:
+                b.isCompeted = True if b.isCompeted and b.price == bb.get(
+                    "price") else False  # rekabet edildi ve fiyat değişmediyse True
 
                 b.rank = bb.get("rank")
                 b.oldPrice = b.price
                 b.price = bb.get("price")
-                b.dispatchTime = bb.get("dispatchTime") if bb.get("dispatchTime") else None
+                b.dispatchTime = bb.get("dispatchTime") if bb.get(
+                    "dispatchTime") else None
                 b.save()
-                bbs = bbs.exclude(merchantName=bb.get("merchantName"))
+                bbs = bbs.exclude(merchantName=mName)
 
             else:
                 mpbbl = MarketProductBuyBoxListModel(
                     mpm=mpm,
                     rank=bb.get("rank"),
-                    merchantName=bb.get("merchantName"),
+                    merchantName=mName,
                     price=bb.get("price"),
                     oldPrice=0,
-                    dispatchTime=bb.get("dispatchTime") if bb.get("dispatchTime") else None
+                    dispatchTime=bb.get("dispatchTime") if bb.get(
+                        "dispatchTime") else None
                 )
-
-
                 mpbbl.save()
-                bbs = bbs.exclude(merchantName=bb.get("merchantName"))
+                bbs = bbs.exclude(merchantName=mName)
 
             if bb.get("merchantName") == "PetiFest":
                 mpm.buyBoxRank = bb.get("rank")
@@ -70,27 +72,27 @@ class ExtraMethods():
 
 
 class ProductModule(
-    HepsiProductModule, 
-    TrendProductModule, 
-    NProductModule, 
-    WixProductModule,
-    CicekProductModule,
-    ExtraMethods):
+        HepsiProductModule,
+        TrendProductModule,
+        NProductModule,
+        WixProductModule,
+        CicekProductModule,
+        ExtraMethods):
 
     def getProducts(self):
         mpms = MarketProductModel.objects.all()
-        
+
         self._addProducts(mpms, self.getTrendProducts())
         self._addProducts(mpms, self.getHepsiProducts())
         self._addProducts(mpms, self.getNProducts())
         self._addProducts(mpms, self.getWixProducts())
         self._addProducts(mpms, self.getCicekProducts())
 
-
     def _addProducts(self, mpms, productList):
 
         for p in productList:
-            marketProduct = mpms.filter(marketplaceSku=p.get("marketplaceSku")).first()
+            marketProduct = mpms.filter(
+                marketplaceSku=p.get("marketplaceSku")).first()
             if not marketProduct:
                 marketProduct = MarketProductModel(
                     productName=p.get("productName"),
@@ -107,12 +109,11 @@ class ProductModule(
                 marketProduct.sellerSku = p.get("sellerSku")
                 marketProduct.salePrice = p.get("salePrice")
                 marketProduct.productLink = p.get("productLink")
-            
+
             marketProduct.save()
             marketProduct.setUserMarket(p.get("marketType"))
 
             self.addProductDetails(marketProduct, p)
-
 
     def addProductDetails(self, mpm, details):
         if details.get("marketType") == "trendyol":
@@ -131,6 +132,7 @@ class ProductModule(
             hpm.CargoCompany1 = details.get("CargoCompany1")
             hpm.CargoCompany2 = details.get("CargoCompany2")
             hpm.CargoCompany3 = details.get("CargoCompany3")
+            hpm.commissionRate = float(details.get("commissionRate")) * 1.18
 
             hpm.save()
         elif details.get("marketType") == "n11":
@@ -139,7 +141,15 @@ class ProductModule(
             self.addWixProductDetail(mpm, details)
         elif details.get("marketType") == "cicek":
             self.addCicekProductDetail(mpm, details)
-            
+
+    def createCommissionModel(self, mpm, com):
+        mpcm = MarketProductCommissionModel.objects.filter(mpm=mpm)
+        #!
+        mpcm = MarketProductCommissionModel(
+            mpm=mpm,
+            commissionRate=com
+        )
+        mpcm.save()
 
     def updateProducts(self):
         muqs = MarketUpdateQueueModel.objects.filter(isUpdated=False)
@@ -164,6 +174,10 @@ class ProductModule(
             self.updateHepsiProducts(hpmList)
             self.updateTrendProducts(tpmList)
 
+    def directUpdateProduct(self, mpm):
+        self.updateQueue(mpm)
+        self.updateProducts()
+
     def updateQueue(self, qs):
         marketUpdateQueueModels = MarketUpdateQueueModel.objects.all()
         if not 'count' in dir(qs):
@@ -180,7 +194,6 @@ class ProductModule(
                 muq = MarketUpdateQueueModel(mpm=qs[0])
                 muq.save()
 
-
     def dropStock(self, product, quantity):
         marketMedProductModels = product.marketmedproductmodel_set.all()
         for marketMedProductModel in marketMedProductModels:
@@ -188,8 +201,6 @@ class ProductModule(
             for medProductModel in medProductModels:
                 medProductModel.base_product.dropStock(
                     quantity*medProductModel.piece)
-                return -1 * quantity * medProductModel.piece
-        return 0
 
     def increaseStock(self, product, quantity):
         marketMedProductModels = product.marketmedproductmodel_set.all()
@@ -198,9 +209,6 @@ class ProductModule(
             for medProductModel in medProductModels:
                 medProductModel.base_product.increaseStock(
                     quantity*medProductModel.piece)
-                return quantity*medProductModel.piece
-        return 0
-
 
     def _buyBoxMessage(self, lastRank, mpm, detail):
         d = {
@@ -227,14 +235,13 @@ class ProductModule(
             self.renewBbModel(bbList, mpm)
 
             time.sleep(.100)
-           
-                
+
             if notif:
-                
-                bbtm = mpm.marketbuyboxtracemodel_set.first() 
-                
+
+                bbtm = mpm.marketbuyboxtracemodel_set.first()
+
                 if bbtm and bbtm.isActive:
-                   
+
                     rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
                     seller = rivals.filter(merchantName="PetiFest").first()
@@ -243,61 +250,44 @@ class ProductModule(
 
                     campaign = True if seller and seller.price != mpm.salePrice else False
 
-                    if int(mpm.buyBoxRank) == 1:
-                        change = True if rivals[0].price != rivals[0].oldPrice else False
-                        if campaign and change:
-                            return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
+                    if campaign:
+                        return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
-                        elif change:
-                            return self._buyBoxMessage(lastRank, mpm, detail="LOG2 \Buybox kazanılıyor. \nDaha kârlı fiyat {}₺ olabilir.".format(round(rivals[0].price-bbtm.priceStep, 2)))
-                        
-                        else:
-                            return {"status": "same"}
+                    target = 0
+                    while target != len(rivals):
+                        rival = rivals[target]
+                        if rival.price > bbtm.minPrice:  # rekabet edilebilir
+                            # düşük fiyatı buluyoruz
+                            price = rival.price if rival.price < seller.price or not rival.isCompeted else seller.price
+                            # son fiyatı hesapladık
+                            lPrice = round(price - bbtm.priceStep, 2)
+                            if seller.rank == target + 1 and rival.isCompeted:
+                                return self._buyBoxMessage(lastRank, mpm, detail="Hedefe ulaşıldı".format(lPrice))
+                            if lPrice >= bbtm.minPrice and (lPrice < bbtm.maxPrice or not bbtm.recoMax):
+                                mpm.salePrice = lPrice
+                                mpm.save()
+                                mpm.updateStock()
+                                
+                                time.sleep(3)
+                                
+                                mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
+                                mpm.save()
 
-                    elif len(rivals) < 1:
-                        return self._buyBoxMessage(lastRank, mpm, detail="LOG1 \nRakip yok. \nBuybox kazandıran fiyat {}₺ olabilir.".format(round(bbtm.maxPrice, 2)))
-                    
-                    else:
-                        change = False
-                        for bb in rivals:
-                            change = True if bb.price != bb.oldPrice or change else False
+                                rival.isCompeted = True
+                                rival.save()
+                                return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazandıran fiyat {}₺ olabilir.".format(lPrice))
 
-                            if bb.price - bbtm.priceStep >= bbtm.minPrice and not bb.uncomp :
+                        target += 1
 
-                                price = mpm.salePrice if mpm.salePrice <= bb.price and mpm.salePrice - bbtm.priceStep >= bbtm.minPrice else bb.price
+                    if target == len(rivals):  # rekabet edilemedi
+                        if bbtm.giveMax and seller.price != bbtm.maxPrice:
+                            return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor max fiyat {}₺ olabilir.".format(bbtm.maxPrice))
+                        elif not bbtm.giveMax and seller.price != bbtm.minPrice:
+                            return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor min fiyat {}₺ olabilir.".format(bbtm.minPrice))
 
-                                if int(mpm.buyBoxRank) > int(bb.rank) and change:  
-
-                                    if mpm.salePrice < bb.price and mpm.salePrice - bbtm.priceStep < bbtm.minPrice:
-                                        bb.uncomp=True
-                                        bb.save()
-                                        change = True
-
-                                    elif price - bbtm.priceStep >= bbtm.minPrice:
-                                        return self._buyBoxMessage(lastRank, mpm, detail="LOG3 Buybox kazandıran fiyat {}₺ olabilir.".format(price - bbtm.priceStep))  
-
-                                elif int(mpm.buyBoxRank) == 1:
-                                    return {"status": "same"}
-
-                                elif int(mpm.buyBoxRank) < int(bb.rank) and change:
-                                    return self._buyBoxMessage(lastRank, mpm, detail="LOG4 Buybox kazandıran fiyat {}₺ olabilir.".format(bb.price - bbtm.priceStep))
-                            
-                            elif bb.price - bbtm.priceStep < bbtm.minPrice:
-                                bb.uncomp = True
-                                bb.save()
-                                change = True if change else False
-                        
-                        return {"status": "same"}
-                
-                elif int(lastRank) != int(mpm.buyBoxRank):
-                    return self._buyBoxMessage(lastRank, mpm, detail="Sıralamada değişiklik oldu.")
-                
-                else:
-                    return {"status": "same"}
-            
             else:
                 return "{} -- Başarılı".format(mpm.sellerSku)
-            
+
         elif notif:
             return {
                 "status": "change",
@@ -314,7 +304,8 @@ class ProductModule(
         for mpm in mpms:
             message = self._getBuyBox(mpm, False)
             if type(message) == dict:
-                messages += str(message.get("tpm")) + " " + str(message.get("detail"))
+                messages += str(message.get("tpm")) + " " + \
+                    str(message.get("detail"))
             else:
                 messages += message
             messages += "\n"
@@ -325,8 +316,8 @@ class ProductModule(
         now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=10)
 
-        mpms = MarketProductModel.objects.filter(onSale=True, 
-                                                lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:20]
+        mpms = MarketProductModel.objects.filter(onSale=True,
+                                                 lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:20]
 
         infos = []
 
@@ -334,15 +325,15 @@ class ProductModule(
             m = self._getBuyBox(mpm, True)
             if m.get("status") == "change":
                 infos.append(m)
-            
+
             mpm.lastControlDate = now
             mpm.save()
 
         if len(infos) > 0:
             return infos
-            
+
         return []
-    
+
     def cronBuyBoxTest(self, mpm):
         now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=10)
@@ -368,3 +359,41 @@ class OrderModule(HepsiOrderModule, TrendOrderModule, NOrderModule):
 
     def getDeliveredOrders(self):
         self.getDeliveredTrendOrders()
+
+
+class ProfitModule():
+    def calcProfit(self, order):
+        orderDetails = order.marketorderdetailmodel_set.all()
+        orderCosts = order.marketorderpredcostmodel_set.all()
+        shipmentRules = UserMarketShipmentRuleModel.objects.filter(
+            userMarket=order.userMarket)
+
+        if not orderCosts.filter(costType="shipment"):
+            mopcm = self.createPredModel(order, None, "shipment")
+            umsrm = shipmentRules.filter(minPrice__lte=order.priceToBilling,
+                                         maxPrice__gte=order.priceToBilling, cargo__in=['tumu', order.cargo])
+            mopcm.costAmount = umsrm.first().cost
+            mopcm.save()
+        for od in orderDetails:
+            if not orderCosts.filter(modm=od, costType="commission"):
+                mopcm = self.createPredModel(order, od, "commission")
+                mopcm.costAmount = od.getCommission()
+                mopcm.save()
+            elif orderCosts.filter(modm=od, costType="commission").first().costAmount == 0:
+                mopcm = orderCosts.filter(
+                    modm=od, costType="commission").first()
+                mopcm.costAmount = od.getCommission()
+                mopcm.save()
+            if not orderCosts.filter(modm=od, costType="purchasePrice"):
+                mopcm = self.createPredModel(order, od, "purchasePrice")
+                mopcm.costAmount = od.mpm.getCost()
+                mopcm.save()
+
+    def createPredModel(self, mom, od, costType):
+        mopcm = MarketOrderPredCostModel(
+            mom=mom,
+            modm=od,
+            costType=costType
+        )
+        mopcm.save()
+        return mopcm

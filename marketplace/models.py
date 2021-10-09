@@ -20,10 +20,10 @@ ORDER_STATUS = (
 )
 
 COST_TYPES = (
-    ('Shipment', 'Kargo'),
-    ('Comission', 'Komisyon'),
-    ('PurchasePrice', 'Alım Fiyatı'),
-    ('Extra', 'Ekstra'),
+    ('shipment', 'Kargo'),
+    ('commission', 'Komisyon'),
+    ('purchasePrice', 'Alım Fiyatı'),
+    ('extra', 'Ekstra'),
 )
 
 MARKET_TYPE = (
@@ -34,6 +34,13 @@ MARKET_TYPE = (
     ('cicek','Çiçek Sepeti'),
 )
 
+
+CARGO_CHOICES = (
+    ('tumu','Bütün Firmalar'),
+    ('hepsi','HepsiJet'),
+    ('aras','Aras Kargo'),
+    ('surat','Sürat Kargo'),
+)
 
 class UserMarketPlaceModel(models.Model):
     user = models.ForeignKey("auth.user", on_delete=models.CASCADE)
@@ -51,6 +58,7 @@ class UserMarketShipmentRuleModel(models.Model):
     minPrice = models.FloatField(verbose_name="Min Fiyat")
     maxPrice = models.FloatField(verbose_name="Max Fiyat")
     cost = models.FloatField(verbose_name="Kargo Tutarı")
+    cargo = models.CharField(verbose_name="Kargo Firması", max_length=255, choices=CARGO_CHOICES, blank=True, null=True)
 
 
 
@@ -83,7 +91,7 @@ class MarketProductModel(models.Model):
 
     def updateStock(self):
         from .module import ProductModule
-        ProductModule().updateQueue(self)
+        ProductModule().directUpdateProduct(self)
 
     def removeFromSale(self):
         self.onSale = False
@@ -97,9 +105,19 @@ class MarketProductModel(models.Model):
             self.productLink,
             "Ürün Linki",
         )
-    
-  
-    
+            
+    def getCost(self):
+        cost = self.marketmedproductmodel_set.first().product.getCost()
+        return cost if cost else 0
+        
+
+class MarketProductCommissionModel(models.Model):
+    mpm = models.ForeignKey(MarketProductModel, verbose_name="Ürün", on_delete=models.CASCADE)
+    startDate = models.DateTimeField(verbose_name="Başlangıç Tarihi", blank=True, null=True)
+    endDate = models.DateTimeField(verbose_name="Bitiş Tarihi", blank=True, null=True)
+    commissionRate = models.FloatField(verbose_name="Komisyon Oranı")
+
+
 class MarketMedProductModel(models.Model):
     product = models.ForeignKey("storage.ProductModel", verbose_name="Bağlı Ürün", on_delete=models.CASCADE)
     mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
@@ -111,6 +129,7 @@ class MarketUpdateQueueModel(models.Model):
     date = models.DateTimeField(verbose_name="Oluşturma Tarihi", auto_now_add=True)
     isUpdated = models.BooleanField(verbose_name="Güncellendi mi?", default=False)
 
+
 class MarketProductBuyBoxListModel(models.Model):
     mpm = models.ForeignKey(MarketProductModel, verbose_name="Pazaryeri Ürünü", on_delete=models.CASCADE)
     rank = models.IntegerField(verbose_name="Sıralama")
@@ -118,16 +137,19 @@ class MarketProductBuyBoxListModel(models.Model):
     price = models.FloatField(verbose_name="Satıcının Fiyatı")
     oldPrice = models.FloatField(verbose_name="Satıcının Önceki Fiyatı")
     dispatchTime = models.IntegerField("Kargoya Verme Süresi", blank=True, null=True) 
-    uncomp = models.BooleanField(verbose_name="Rekabet edilemez?", default=False)
+    isCompeted = models.BooleanField(verbose_name="Rekabet edildi mi?", default=False)
 
     def __str__(self):
         return str(self.rank) + self.merchantName
+
 
 class MarketBuyBoxTraceModel(models.Model):
     marketProduct = models.ForeignKey(MarketProductModel, on_delete=models.CASCADE)
     minPrice = models.FloatField(verbose_name="Alt Fiyat")
     maxPrice = models.FloatField(verbose_name="Üst Fiyat")
     priceStep = models.FloatField(verbose_name="Değişim Miktarı")
+    giveMax = models.BooleanField(verbose_name="Rakip yoksa veya rekabet edilemiyorsa max(true)/min(false) fiyatı ver?", default=False)
+    recoMax = models.BooleanField(verbose_name="Max fiyatı tanı(true)/ma(false)?", default=False)
     isActive = models.BooleanField(verbose_name="Aktif mi?", default=True)
 
 
@@ -149,6 +171,7 @@ class MarketOrderModel(models.Model):
     totalPrice = models.FloatField(verbose_name="Toplam Tutar", blank=True, null=True)
     priceToBilling = models.FloatField(verbose_name="Faturalandırılacak Tutar", blank=True, null=True)
     orderStatus = models.CharField(verbose_name="Siparişin Durumu", max_length=255, choices=ORDER_STATUS, blank=True, null=True)
+    cargo = models.CharField(verbose_name="Kargo Firması", max_length=255, choices=CARGO_CHOICES, blank=True, null=True)
 
     objects = MarketOrderModelManager()
 
@@ -176,6 +199,13 @@ class MarketOrderModel(models.Model):
         self.userMarket = userMarket
         self.save()
 
+    def setCargo(self, cargoT):
+        cargoT = cargoT.split(' ')[0]
+        for cc in CARGO_CHOICES:
+            if cc[1].split(' ')[0] == cargoT:
+                self.cargo = cc[0]
+        self.save()
+
     def canceledOrder(self):
         self.orderStatus = "Cancelled"
         self.save()
@@ -183,13 +213,23 @@ class MarketOrderModel(models.Model):
         if modms:
             for modm in modms:
                 modm.increaseStock()
-        
 
+    def getProfit(self):
+        cost = 0
+        cdms = self.marketorderpredcostmodel_set.all()
+        if cdms:
+            print("test1")
+            for cdm in cdms:
+                print("test2")
+                cost += cdm.costAmount
+        print(cost)
+        return self.totalPrice - cost
 
 class MarketOrderDetailModel(models.Model):
     mom = models.ForeignKey(MarketOrderModel, verbose_name="Sipariş Modeli", on_delete=models.CASCADE)
     mpm = models.ForeignKey(MarketProductModel, verbose_name="Market Ürünü", on_delete=models.CASCADE)
     totalPrice = models.FloatField(verbose_name="Tutar", blank=True, null=True)
+    commissionRate = models.FloatField(verbose_name="Komisyon Oranı", default=0)
     quantity = models.IntegerField(verbose_name="Adet")
 
     def __str__(self):
@@ -203,9 +243,11 @@ class MarketOrderDetailModel(models.Model):
         from .module import ProductModule
         return ProductModule().increaseStock(self.mpm, self.quantity)
 
+    def getCommission(self):
+        return self.totalPrice * self.commissionRate / 100 * 1.18
 
 class MarketOrderPredCostModel(models.Model):
     mom = models.ForeignKey(MarketOrderModel, verbose_name="Sipariş Modeli", on_delete=models.CASCADE)
     modm = models.ForeignKey(MarketOrderDetailModel, verbose_name="Sipariş Detay Modeli", on_delete=models.CASCADE, blank=True, null=True)
     costType = models.CharField(verbose_name="Gider Türü", max_length=255, choices=COST_TYPES)
-    costAmount = models.FloatField(verbose_name="Tutar")
+    costAmount = models.FloatField(verbose_name="Tutar", blank=True, null=True)
