@@ -16,6 +16,4 @@ def getDeliverdOrders():
 def getBuyBoxes():
     infos = ProductModule().cronBuyBox()
 
-    if len(infos) > 0:
-        loseBuyboxMail(infos)
 
