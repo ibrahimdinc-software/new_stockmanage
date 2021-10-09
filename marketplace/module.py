@@ -279,7 +279,7 @@ class ProductModule(
 
                     if target == len(rivals):  # rekabet edilemedi
                         if bbtm.giveMax and seller.price != bbtm.maxPrice:
-                            mpm.salePrice = lPrice
+                            mpm.salePrice = bbtm.maxPrice
                             mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
                             mpm.save()
                             mpm.updateStock()
@@ -288,7 +288,7 @@ class ProductModule(
 
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor max fiyat {}₺ olabilir.".format(bbtm.maxPrice))
                         elif not bbtm.giveMax and seller.price != bbtm.minPrice:
-                            mpm.salePrice = lPrice
+                            mpm.salePrice = bbtm.minPrice
                             mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
                             mpm.save()
                             mpm.updateStock()
