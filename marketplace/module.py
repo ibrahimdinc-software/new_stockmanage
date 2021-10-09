@@ -328,7 +328,7 @@ class ProductModule(
     def cronBuyBox(self):
 
         now = datetime.now()
-        tenMinAgo = datetime.now()-timedelta(minutes=10)
+        tenMinAgo = datetime.now()-timedelta(minutes=5)
 
         mpms = MarketProductModel.objects.filter(onSale=True,
                                                  lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:20]
