@@ -265,13 +265,11 @@ class ProductModule(
                                 return self._buyBoxMessage(lastRank, mpm, detail="Hedefe ulaşıldı".format(lPrice))
                             if lPrice >= bbtm.minPrice and (lPrice < bbtm.maxPrice or not bbtm.recoMax):
                                 mpm.salePrice = lPrice
+                                mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
                                 mpm.save()
                                 mpm.updateStock()
 
                                 time.sleep(3)
-                                
-                                mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
-                                mpm.save()
 
                                 rival.isCompeted = True
                                 rival.save()
@@ -282,23 +280,20 @@ class ProductModule(
                     if target == len(rivals):  # rekabet edilemedi
                         if bbtm.giveMax and seller.price != bbtm.maxPrice:
                             mpm.salePrice = lPrice
+                            mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
                             mpm.save()
                             mpm.updateStock()
 
                             time.sleep(3)
-                            
-                            mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
-                            mpm.save()
 
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor max fiyat {}₺ olabilir.".format(bbtm.maxPrice))
                         elif not bbtm.giveMax and seller.price != bbtm.minPrice:
+                            mpm.salePrice = lPrice
+                            mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
                             mpm.save()
                             mpm.updateStock()
 
                             time.sleep(3)
-                            
-                            mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
-                            mpm.save()
 
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor min fiyat {}₺ olabilir.".format(bbtm.minPrice))
                 
