@@ -51,7 +51,7 @@ class TrendProductModule(TrendProductAPI):
     def _getTrendBuyBox(self, mpm):
         bbList = []
 
-        for bb in self.getTrendBuyboxList(mpm.productLink):
+        for bb in self.getTrendBuyboxList(mpm.productLink+"?filterOverPriceListings=false"):
             bbList.append({
                 "rank": bb.get("rank"),
                 "merchantName": bb.get("merchantName"),
@@ -165,6 +165,7 @@ class TrendOrderModule(TrendOrderAPI):
         )
         tom.save()
         tom.setUserMarket("trendyol")
+        tom.setCargo(order.get("cargoProviderName"))
 
         if order.get("status") == "Delivered":
             self.setDeliveryDate(tom, order.get("packageHistories"))
