@@ -262,6 +262,7 @@ class ProductModule(
                             # son fiyatı hesapladık
                             lPrice = round(price - bbtm.priceStep, 2)
                             if seller.rank == target + 1 and rival.isCompeted:
+                                mpm.lastControlDate = datetime.now()
                                 return self._buyBoxMessage(lastRank, mpm, detail="Hedefe ulaşıldı".format(lPrice))
                             if lPrice >= bbtm.minPrice and (lPrice < bbtm.maxPrice or not bbtm.recoMax):
                                 mpm.salePrice = lPrice
@@ -297,6 +298,7 @@ class ProductModule(
 
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor min fiyat {}₺ olabilir.".format(bbtm.minPrice))
                 
+                mpm.lastControlDate = datetime.now()
                 return self._buyBoxMessage(lastRank, mpm, detail="???")
 
             else:
@@ -339,9 +341,6 @@ class ProductModule(
             m = self._getBuyBox(mpm, True)
             if m.get("status") == "change":
                 infos.append(m)
-
-            mpm.lastControlDate = now
-            mpm.save()
 
         if len(infos) > 0:
             return infos
