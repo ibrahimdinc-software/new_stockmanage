@@ -236,6 +236,9 @@ class ProductModule(
 
             time.sleep(.100)
 
+            mpm.lastControlDate = datetime.now()
+            mpm.save()
+
             if notif:
 
                 bbtm = mpm.marketbuyboxtracemodel_set.first()
@@ -248,7 +251,7 @@ class ProductModule(
 
                     rivals = rivals.exclude(merchantName="PetiFest")
 
-                    campaign = True if seller and seller.price != mpm.salePrice else False
+                    campaign = True if seller.price != mpm.salePrice else False
 
                     if campaign:
                         return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
@@ -328,12 +331,10 @@ class ProductModule(
         return messages
 
     def cronBuyBox(self):
-
-        now = datetime.now()
         tenMinAgo = datetime.now()-timedelta(minutes=5)
 
         mpms = MarketProductModel.objects.filter(onSale=True,
-                                                 lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:20]
+                                                 lastControlDate__lte=tenMinAgo).exclude(userMarket__marketType__in=["n11", "wix", "cicek"])[:10]
 
         infos = []
 
