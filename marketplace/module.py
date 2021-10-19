@@ -41,9 +41,7 @@ class ExtraMethods():
             mName = bb.get("merchantName")[:-1] if bb.get("merchantName")[-1] == ' ' else bb.get("merchantName")
             b = bbs.filter(merchantName=mName).first()
             if b:
-                b.isCompeted = True if b.isCompeted and b.price == bb.get(
-                    "price") else False  # rekabet edildi ve fiyat değişmediyse True
-
+                b.isCompeted = True if b.isCompeted and b.price == float(bb.get("price")) else False  # rekabet edildi ve fiyat değişmediyse True
                 b.rank = bb.get("rank")
                 b.oldPrice = b.price
                 b.price = bb.get("price")
@@ -232,7 +230,11 @@ class ProductModule(
             elif self.marketType(mpm) == TrendProductModel:
                 bbList += self._getTrendBuyBox(mpm)
 
+            rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
+
             self.renewBbModel(bbList, mpm)
+
+            rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
             time.sleep(.100)
 
@@ -269,7 +271,7 @@ class ProductModule(
                                 return self._buyBoxMessage(lastRank, mpm, detail="Hedefe ulaşıldı".format(lPrice))
                             if lPrice >= bbtm.minPrice and (lPrice < bbtm.maxPrice or not bbtm.recoMax):
                                 mpm.salePrice = lPrice
-                                mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
+                                mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
                                 mpm.save()
                                 mpm.updateStock()
 
@@ -284,7 +286,7 @@ class ProductModule(
                     if target == len(rivals):  # rekabet edilemedi
                         if bbtm.giveMax and seller.price != bbtm.maxPrice:
                             mpm.salePrice = bbtm.maxPrice
-                            mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
+                            mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
                             mpm.save()
                             mpm.updateStock()
 
@@ -293,7 +295,7 @@ class ProductModule(
                             return self._buyBoxMessage(lastRank, mpm, detail="Buybox kazanılamıyor max fiyat {}₺ olabilir.".format(bbtm.maxPrice))
                         elif not bbtm.giveMax and seller.price != bbtm.minPrice:
                             mpm.salePrice = bbtm.minPrice
-                            mpm.lastControlDate = datetime.now()-timedelta(minutes=20)
+                            mpm.lastControlDate = datetime.now()-timedelta(minutes=10)
                             mpm.save()
                             mpm.updateStock()
 
