@@ -25,6 +25,7 @@ class HepsiProductModule(Listing):
                 "sellerSku": p.get("MerchantSku"),
                 "salePrice": p.get("Price"),
                 "productLink": "https://www.hepsiburada.com/product-p-"+str(p.get("HepsiburadaSku")),
+                "commissionRate": p.get("CommissionRate"),
                 "DispatchTime": p.get("DispatchTime"),
                 "CargoCompany1": p.get("CargoCompany1"),
                 "CargoCompany2": p.get("CargoCompany2"),
@@ -41,11 +42,12 @@ class HepsiProductModule(Listing):
                 d = {
                     "HepsiburadaSku": hpm.marketplaceSku,
                     "MerchantSku": hpm.sellerSku,
-                    "ProductName": hpm.productName,
                     "Price": hpm.get_price(),
                     "AvailableStock": hpm.availableStock,
                     "DispatchTime": hpm.DispatchTime,
                     "CargoCompany1": hpm.CargoCompany1,
+                    "CargoCompany2": hpm.CargoCompany2,
+                    "CargoCompany3": hpm.CargoCompany3,
                 }
                 l.append(d)
 
@@ -112,7 +114,6 @@ class HepsiOrderModule(HepsiOrderAPI):
                 )
                 hom.save()
                 hom.setUserMarket("hepsiburada")
-                hom.setCustomer(customer, customerData)
 
                 details = self.getDetails(hom.orderNumber)
 
@@ -121,9 +122,9 @@ class HepsiOrderModule(HepsiOrderAPI):
                         mom=hom,
                         priceToBilling=detail.get("priceToBilling"),
                         totalHbDiscount=detail.get("totalHbDiscount"),
-                        mpm=hepsiProducts.get(
-                            marketplaceSku=detail.get("sku")),
-                        quantity=detail.get("quantity")
+                        mpm=hepsiProducts.get(marketplaceSku=detail.get("sku")),
+                        quantity=detail.get("quantity"),
+                        commissionRate=detail.get("commissionRate")
                     )
                     hodm.save()
                     hodm.dropStock()
@@ -134,8 +135,9 @@ class HepsiOrderModule(HepsiOrderAPI):
                 hom.setPriceToBilling()
             else:
                 hom = hom.first()
-                hom.setCustomer(customer, customerData)
             
+            hom.setCustomer(customer, customerData)
+            hom.setCargo(order.get("cargoCompany"))
 
 
     def setPackageDetails(self):

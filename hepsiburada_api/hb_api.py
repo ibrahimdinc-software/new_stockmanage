@@ -42,7 +42,7 @@ class Listing:
     }
 
     def getHepsiProductAPI(self):
-        a = requests.get(self.listing_url+merchant_id, headers=self.hepiHeaders).content
+        a = requests.get(self.listing_url+merchant_id+"?limit=5000&offset=0", headers=self.hepiHeaders).content
         
         result = xmldict(a)
         result = result["Result"]["Listings"]["Listing"]
@@ -50,15 +50,14 @@ class Listing:
 
     def update(self,product):
         listings = et.Element('listings')    
+        listing = et.SubElement(listings, 'listing')
         if type(product) == list:
             for p in product:
-                listing = et.SubElement(listings, 'listing')
                 for k,v in p.items():
                     e = et.SubElement(listing, k)
                     e.text = str(v)
                     del e    
         else:
-            listing = et.SubElement(listings, 'listing')
             for k,v in product.items():
                 e = et.SubElement(listing, k)
                 e.text = str(v)
@@ -79,75 +78,6 @@ class Listing:
         return js.get("Result")
 
     def getHepsiBuyboxList(self,hbSku):
-        """
-        Örnek Cevap
-        <?xml version="1.0"?>
-        <Result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-            <Variants>
-                <Variant>
-                    <Sku>HBV00000NDL8B</Sku>
-                    <BuyboxOrders>
-                        <BuyboxOrder>
-                            <Rank>4</Rank>
-                            <MerchantName>Evinemama</MerchantName>
-                            <Price>13.51</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>5</Rank>
-                            <MerchantName>Coco petshop</MerchantName>
-                            <Price>15</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>1</Rank>
-                            <MerchantName>PativeMama</MerchantName>
-                            <Price>11</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>7</Rank>
-                            <MerchantName>Petimister</MerchantName>
-                            <Price>20.9</Price>
-                            <DispatchTime>3</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>6</Rank>
-                            <MerchantName>Birtiklagelir</MerchantName>
-                            <Price>20.02</Price>
-                            <DispatchTime>1</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>2</Rank>
-                            <MerchantName>Meow Meow</MerchantName>
-                            <Price>12</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>3</Rank>
-                            <MerchantName>özlempet</MerchantName>
-                            <Price>12.5</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                        <BuyboxOrder>
-                            <Rank>8</Rank>
-                            <MerchantName>petihtiyaç</MerchantName>
-                            <Price>23.76</Price>
-                            <DispatchTime>0</DispatchTime>
-                            <MerchantRating xsi:nil="true" />
-                        </BuyboxOrder>
-                    </BuyboxOrders>
-                </Variant>
-            </Variants>
-        </Result>
-        """
         url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList="+str(hbSku)
         response = requests.get(url, headers=self.hepiHeaders)
         if response.status_code != 200:
@@ -184,7 +114,8 @@ class HepsiOrderAPI:
                 "orderDate": order.get("orderDate"),
                 "totalPrice": order["totalPrice"]["amount"],
                 "status": order["status"],
-                "shippingAddress": order["shippingAddress"]
+                "shippingAddress": order["shippingAddress"],
+                "cargoCompany": order["cargoCompany"]
             }
             orders.append(o)
 
@@ -206,7 +137,8 @@ class HepsiOrderAPI:
                 "id": detail.get("id"),
                 "priceToBilling": detail.get("totalPrice").get("amount"),
                 "totalHbDiscount": detail.get("hbDiscount").get("totalPrice").get("amount"),
-                "quantity": detail.get("quantity")
+                "quantity": detail.get("quantity"),
+                "commissionRate": detail.get("commissionRate"),
             }
             details.append(d)
 

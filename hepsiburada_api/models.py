@@ -77,7 +77,6 @@ class HepsiOrderDetailModel(MarketOrderDetailModel):
     totalHbDiscount = models.FloatField(verbose_name="Toplam HB İndirimi")
     priceToBilling = models.FloatField(verbose_name="Faturalandırılacak Tutar")
    
-    comissionRate = models.FloatField(verbose_name="Komisyon Oranı", blank=True, null=True)
     comission = models.FloatField(verbose_name="Komisyon Tutarı(KDV Dahil)", blank=True, null=True)
     recoupByHB = models.FloatField(verbose_name="HB'nin Karşıladığı Kampanya Tutarı", blank=True, null=True)
     billToHb = models.FloatField(verbose_name="HB'ye Faturalandırılacak", blank=True, null=True)
