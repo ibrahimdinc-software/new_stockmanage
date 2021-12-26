@@ -47,7 +47,6 @@ class HepsiProductModule(Listing):
                     "DispatchTime": hpm.DispatchTime,
                     "CargoCompany1": hpm.CargoCompany1,
                     "CargoCompany2": hpm.CargoCompany2,
-                    "CargoCompany3": hpm.CargoCompany3,
                 }
                 l.append(d)
 

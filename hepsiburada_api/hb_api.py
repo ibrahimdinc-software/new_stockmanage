@@ -14,20 +14,21 @@ dev_pass = "!IasvVxJkMXIzu"
 merchant_id = "6555aefb-86d4-4fd8-bd85-232cbd8f23ab"
 
 
-
 def encode():
     up_encode = dev_user+":"+dev_pass
     up_encode = up_encode.encode("utf-8")
     b64_encode = base64.b64encode(up_encode)
     return "Basic " + str(b64_encode, 'utf-8')
 
+
 def authenticate(request=None):
     request = {
         "username": dev_user,
         "password": dev_pass,
-        "authenticationType": "INTEGRATOR"    
+        "authenticationType": "INTEGRATOR"
     }
     return requests.post(base_url+"api/authenticate", json=request)
+
 
 def xmldict(xml):
     return xmltodict.parse(xml)
@@ -35,52 +36,54 @@ def xmldict(xml):
 
 class Listing:
     listing_url = "https://listing-external.hepsiburada.com/listings/merchantid/"
-    
+
     hepiHeaders = {
         "Authorization": encode(),
-        'Content-Type': 'application/xml'
+        'Content-Type': 'application/xml',
+        "Accept": 'application/xml',
     }
 
     def getHepsiProductAPI(self):
-        hh = self.hepiHeaders
-        hh["Accept"] = "application/xml"
-        a = requests.get(self.listing_url+merchant_id+"?limit=5000&offset=0", headers=hh).content
-        
+        a = requests.get(self.listing_url+merchant_id +
+                         "?limit=5000&offset=0", headers=self.hepiHeaders).content
+
         result = xmldict(a)
         result = result["Result"]["Listings"]["Listing"]
         return result
 
-    def update(self,product):
-        listings = et.Element('listings')    
+    def update(self, product):
+        listings = et.Element('listings')
         listing = et.SubElement(listings, 'listing')
         if type(product) == list:
             for p in product:
-                for k,v in p.items():
+                for k, v in p.items():
                     e = et.SubElement(listing, k)
                     e.text = str(v)
-                    del e    
+                    del e
         else:
-            for k,v in product.items():
+            for k, v in product.items():
                 e = et.SubElement(listing, k)
                 e.text = str(v)
                 del e
 
-
         data = et.tostring(listings)
-        
-        response = requests.post(self.listing_url+merchant_id+"/inventory-uploads", headers=self.hepiHeaders, data=data).content
 
+        response = requests.post(self.listing_url+merchant_id +
+                                 "/inventory-uploads", headers=self.hepiHeaders, data=data).content
+        print(response)
         js = xmldict(response)
-        
+
         return js.get("Result")
 
-    def controlListing(self,id):
-        response = requests.get(self.listing_url+merchant_id+"/inventory-uploads/id/"+id, headers=self.hepiHeaders).content
+    def controlListing(self, id):
+        response = requests.get(self.listing_url+merchant_id +
+                                "/inventory-uploads/id/"+id, headers=self.hepiHeaders).content
         js = xmldict(response)
         return js.get("Result")
 
-    def getHepsiBuyboxList(self,hbSku):
-        url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/"+merchant_id+"?skuList="+str(hbSku)
+    def getHepsiBuyboxList(self, hbSku):
+        url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/" + \
+            merchant_id+"?skuList="+str(hbSku)
         response = requests.get(url, headers=self.hepiHeaders)
         if response.status_code != 200:
             return None
@@ -98,12 +101,14 @@ class HepsiOrderAPI:
     hepsiurl = "https://oms-external.hepsiburada.com/orders/merchantid/"
     hepsiHeaders = {
         "Authorization": encode(),
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "Accept": 'application/xml',
     }
-    
+
     def hepsiGet(self):
-        req = requests.get(self.hepsiurl+merchant_id, headers=self.hepsiHeaders).content
-        
+        req = requests.get(self.hepsiurl+merchant_id,
+                           headers=self.hepsiHeaders).content
+
         response = json.loads(req.decode('utf-8'))
 
         orders = []
@@ -123,10 +128,10 @@ class HepsiOrderAPI:
 
         return orders
 
-    def getDetails(self,orderNumber):
+    def getDetails(self, orderNumber):
         response = json.loads(
             requests.get(
-                self.hepsiurl+merchant_id+"/ordernumber/"+orderNumber, 
+                self.hepsiurl+merchant_id+"/ordernumber/"+orderNumber,
                 headers=self.hepsiHeaders
             ).content
         )
@@ -149,7 +154,8 @@ class HepsiOrderAPI:
     def getPackageDetails(self):
         response = json.loads(
             requests.get(
-                "https://oms-external.hepsiburada.com/packages/merchantid/"+merchant_id+"?timespan=120",
+                "https://oms-external.hepsiburada.com/packages/merchantid/" +
+                merchant_id+"?timespan=120",
                 headers=self.headers
             ).content
         )
@@ -166,7 +172,7 @@ class HepsiOrderAPI:
             }
             for detail in r["items"]:
                 det = {
-                    "marketplaceSku":detail["hbSku"],
+                    "marketplaceSku": detail["hbSku"],
                     "totalHbDiscount": detail["totalHBDiscount"]["amount"],
                     "priceToBilling": detail["merchantTotalPrice"]["amount"],
                     "totalPrice": detail["totalPrice"]["amount"],
@@ -174,8 +180,7 @@ class HepsiOrderAPI:
                 }
                 d["detail"].append(det)
             data.append(d)
-            
-        
+
         return data
 
 
@@ -189,13 +194,14 @@ class Accounting:
     def getWoffset(self, offset, endDate, startDate, tType):
         response = json.loads(
             requests.get(self.url+merchant_id+"/transactiontype/"+tType+"?offset="+str(offset)+"&endDate="+endDate+"&startDate="+startDate+"&useInvoiceDate=false",
-                headers=self.headers).content
+                         headers=self.headers).content
         )
 
         return response
 
     def get(self, tType, endDate, startDate):
-        response = self.getWoffset(offset=0, endDate=endDate, startDate=startDate, tType=tType)
+        response = self.getWoffset(
+            offset=0, endDate=endDate, startDate=startDate, tType=tType)
 
         count = response["count"]
         offset = 10
@@ -203,19 +209,9 @@ class Accounting:
 
         data = response["items"]
         while count > offset:
-            response = self.getWoffset(offset=offset, endDate=endDate, startDate=startDate, tType=tType)
+            response = self.getWoffset(
+                offset=offset, endDate=endDate, startDate=startDate, tType=tType)
             data += response["items"]
             offset += limit
 
         return data
-
-
-
-
-
-
-
-
-
-
-
