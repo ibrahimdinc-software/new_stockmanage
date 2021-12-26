@@ -83,8 +83,8 @@ class ProductModule(
         self._addProducts(mpms, self.getTrendProducts())
         self._addProducts(mpms, self.getHepsiProducts())
         #self._addProducts(mpms, self.getNProducts())
-        self._addProducts(mpms, self.getWixProducts())
-        self._addProducts(mpms, self.getCicekProducts())
+        #self._addProducts(mpms, self.getWixProducts())
+        #self._addProducts(mpms, self.getCicekProducts())
 
     def _addProducts(self, mpms, productList):
 
