@@ -142,7 +142,7 @@ class MarketUpdateQueueModelAdmin(admin.ModelAdmin):
 
         ProductModule().updateProducts()
 
-        self.message_user(request, "Ürünler gitti loo...")
+        self.message_user(request, "Ürünler pazar yerlerine gönderildi.")
         return HttpResponseRedirect("../")
 
 
