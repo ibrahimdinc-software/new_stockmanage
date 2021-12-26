@@ -43,7 +43,7 @@ class Listing:
 
     def getHepsiProductAPI(self):
         hh = self.hepiHeaders
-        hh["Accept"] = "application/json"
+        hh["Accept"] = "application/xml"
         a = requests.get(self.listing_url+merchant_id+"?limit=5000&offset=0", headers=hh).content
         
         result = xmldict(a)
