@@ -51,7 +51,6 @@ class HepsiProductModule(Listing):
                 l.append(d)
 
             response = self.update(l)
-            self.createUpdateControl(response.get("Id"))
 
     def createUpdateControl(self, id):
         usm = UpdateStatusModel(control_id=id)
