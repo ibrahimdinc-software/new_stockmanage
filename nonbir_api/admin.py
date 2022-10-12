@@ -52,7 +52,7 @@ class NProductModelAdmin(admin.ModelAdmin):
             if result:
                 self.message_user(request, result)
             else:
-                self.message_user(request, "Ürünler geldii hanıım...")
+                self.message_user(request, "Ürünler getirildi...")
             return HttpResponseRedirect("../")
     
     def send_list(self, request, queryset):

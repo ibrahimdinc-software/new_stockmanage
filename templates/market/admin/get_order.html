@@ -5,14 +5,14 @@
 
 {% block object-tools %}
 <div>
-    <a href="getorders" class="button">Siparişleri Getir la</a>
+    <a href="getorders" class="button">Siparişleri Getir</a>
     <a href="getdeliverdorders" class="button">Teslim edilen siparişleri kontrol et</a>
     <br>
     <br>
     <form action="getoldorders/" method="post">
         {% csrf_token %}
         <input type="date" name="date" id="id_date">
-        <button type="submit" class="button">Eski Siparişleri Alayım</button>
+        <button type="submit" class="button">Eski Siparişleri Getir</button>
     </form>
 
 </div>

@@ -5,9 +5,9 @@ import re
 from bs4 import BeautifulSoup
 
 
-supplierId = "356587"
-apiKey = "YFZDBDCCxRRy1YBkwrrL"
-apiSecret = "iaNnyoGaqnJEi0g3Pw9b"
+supplierId = ""
+apiKey = ""
+apiSecret = ""
 
 
 def encodeTrend():
@@ -18,9 +18,10 @@ def encodeTrend():
 
 
 class TrendProductAPI:
+
     trendHeaders = {
         "Authorization": encodeTrend(),
-        "User-Agent": "356587 - YFZDBDCCxRRy1YBkwrrL"
+        "User-Agent": supplierId + " - " + apiKey
     }
     url = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/products"
 
@@ -28,6 +29,7 @@ class TrendProductAPI:
         response = requests.get(
             self.url+"/batch-requests/"+controlId, headers=self.trendHeaders)
         result = response.content.decode("utf-8")
+        print(json.loads(result))
         return json.loads(result)
 
     def getWPage(self, page):
@@ -93,7 +95,7 @@ class TrendOrderAPI:
     trendurl = "https://api.trendyol.com/sapigw/suppliers/"+supplierId+"/orders"
     trendHeaders = {
         "Authorization": encodeTrend(),
-        "User-Agent": "230796 - TkgLO3JguKqXJUjk7Kmh"
+        "User-Agent": supplierId + " - " + apiKey
     }
 
     def getWPage(self, url, page, status=None, date=None, endDate=None, orderNumber=None):

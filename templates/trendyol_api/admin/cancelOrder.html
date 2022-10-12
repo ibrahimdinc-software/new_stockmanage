@@ -1,8 +1,6 @@
-{% extends 'admin/change_form.html' %}
-
-{% block submit_buttons_bottom %}
-    {{ block.super }}
-    <div class="submit-row">
-            <input type="submit" value="İptal Edildi" name="cancelOrder">
-    </div>
+{% extends 'admin/change_form.html' %} {% block submit_buttons_bottom %} {{ block.super }}
+<div class="submit-row">
+    <input type="submit" value="İptal Edildi" name="cancelOrder">
+    <input type="submit" value="Kâr Hesapla" name="calcProfit">
+</div>
 {% endblock %}

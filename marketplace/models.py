@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.html import format_html
 from django.utils import timezone
+from difflib import SequenceMatcher
 from .manager import MarketOrderModelManager
 
 # Create your models here.
@@ -37,9 +38,14 @@ MARKET_TYPE = (
 
 CARGO_CHOICES = (
     ('tumu', 'Bütün Firmalar'),
-    ('hepsi', 'HepsiJet'),
+    ('hepsiJET', 'hepsiJet'),
     ('aras', 'Aras Kargo'),
     ('surat', 'Sürat Kargo'),
+    ('yurtici', 'Yurtiçi Kargo'),
+    ('ptt', 'PTT Kargo'),
+    ('borusan', 'Borusan Lojistik'),
+    ('horoz', 'Horoz Lojistik'),
+    ('mng', 'MNG Kargo'),
 )
 
 
@@ -69,22 +75,17 @@ class UserMarketShipmentRuleModel(models.Model):
 
 
 class MarketProductModel(models.Model):
-    userMarket = models.ForeignKey(
-        UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
-    productName = models.CharField(
-        verbose_name="Ürün Adı", max_length=200, blank=True, null=True)
-    marketplaceSku = models.CharField(
-        verbose_name="Pazaryeri SKU", max_length=100)
+    userMarket = models.ForeignKey(UserMarketPlaceModel, verbose_name="Pazar Yeri", on_delete=models.CASCADE, blank=True, null=True)
+    productName = models.CharField(verbose_name="Ürün Adı", max_length=200, blank=True, null=True)
+    marketplaceSku = models.CharField(verbose_name="Pazaryeri SKU", max_length=100)
     sellerSku = models.CharField(verbose_name="Satıcı SKU", max_length=100)
     salePrice = models.FloatField(verbose_name="Satış Fiyatı")
     onSale = models.BooleanField(verbose_name="Satılabilir mi?")
     availableStock = models.IntegerField(verbose_name="Mevcut Stok")
-    lastControlDate = models.DateTimeField(
-        verbose_name="Son BuyBox Kontrol Tarihi", default=timezone.now)
-    buyBoxRank = models.IntegerField(
-        verbose_name="Buybox Sıralaması", blank=True, null=True)
-    productLink = models.CharField(
-        verbose_name="Link", max_length=255, blank=True, null=True)
+    lastControlDate = models.DateTimeField(verbose_name="Son BuyBox Kontrol Tarihi", default=timezone.now)
+    buyBoxRank = models.IntegerField(verbose_name="Buybox Sıralaması", blank=True, null=True)
+    productLink = models.CharField(verbose_name="Link", max_length=255, blank=True, null=True)
+    commissionRate = models.FloatField(verbose_name="Komisyon Oranı (KDV Dahil)", default=0)
 
     def __str__(self):
         return str(self.userMarket) + " / " + self.sellerSku
@@ -233,10 +234,15 @@ class MarketOrderModel(models.Model):
         self.save()
 
     def setCargo(self, cargoT):
-        cargoT = cargoT.split(' ')[0]
+        ratio = 0
+        firm = ""
         for cc in CARGO_CHOICES:
-            if cc[1].split(' ')[0] == cargoT:
-                self.cargo = cc[0]
+            similarityRat = SequenceMatcher(None, cc[1], cargoT).ratio()
+            if similarityRat > ratio:
+                firm = cc[0]
+                ratio = similarityRat
+        
+        self.cargo = firm
         self.save()
 
     def canceledOrder(self):
@@ -251,9 +257,7 @@ class MarketOrderModel(models.Model):
         cost = 0
         cdms = self.marketorderpredcostmodel_set.all()
         if cdms:
-            print("test1")
             for cdm in cdms:
-                print("test2")
                 cost += cdm.costAmount
         print(cost)
         return self.totalPrice - cost
@@ -268,6 +272,7 @@ class MarketOrderDetailModel(models.Model):
     commissionRate = models.FloatField(
         verbose_name="Komisyon Oranı", default=0)
     quantity = models.IntegerField(verbose_name="Adet")
+    sapNumber = models.IntegerField(verbose_name="Kalem Numarası", default=0)
 
     def __str__(self):
         return str(self.mom)+"/"+str(self.mpm)
@@ -281,7 +286,7 @@ class MarketOrderDetailModel(models.Model):
         return ProductModule().increaseStock(self.mpm, self.quantity)
 
     def getCommission(self):
-        return self.totalPrice * self.commissionRate / 100 * 1.18
+        return self.totalPrice * self.commissionRate / 100
 
 
 class MarketOrderPredCostModel(models.Model):

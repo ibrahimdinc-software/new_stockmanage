@@ -8,10 +8,10 @@ from xml.etree import ElementTree as et
 
 base_url = "https://mpop.hepsiburada.com/"
 
-dev_user = "PetiFest_Dev"
-dev_pass = "!IasvVxJkMXIzu"
+dev_user = ""
+dev_pass = ""
 
-merchant_id = "6555aefb-86d4-4fd8-bd85-232cbd8f23ab"
+merchant_id = ""
 
 
 def encode():
@@ -40,16 +40,14 @@ class Listing:
     hepiHeaders = {
         "Authorization": encode(),
         'Content-Type': 'application/xml',
-        "Accept": 'application/xml',
     }
 
     def getHepsiProductAPI(self):
         a = requests.get(self.listing_url+merchant_id +
                          "?limit=5000&offset=0", headers=self.hepiHeaders).content
 
-        result = xmldict(a)
-        result = result["Result"]["Listings"]["Listing"]
-        return result
+        result = json.loads(a)
+        return result["listings"]
 
     def update(self, product):
         listings = et.Element('listings')
@@ -70,16 +68,15 @@ class Listing:
 
         response = requests.post(self.listing_url+merchant_id +
                                  "/inventory-uploads", headers=self.hepiHeaders, data=data).content
-        print(response)
-        js = xmldict(response)
+        response = json.loads(response)
 
-        return js.get("Result")
+        return response
 
     def controlListing(self, id):
         response = requests.get(self.listing_url+merchant_id +
                                 "/inventory-uploads/id/"+id, headers=self.hepiHeaders).content
-        js = xmldict(response)
-        return js.get("Result")
+        response = json.loads(response)
+        return response
 
     def getHepsiBuyboxList(self, hbSku):
         url = "https://listing-external.hepsiburada.com/buybox-orders/merchantid/" + \
@@ -87,10 +84,10 @@ class Listing:
         response = requests.get(url, headers=self.hepiHeaders)
         if response.status_code != 200:
             return None
-        js = xmldict(response.content)
+        
+        response = json.loads(response.content)
 
-        data = js["Result"]["Variants"]["Variant"]
-        data = data.get("BuyboxOrders").get("BuyboxOrder")
+        data = response.get("variants")[0].get("buyboxOrders")
 
         if type(data) != list:
             return [data]
@@ -105,12 +102,11 @@ class HepsiOrderAPI:
         "Accept": 'application/xml',
     }
 
-    def hepsiGet(self):
+    def getHepsiOrdersAPI(self):
         req = requests.get(self.hepsiurl+merchant_id,
                            headers=self.hepsiHeaders).content
 
         response = json.loads(req.decode('utf-8'))
-
         orders = []
 
         for order in response["items"]:
@@ -127,6 +123,7 @@ class HepsiOrderAPI:
             orders.append(o)
 
         return orders
+
 
     def getDetails(self, orderNumber):
         response = json.loads(
@@ -146,6 +143,7 @@ class HepsiOrderAPI:
                 "totalHbDiscount": detail.get("hbDiscount").get("totalPrice").get("amount"),
                 "quantity": detail.get("quantity"),
                 "commissionRate": detail.get("commissionRate"),
+                "sapNumber": detail.get("sapNumber")
             }
             details.append(d)
 

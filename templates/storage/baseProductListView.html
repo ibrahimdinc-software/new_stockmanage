@@ -1,63 +1,53 @@
-{% extends 'layout/layout.html' %} {% block header %} Temel Ürünler {% endblock header %} {% block customRightButton %}
+{% extends 'layout/layout.html' %} {% load static %} {% block header %} Temel Ürünler {% endblock header %} {% block customRightButton %}
 <a href="{% url 'baseProductsCreateView' %}" class="btn btn-accent-red">
     <i class="material-icons icon--left">add</i> ekle
 </a> {% endblock customRightButton %} {% block body %}
 <div class="card mb-lg-32pt">
 
-    <div class="table-responsive" data-toggle="lists" data-lists-sort-by="js-lists-values-date" data-lists-sort-desc="true" data-lists-values='["js-lists-values-name", "js-lists-values-department", "js-lists-values-status", "js-lists-values-type", "js-lists-values-phone", "js-lists-values-date"]'>
+    <!-- data-lists-sort-by="js-lists-values-date" data-lists-sort-desc="true" data-lists-values='["js-lists-values-name", "js-lists-values-quantity", "js-lists-values-barcode"]'-->
 
-        <table class="table mb-0 thead-border-top-0 table-nowrap">
+    <div class="table-responsive pt-16pt px-16pt" ">
+
+        <table class=" table mb-0 thead-border-top-0 table-nowrap " id="data">
             <thead>
                 <tr>
-                    <th style="width: 18px;" class="pr-0">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input js-toggle-check-all" data-target="#employees" id="customCheckAllemployees">
-                            <label class="custom-control-label" for="customCheckAllemployees"><span
-                                    class="text-hide">Toggle all</span></label>
-                        </div>
-                    </th>
-
+                    <th></th>
                     <th>
-                        <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-name">Ürün Adı</a>
+                        <a href=" javascript:void(0) ">Ürün Adı</a>
                     </th>
 
-                    <th style="width: 150px;">
-                        <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-department">Adet</a>
+                    <th style=" width: 150px; ">
+                        <a href=" javascript:void(0) ">Adet</a>
                     </th>
 
-                    <th style="width: 48px;">
-                        <a href="javascript:void(0)" class="sort" data-sort="js-lists-values-status">Barkod</a>
+                    <th style=" width: 48px; ">
+                        <a href=" javascript:void(0) ">Barkod</a>
                     </th>
 
-                    <th style="width: 24px;"></th>
+                    <th style=" width: 24px; "></th>
                 </tr>
             </thead>
-            <tbody class="list" id="employees">
+            <tbody class=" list " id=" employees ">
 
                 {% for obj in object_list %}
                 <tr>
 
-                    <td class="pr-0">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input js-check-selected-row" id="customCheck1_{{obj.id}}">
-                            <label class="custom-control-label" for="customCheck1_{{obj.id}}"><span
-                                    class="text-hide">Check</span></label>
-                        </div>
-                    </td>
+                    <td></td>
 
                     <td>
 
-                        <div class="media flex-nowrap align-items-center" style="white-space: nowrap;">
-                            <div class="avatar avatar-32pt mr-8pt">
+                        <div class=" media flex-nowrap align-items-center " style=" white-space: nowrap; ">
+                            <div class=" avatar avatar-32pt mr-8pt ">
 
-                                <span class="avatar-title rounded-circle">{{obj.name.0}}</span>
+                                <span class=" avatar-title rounded-circle ">{{obj.name.0}}</span>
 
                             </div>
-                            <div class="media-body">
+                            <div class=" media-body ">
 
-                                <div class="d-flex align-items-center">
-                                    <div class="flex d-flex flex-column">
-                                        <a href="edit/{{obj.id}}" class="mb-0"><strong class="js-lists-values-name">{{obj.name}}</strong></a>
+                                <div class=" d-flex align-items-center ">
+                                    <div class=" flex d-flex flex-column ">
+                                        <a href=" edit/{{obj.id}} " class=" mb-0 "><strong
+                                                class=" js-lists-values-name ">{{obj.name}}</strong></a>
                                     </div>
                                 </div>
 
@@ -68,10 +58,10 @@
 
                     <td>
 
-                        <div class="media flex-nowrap align-items-center" style="white-space: nowrap;">
-                            <div class="media-body">
-                                <div class="d-flex flex-column">
-                                    <small class="js-lists-values-department"><strong>{{obj.piece}}</strong></small>
+                        <div class=" media flex-nowrap align-items-center " style=" white-space: nowrap; ">
+                            <div class=" media-body ">
+                                <div class=" d-flex flex-column ">
+                                    <small class=" js-lists-values-quantity "><strong>{{obj.piece}}</strong></small>
                                 </div>
                             </div>
                         </div>
@@ -79,15 +69,15 @@
                     </td>
 
                     <td>
-                        <div class="d-flex flex-column">
-                            <small class="js-lists-values-status  mb-4pt">{{obj.barcode}}</small>
+                        <div class=" d-flex flex-column ">
+                            <small class=" js-lists-values-barcode mb-4pt ">{{obj.barcode}}</small>
                         </div>
                     </td>
 
 
 
-                    <td class="text-right">
-                        <a href="#" class="text-50"><i class="material-icons">more_vert</i></a>
+                    <td class=" text-right ">
+                        <a href=" # " class=" text-50 "><i class=" material-icons ">more_vert</i></a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -96,9 +86,74 @@
 
             </tbody>
         </table>
+
     </div>
 
+    <!--
+    <div class=" card-footer p-8pt ">
+        <div class=" col-lg-8 d-flex align-items-center ">
+            <div class=" flex " style=" max-width: 100% ">
 
+                <nav aria-label=" Page navigation example ">
+                    <ul class=" pagination pagination-sm ">
+                        <li class=" page-item {% if not page_obj.has_previous %} disabled {% endif %} ">
+                            <a class=" page-link " {% if page_obj.has_previous %} href=" ?page={{page_obj.previous_page_number}} " {% endif %} aria-label=" Previous ">
+                                <span aria-hidden=" true " class=" material-icons ">chevron_left</span>
+                                <span>Prev</span>
+                            </a>
+                        </li>
 
+                        <li class=" page-item active ">
+                            <a class=" page-link " href=" # " aria-label=" 1 ">
+                                <span>1</span>
+                            </a>
+                        </li>
+
+                        <li class=" page-item ">
+                            <a class=" page-link " href=" # " aria-label=" 2 ">
+                                <span>2</span>
+                            </a>
+                        </li>
+
+                        <li class=" page-item {% if not page_obj.has_next %} disabled {% endif %} ">
+                            <a class=" page-link " {% if page_obj.has_next %} href=" ?{{request.GET.urlencode}}&page={{page_obj.next_page_number}} " {% endif %} aria-label=" Next ">
+                                <span>Next</span>
+                                <span aria-hidden=" true " class=" material-icons ">chevron_right</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+    -->
 </div>
-{% endblock body %}
+{% endblock body %} {% block script %}
+
+<script>
+    $('#data').DataTable({
+        language: {
+            "url": '{% static "template/json/dataTableTurkish.json" %}'
+        },
+        columnDefs: [ {
+            orderable: false,
+            className: "select-checkbox",
+            targets:   0
+        } ],
+        select: {
+            style:    "multi",
+            selector: "td:first-child"
+        },
+        order: [[ 1, 'asc' ]]
+    });
+</script>
+<!--
+<div class=" custom-control custom-checkbox ">
+    <input type=" checkbox " class=" custom-control-input js-check-selected-row " id=" customCheck1_{{obj.id}} ">
+    <label class=" custom-control-label " for=" customCheck1_{{obj.id}} "><span
+            class=" text-hide ">Check</span></label>
+</div>
+-->
+{% endblock script %}

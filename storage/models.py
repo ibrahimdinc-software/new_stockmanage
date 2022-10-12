@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls.base import reverse
 from new_stockmanage.mail import outOfStockMail
 
 # Create your models here.
@@ -37,15 +38,25 @@ class ProductModel(models.Model):
     def setStock(self):        
         self.piece = self.stockMethod()
         self.save()
-
+    
+    def getCost(self):
+        mpms = self.medproductmodel_set.all()
+        cost = 0
+        for mpm in mpms:
+            cost += mpm.base_product.getCost() * mpm.piece
+        return cost
+        
 class BaseProductModel(models.Model):
     name = models.CharField("Temel Ürün Adı", max_length=100)
     barcode = models.BigIntegerField(verbose_name="Barkod", blank=True, null=True)
-    piece = models.IntegerField(verbose_name="Adet (Canlı Stok)", blank=True, null=True)
+    piece = models.PositiveIntegerField(verbose_name="Adet (Canlı Stok)", blank=True, null=True)
     
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('baseProductsUpdateView', kwargs={"pk": self.pk})
+        
     def getPiece(self):
         cdm = self.getActiveStock()
         if cdm:
@@ -87,11 +98,14 @@ class BaseProductModel(models.Model):
             self.piece += quantity
             self.save()
         self.setMedProductStock()
+    
+    def getCost(self):
+        return self.getActiveStock().cost
 
 class CostDetailModel(models.Model):
     baseProduct = models.ForeignKey(BaseProductModel, verbose_name="Ürün", on_delete=models.CASCADE)
     buyDate = models.DateTimeField(verbose_name="Alım Tarihi", auto_now_add=True, blank=True, null=True)
-    piece = models.IntegerField(verbose_name="Adet")
+    piece = models.PositiveIntegerField(verbose_name="Adet")
     cost = models.FloatField(verbose_name="Tutar")
     active = models.BooleanField(verbose_name="Satışta Mı?")
 

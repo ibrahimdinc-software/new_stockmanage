@@ -1,0 +1,13 @@
+django
+django_crontab
+django-admin-rangefilter
+djangorestframework
+django-ckeditor
+django-import-export
+django-widget-tweaks
+django-cors-headers
+xmltodict
+pandas
+beautifulsoup4
+requests
+Pillow

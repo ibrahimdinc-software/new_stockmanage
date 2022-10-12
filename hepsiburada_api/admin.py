@@ -41,7 +41,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
         HepsiProductModule().getHepsiProducts()
 
-        self.message_user(request, "Ürünler geldii hanıım...")
+        self.message_user(request, "Ürünler geldi...")
         return HttpResponseRedirect("../")
 
     def send_list(self, request, queryset):
@@ -52,7 +52,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
 
     def getBuyBoxes(self, request, queryset):
         ProductModule().buyboxList(queryset)
-        self.message_user(request, "Hadi H.O.")
+        self.message_user(request, "Buybox listesi getirildi")
 
     def response_change(self, request, obj):
         if "update" in request.POST:
@@ -66,7 +66,7 @@ class HepsiProductModelAdmin(admin.ModelAdmin):
             if message:
                 self.message_user(request, message)
             else:
-                self.message_user(request, "Geldi mi bi bak bakalım.")
+                self.message_user(request, "Buybox listesi getirildi.")
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
@@ -128,20 +128,20 @@ class HepsiOrderModelAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def getOldOrders(self, request):
-        HepsiOrderModule().getOldOrders(request.FILES.get("excel"))
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        HepsiOrderModule().getHepsiOldOrders(request.FILES.get("excel"))
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def get_hb_order(self, request):
 
         HepsiOrderModule().getHepsiOrders()
 
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def getPackageDetails(self, request):
         HepsiOrderModule().setPackageDetails()
-        self.message_user(request, "Paket detaylarını getirelim")
+        self.message_user(request, "Paket detayları getirildi.")
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):

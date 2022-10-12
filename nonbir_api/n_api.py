@@ -9,8 +9,8 @@ from errorLogger.module import createErrorLoggingModel
 baseUrl = "https://api.n11.com/ws/"
 
 auth = {
-    "appKey": "5322eec2-6516-47a3-9d3a-46649f3e889b",
-    "appSecret": "DcJqBm164HGO6ndU"
+    "appKey": " ",
+    "appSecret": " "
 }
 
 headers = {
@@ -43,7 +43,8 @@ class ShipmentApi:
             data=xmltodict.unparse(b),
             headers=headers
         ).content
-
+        if response.decode("utf-8") == 'Authentication failed':
+            return "ERROR"
         res = xmltodict.parse(response)["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["ns3:GetShipmentTemplateListResponse"]
         x = res["shipmentTemplates"]["shipmentTemplate"]
 

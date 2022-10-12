@@ -108,7 +108,13 @@
 
     <!-- App Settings (safe to remove) -->
     <script src="{% static 'template/js/app-settings.js' %}"></script>
+
+    <script src="{% static 'template/js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'template/js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'template/js/dataTables/dataTables.select.min.js' %}"></script>
     {% block script %} {% endblock script %}
+{% include 'layout/messages.html' %}
+
 </body>
 
 </html>

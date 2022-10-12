@@ -1,6 +1,6 @@
 from billing.models import CustomerModel
 import datetime
-import time
+import pandas as pd
 
 from .models import HepsiProductModel, UpdateStatusModel, HepsiOrderModel, HepsiOrderDetailModel, HepsiBillModel
 
@@ -18,18 +18,18 @@ class HepsiProductModule(Listing):
 
             productList.append({
                 "marketType": "hepsiburada",
-                "productName": p.get("ProductName"),
-                "marketplaceSku": p.get("HepsiburadaSku"),
-                "availableStock": p.get("AvailableStock"),
+                "productName": p.get("productName"),
+                "marketplaceSku": p.get("hepsiburadaSku"),
+                "availableStock": p.get("availableStock"),
                 "onSale": onSale,
-                "sellerSku": p.get("MerchantSku"),
-                "salePrice": p.get("Price"),
-                "productLink": "https://www.hepsiburada.com/product-p-"+str(p.get("HepsiburadaSku")),
-                "commissionRate": p.get("CommissionRate"),
-                "DispatchTime": p.get("DispatchTime"),
-                "CargoCompany1": p.get("CargoCompany1"),
-                "CargoCompany2": p.get("CargoCompany2"),
-                "CargoCompany3": p.get("CargoCompany3"),
+                "sellerSku": p.get("merchantSku"),
+                "salePrice": p.get("price"),
+                "productLink": "https://www.hepsiburada.com/product-p-"+str(p.get("hepsiburadaSku")),
+                "commissionRate": p.get("commissionRate"),
+                "DispatchTime": p.get("dispatchTime"),
+                "CargoCompany1": p.get("cargoCompany1"),
+                "CargoCompany2": p.get("cargoCompany2"),
+                "CargoCompany3": p.get("cargoCompany3"),
             })
         return productList
 
@@ -51,15 +51,16 @@ class HepsiProductModule(Listing):
                 l.append(d)
 
             response = self.update(l)
+            self.createUpdateControl(response["id"])
 
     def createUpdateControl(self, id):
         usm = UpdateStatusModel(control_id=id)
         usm.save()
 
     def updateControl(self, id):
-        response = Listing().controlListing(id)
-        if response.get("Errors"):
-            return "Hata var kontrol et!"
+        response = self.controlListing(id)
+        if response.get("errors"):
+            return response.get("errors")
         return "Oha gerçekten nasıl başarılı olabilir ya?"
 
     def _getHepsiBuyBox(self, mpm):
@@ -68,10 +69,10 @@ class HepsiProductModule(Listing):
         if data:
             for bb in data:
                 bbList.append({
-                    "rank": bb.get("Rank"),
-                    "merchantName": bb.get("MerchantName"),
-                    "price": bb.get("Price"),
-                    "dispatchTime": bb.get("DispatchTime")
+                    "rank": bb.get("rank"),
+                    "merchantName": bb.get("merchantName"),
+                    "price": bb.get("price"),
+                    "dispatchTime": bb.get("dispatchTime")
                 })
         return bbList
 
@@ -85,9 +86,56 @@ class HepsiOrderModule(HepsiOrderAPI):
             if (orderNumber and order.get("orderNumber") == orderNumber) or (packageNumber and order.get("packageNumber") == packageNumber):
                 return order
 
+    def getHepsiOldOrders(self, data):
+        hepsiOrders = HepsiOrderModel.objects.all()
+        hepsiProducts = HepsiProductModel.objects.all()
+
+        orders = pd.read_csv(data, ";").to_numpy()
+
+        for order in orders:
+            customer, customerData = CustomerModel.objects.get_or_create(name=order[9])
+            customerData = {
+                "taxId" : "",
+                "mail": order[36] if order[36] else "",
+                "phone": "",
+                "district": "",
+                "fullAddress": order[31]
+            }
+
+            hom = hepsiOrders.filter(orderNumber=order[7])
+            if not hom:
+                hom = HepsiOrderModel(
+                    orderNumber=order[7],
+                    orderDate=datetime.datetime.strptime(order[3], '%d-%m-%Y %H:%M:%S'),
+                    orderStatus=order[32]
+                )
+                hom.save()
+                hom.setUserMarket("hepsiburada")
+
+            else:
+                hom = hom.first()
+
+            hodm, creeated = HepsiOrderDetailModel.objects.get_or_create(
+                mom=hom,
+                priceToBilling=float(order[23].replace("TRY","").replace(",",".")),
+                totalHbDiscount=float(order[25].replace("TRY","").replace(",",".")),
+                mpm=hepsiProducts.get(marketplaceSku=order[13]),
+                quantity=order[21],
+                commissionRate=100*float(order[24].replace("TRY","").replace(",","."))/float(order[22].replace("TRY","").replace(",",".")),
+                sapNumber=order[8]
+            )
+            hodm.save()
+
+            hodm.setTotalPrice()
+
+            hom.setTotalPrice()
+            hom.setPriceToBilling()
+
+            hom.setCustomer(customer, customerData)
+            hom.setCargo(order[2])
 
     def getHepsiOrders(self):
-        orders = self.hepsiGet()
+        orders = self.getHepsiOrdersAPI()
 
         hepsiOrders = HepsiOrderModel.objects.all()
         hepsiProducts = HepsiProductModel.objects.all()
@@ -122,7 +170,8 @@ class HepsiOrderModule(HepsiOrderAPI):
                         totalHbDiscount=detail.get("totalHbDiscount"),
                         mpm=hepsiProducts.get(marketplaceSku=detail.get("sku")),
                         quantity=detail.get("quantity"),
-                        commissionRate=detail.get("commissionRate")
+                        commissionRate=detail.get("commissionRate")*1.18,
+                        sapNumber=detail.get("sapNumber")
                     )
                     hodm.save()
                     hodm.dropStock()
@@ -135,7 +184,7 @@ class HepsiOrderModule(HepsiOrderAPI):
                 hom = hom.first()
             
             hom.setCustomer(customer, customerData)
-            hom.setCargo(order.get("cargoCompany"))
+            hom.setCargo(order["cargoCompany"])
 
 
     def setPackageDetails(self):

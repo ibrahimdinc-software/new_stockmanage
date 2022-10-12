@@ -1,0 +1,13 @@
+<div id="toast-container" class="toast-top-right">
+    {% for message in messages %}
+    {{message}}
+    <div class="toast {{ message.tags }} toast-success" aria-live="polite">
+        <button type="button" class="toast-close-button" role="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="toast-message">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>

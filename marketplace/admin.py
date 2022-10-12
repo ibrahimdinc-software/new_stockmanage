@@ -82,7 +82,7 @@ class MarketProductModelAdmin(admin.ModelAdmin):
         if result:
             self.message_user(request, result)
         else:
-            self.message_user(request, "Ürünler geldii hanıım...")
+            self.message_user(request, "Ürünler geldi...")
         return HttpResponseRedirect("../")
 
     def send_list(self, request, queryset):
@@ -107,14 +107,14 @@ class MarketProductModelAdmin(admin.ModelAdmin):
             if message:
                 self.message_user(request, message)
             else:
-                self.message_user(request, "Geldi mi bak")
+                self.message_user(request, "Buybox getirildi.")
             return HttpResponseRedirect(".")
         if "getBuyBoxTest" in request.POST:
             message = ProductModule().cronBuyBoxTest(obj)
             if message:
                 self.message_user(request, message)
             else:
-                self.message_user(request, "Geldi mi bak")
+                self.message_user(request, "Buybox getirildi.")
             return HttpResponseRedirect(".")
 
         return super().response_change(request, obj)
@@ -234,17 +234,17 @@ class MarketOrderModelAdmin(ImportExportActionModelAdmin):
 
     def getOrder(self, request):
         OrderModule().getOrders()
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def getOldOrders(self, request):
         OrderModule().getOldOrders(request.POST.get("date"))
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def getdeliverdorders(self, request):
         OrderModule().getDeliveredOrders()
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):

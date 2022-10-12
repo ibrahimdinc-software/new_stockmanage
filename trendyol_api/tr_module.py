@@ -61,9 +61,6 @@ class TrendProductModule(TrendProductAPI):
 
 
 class TrendOrderModule(TrendOrderAPI):
-    def getTrendOrders_NEW(self):
-        orders = self.get("Awaiting,Created,Picking,Invoiced,Cancelled,Shipped")
-
         
     def getTrendOrders(self):
         orders = self.get("Awaiting,Created,Picking,Invoiced,Cancelled,Shipped")
@@ -87,7 +84,7 @@ class TrendOrderModule(TrendOrderAPI):
             
             to.save()
             to.setCustomer(customer, customerData)
-
+            to.setCargo(order.get("cargoProviderName"))
 
             if order.get("shipmentPackageStatus") == "Cancelled":
                 to = trendOrders.filter(orderNumber=order.get("orderNumber"))

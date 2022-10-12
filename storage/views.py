@@ -1,19 +1,25 @@
 
-from django.views.generic import ListView, UpdateView, CreateView
+from django.views.generic import UpdateView, CreateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
 
 from rest_framework import generics
 
 from .forms import BaseProductModelForm
-from .models import BaseProductModel
-from .serializers import BaseProductModelSerializer
+from .models import BaseProductModel, ProductModel
+from .serializers import BaseProductModelSerializer, ProductModelSeriailzer
 
 # Create your views here.
 
 
-class BaseProductListView(ListView):
-    template_name = "storage/baseProductListView.html"
-    model = BaseProductModel
+class BaseProductList(generics.ListAPIView):
+    queryset = BaseProductModel.objects.all()
+    serializer_class = BaseProductModelSerializer
+
+
+class ProductList(generics.ListAPIView):
+    queryset = ProductModel.objects.all()
+    serializer_class = ProductModelSeriailzer
 
 
 class BaseProductCreateView(CreateView, SuccessMessageMixin):
@@ -21,17 +27,11 @@ class BaseProductCreateView(CreateView, SuccessMessageMixin):
     model = BaseProductModel
     form_class = BaseProductModelForm
 
-    success_message = 'Temel ürün başarıyla eklendi!'
 
-
-class BaseProductUpdateView(UpdateView):
-    template_name = "storage/baseProductUpdateView.html"
-    
-
-
-
-
-
+class BaseProductUpdateView(UpdateView, SuccessMessageMixin):
+    template_name = "storage/baseProductCreateView.html"
+    model = BaseProductModel
+    form_class = BaseProductModelForm
 
 
 """

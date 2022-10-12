@@ -7,7 +7,7 @@ from errorLogger.module import createErrorLoggingModel
 baseUrl = "https://apis.ciceksepeti.com/api/v1/"
 
 headers = {
-    "x-api-key": "Thx5D37VJ04S1citzaIqQ9b4EnGPGxWs8BfymjT6"
+    "x-api-key": ""
 }
 
 class CicekProductAPI:

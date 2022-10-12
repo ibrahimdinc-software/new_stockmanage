@@ -48,7 +48,6 @@ class ExtraMethods():
                 b.dispatchTime = bb.get("dispatchTime") if bb.get(
                     "dispatchTime") else None
                 b.save()
-                bbs = bbs.exclude(merchantName=mName)
 
             else:
                 mpbbl = MarketProductBuyBoxListModel(
@@ -61,7 +60,8 @@ class ExtraMethods():
                         "dispatchTime") else None
                 )
                 mpbbl.save()
-                bbs = bbs.exclude(merchantName=mName)
+
+            bbs = bbs.exclude(merchantName=mName)
 
             if bb.get("merchantName") == "PetiFest":
                 mpm.buyBoxRank = bb.get("rank")
@@ -221,20 +221,20 @@ class ProductModule(
 
     def _getBuyBox(self, mpm, notif):
         if mpm.onSale:
-            lastRank = mpm.buyBoxRank
+            lastRank = mpm.buyBoxRank #ürün üzerinde görünen eski sıralama
 
-            bbList = []
+            bbList = [] #pazaryerlerinden gelen buybox bilgelerinin tutulacağı yer
 
             if self.marketType(mpm) == HepsiProductModel:
                 bbList += self._getHepsiBuyBox(mpm)
             elif self.marketType(mpm) == TrendProductModel:
                 bbList += self._getTrendBuyBox(mpm)
 
-            rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
+            #rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
             self.renewBbModel(bbList, mpm)
 
-            rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
+            #rivals = mpm.marketproductbuyboxlistmodel_set.all().order_by("rank")
 
             time.sleep(.100)
 
@@ -252,18 +252,22 @@ class ProductModule(
                     seller = rivals.filter(merchantName="PetiFest").first()
 
                     rivals = rivals.exclude(merchantName="PetiFest")
-
+                    
+                    discountRate = 1
                     campaign = True if seller.price != mpm.salePrice else False
-
+                    if self.marketType(mpm) == HepsiProductModel:
+                        campaign = False
+                        discountRate = ((mpm.salePrice - seller.price) / mpm.salePrice)+1
                     if campaign:
                         return self._buyBoxMessage(lastRank, mpm, detail="Kampanya var fiyat önerilmiyor.")
 
                     target = 0
                     while target != len(rivals):
                         rival = rivals[target]
-                        if rival.price > bbtm.minPrice:  # rekabet edilebilir
+                        rPrice = rival.price * discountRate
+                        if rPrice > bbtm.minPrice:  # rekabet edilebilir
                             # düşük fiyatı buluyoruz
-                            price = rival.price if rival.price < seller.price or not rival.isCompeted else seller.price
+                            price = rPrice if rPrice < mpm.salePrice or not rival.isCompeted else mpm.salePrice
                             # son fiyatı hesapladık
                             lPrice = round(price - bbtm.priceStep, 2)
                             if seller.rank == target + 1 and rival.isCompeted:
@@ -388,6 +392,7 @@ class ProfitModule():
             mopcm = self.createPredModel(order, None, "shipment")
             umsrm = shipmentRules.filter(minPrice__lte=order.priceToBilling,
                                          maxPrice__gte=order.priceToBilling, cargo__in=['tumu', order.cargo])
+            print(umsrm)
             mopcm.costAmount = umsrm.first().cost
             mopcm.save()
         for od in orderDetails:
@@ -395,11 +400,13 @@ class ProfitModule():
                 mopcm = self.createPredModel(order, od, "commission")
                 mopcm.costAmount = od.getCommission()
                 mopcm.save()
+            #? neden gerekli
             elif orderCosts.filter(modm=od, costType="commission").first().costAmount == 0:
                 mopcm = orderCosts.filter(
                     modm=od, costType="commission").first()
                 mopcm.costAmount = od.getCommission()
                 mopcm.save()
+            #? son stoksa hata verir mi?
             if not orderCosts.filter(modm=od, costType="purchasePrice"):
                 mopcm = self.createPredModel(order, od, "purchasePrice")
                 mopcm.costAmount = od.mpm.getCost()

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from django.utils.translation import gettext_lazy as _
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,7 @@ SECRET_KEY = '9^8u&__1+&t&48n0%0(ykve7ktm#^=q!i9-x@@amkl7b*)e1-v'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -38,15 +39,32 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #OWN
+    # OWN
+    'main',
     'storage',
     'hepsiburada_api',
-    'trendyol_api'
+    'trendyol_api',
+    'nonbir_api',
+    'wix_api',
+    'cs_api',
+    'billing',
+    'marketplace',
+    'errorLogger',
+    # THIRD PARTY
+    'django_crontab',
+    'rangefilter',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'ckeditor',
+    'import_export',
+    'widget_tweaks',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -71,7 +89,7 @@ TEMPLATES = [
         },
     },
 ]
-
+APPEND_SLASH = True
 WSGI_APPLICATION = 'new_stockmanage.wsgi.application'
 
 
@@ -126,3 +144,44 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    'static',
+)
+
+STATIC_ROOT = 'staticfiles/'
+
+MEDIA_ROOT = 'media'
+MEDIA_URL = '/media/'
+
+# CRON JOBS
+CRONJOBS = [
+    ('* * * * *', 'storage.cron.getOrders'),
+    ('*/10 * * * *', 'storage.cron.getBuyBoxes'),
+    ('0 0 * * *', 'storage.cron.getDeliverdOrders'),
+]
+
+
+# EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mail@mail.com'
+EMAIL_HOST_PASSWORD = 'mailpass'
+
+# REST FRAMEWORK
+REST_FRAMEWORK = {
+}
+
+t = """
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+    """
+
+
+CORS_ORIGIN_ALLOW_ALL = True

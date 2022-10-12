@@ -48,7 +48,7 @@ class TrendProductModelAdmin(admin.ModelAdmin):
         if result:
             self.message_user(request, result)
         else:
-            self.message_user(request, "Ürünler geldii hanıım...")
+            self.message_user(request, "Ürünler getirildi...")
         return HttpResponseRedirect("../")
 
     def send_list(self, request, queryset):
@@ -73,7 +73,7 @@ class TrendProductModelAdmin(admin.ModelAdmin):
             if message:
                 self.message_user(request, message)
             else:
-                self.message_user(request, "Geldi mi bak")
+                self.message_user(request, "Buybox listesi getirildi.")
             return HttpResponseRedirect(".")
 
         return super().response_change(request, obj)
@@ -106,7 +106,7 @@ class TrendOrderModelAdmin(ImportExportModelAdmin):
     def get_tr_order(self, request):
 
         TrendOrderModule().getTrendOrders()
-        self.message_user(request, "Siparişler gelmiştir ha...")
+        self.message_user(request, "Siparişler getirildi...")
         return HttpResponseRedirect("../")
 
     def response_change(self, request, obj):
